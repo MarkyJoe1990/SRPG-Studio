@@ -1,3 +1,49 @@
+/*
+	Version 1.0
+	Made by MarkyJoe1990
+	
+	This script adds a new custom skill that gives the owner
+	bonuses to their attack, hit, avoid, critical, critical avoid,
+	defense and resistance, but ONLY if there aren't any allies
+	nearby them.
+	
+	How to use:
+	- Create a skill with the "custom" radio checked
+	- Set the keyword to "LoneWolf"
+	- Click custom parameters and set the scope and what bonuses
+		you get (more on that in a moment)
+	- Done
+	
+	Custom Parameters:
+	The skill has the following custom parameters.
+	
+	scope (required)
+	Determines how many tiles away all allies need to be
+	for the skill to not activate
+	
+	attack (optional)
+	Your unit's attack power. Displays on the stat screen.
+	
+	hit (optional)
+	Your unit's hit rate. Displays on the stat screen.
+	
+	avoid (optional)
+	Your unit's avoid rate. Displays on the stat screen.
+	
+	critical (optional)
+	Your unit's crit rate. Displays on the stat screen.
+	
+	criticalAvoid (optional)
+	Your unit's critical avoidance rate. Does NOT display on the stat screen
+	unless you have a plugin that enables it.
+	
+	defense (optional)
+	Your unit's physical defense. Does NOT display on the stat screen.
+	
+	resistance (optional)
+	Your unit's magical defense. Does NOT display on the stat screen.
+*/
+
 (function() {
 	var scopeError = function(skill) {
 		root.msg("Check the custom parameter \"scope\" for skill: '" + skill.getName() + "'");
