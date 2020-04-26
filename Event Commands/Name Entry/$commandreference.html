@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<title>How To Use</title>
+		<style>
+			body {background-color:#7A6617;}
+			.wrapper {width:50%;margin:auto;background-color:#FFEFAA;padding:20px;border:solid black 1px;font-family:tahoma;}
+			pre {background-color:#E2D8B1;}
+			td {background-color:white;border:solid black 1px;}
+			.fieldname {font-weight:bold;}
+		</style>
+	</head>
+	<body>
+		<div class="wrapper">
+			<h2 align="center">Name Entry Event Command by MarkyJoe1990</h2>
+			<h2>How to use</h2>
+			<p>1. Put the "Name-Entry-Event-Command" folder in your SRPG Studio plugin folder.</p>
+			<p>2. Put the "keys" folder inside your project's material folder</p>
+			<p>3. In your events, create an "Execute Script" event command.</p>
+			<p>4. In the "Script" tab, click "Call Event Command" and in the object name field, type "Name Entry".</p>
+			<p>5. In the "Original Data" tab, set the unit field to whatever unit whose name you wish to change.</p>
+			<p>6. OPTIONAL. In the "Property" field of the "Script" tab, create open and closed curly braces "{}", and put whatever additional arguments you want for the event command. Example:</p>
+			
+			<pre>{
+	title: "Name Entry",
+	keys: "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
+	selfSwitch: "A",
+	lengthLimit: 20
+}</pre>
+			<h2>Event Commands<h2>
+			<table width="100%">
+				<tr>
+					<td class="fieldname">Name</td>
+					<td class="fieldname">Description</td>
+					<td class="fieldname">Original Data</td>
+					<td class="fieldname">Properties</td>
+				</tr>
+				<tr>
+					<td>Name Entry</td>
+					<td>Enter a string to be used in other event commands or scripts.</td>
+					<td>Unit</td>
+					<td>title, keys, selfSwitch, lengthLimit</td>
+				</tr>
+			</table>
+			<h2>Properties</h2>
+			<h3>title : "String"</h3>
+			<p>String. Optional. The title of the name entry window. Examples would include "Enter your name" and "Rename character". The default name is "Name Entry"</p>
+			<h3>keys: "Keyboard Buttons"</h3>
+			<p>String. Optional. Specifies what letters, numbers and symbols will be available on the name entry keyboard. For example, "ABCDEF" would have a keyboard lay out of only A, B, C, D, E and F. The default is "ABCDEFGHIJKLMNOPQRSTUVWXYZ "</p>
+			<h3>selfSwitch: "Letter Or Number"</h3>
+			<p>String or Number. Optional. Determines what self switch will be set to true if the player cancels the name entry event. If you don't set this, the player will not be allowed to cancel the event.</p>
+			<h3>lengthLimit : "number"</h3>
+			<p>Number. Optional. Sets the maximum number of characters the player can type in. Default is 20.</p>
+		</div>
+	</body>
+</html>
