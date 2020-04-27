@@ -22,7 +22,6 @@
 			
 			<pre>{
 	title: "Name Entry",
-	globalVariable: "nameEntry",
 	keys: "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
 	selfSwitch: "A",
 	lengthLimit: 20
@@ -32,19 +31,19 @@
 				<tr>
 					<td class="fieldname">Name</td>
 					<td class="fieldname">Description</td>
+					<td class="fieldname">Original Data</td>
 					<td class="fieldname">Properties</td>
 				</tr>
 				<tr>
 					<td>Name Entry</td>
 					<td>Enter a string to be used in other event commands or scripts.</td>
-					<td>title, globalVariable, keys, selfSwitch, lengthLimit</td>
+					<td>Unit</td>
+					<td>title, keys, selfSwitch, lengthLimit</td>
 				</tr>
 			</table>
 			<h2>Properties</h2>
 			<h3>title : "String"</h3>
-			<p>String. Optional. The title of the name entry window. Examples would include "Enter your name" and "What's the password?". The default name is "Name Entry"</p>
-			<h3>globalVariable : "Global Variable Name"</h3>
-			<p>String. Optional. Sets what global parameter will store the string entered by the player. You can call this string by typing root.getMetaSession().global.NAME_OF_YOUR_GLOBAL_VARIABLE. The default is "nameEntry"</p>
+			<p>String. Optional. The title of the name entry window. Examples would include "Enter your name" and "What's their name?". The default name is "Name Entry"</p>
 			<h3>keys: "Keyboard Buttons"</h3>
 			<p>String. Optional. Specifies what letters, numbers and symbols will be available on the name entry keyboard. For example, "ABCDEF" would have a keyboard lay out of only A, B, C, D, E and F. The default is "ABCDEFGHIJKLMNOPQRSTUVWXYZ "</p>
 			<h3>selfSwitch: "Letter Or Number"</h3>
