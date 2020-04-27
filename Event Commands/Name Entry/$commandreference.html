@@ -18,10 +18,11 @@
 			<p>3. In your events, create an "Execute Script" event command.</p>
 			<p>4. In the "Script" tab, click "Call Event Command" and in the object name field, type "Name Entry".</p>
 			<p>5. In the "Original Data" tab, set the unit field to whatever unit whose name you wish to change.</p>
-			<p>6. OPTIONAL. In the "Property" field of the "Script" tab, create open and closed curly braces "{}", and put whatever additional arguments you want for the event command. Example:</p>
+			<p>6. OPTIONAL. In the "Property" field of the "Script" tab, create open and closed curly braces "{}", and put whatever arguments specified by each event command in between the braces. Example:</p>
 			
 			<pre>{
 	title: "Name Entry",
+	globalVariable: "nameEntry",
 	keys: "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
 	selfSwitch: "A",
 	lengthLimit: 20
@@ -31,19 +32,19 @@
 				<tr>
 					<td class="fieldname">Name</td>
 					<td class="fieldname">Description</td>
-					<td class="fieldname">Original Data</td>
 					<td class="fieldname">Properties</td>
 				</tr>
 				<tr>
 					<td>Name Entry</td>
 					<td>Enter a string to be used in other event commands or scripts.</td>
-					<td>Unit</td>
-					<td>title, keys, selfSwitch, lengthLimit</td>
+					<td>title, globalVariable, keys, selfSwitch, lengthLimit</td>
 				</tr>
 			</table>
 			<h2>Properties</h2>
 			<h3>title : "String"</h3>
-			<p>String. Optional. The title of the name entry window. Examples would include "Enter your name" and "Rename character". The default name is "Name Entry"</p>
+			<p>String. Optional. The title of the name entry window. Examples would include "Enter your name" and "What's the password?". The default name is "Name Entry"</p>
+			<h3>globalVariable : "Global Variable Name"</h3>
+			<p>String. Optional. Sets what global parameter will store the string entered by the player. You can call this string by typing root.getMetaSession().global.NAME_OF_YOUR_GLOBAL_VARIABLE. The default is "nameEntry"</p>
 			<h3>keys: "Keyboard Buttons"</h3>
 			<p>String. Optional. Specifies what letters, numbers and symbols will be available on the name entry keyboard. For example, "ABCDEF" would have a keyboard lay out of only A, B, C, D, E and F. The default is "ABCDEFGHIJKLMNOPQRSTUVWXYZ "</p>
 			<h3>selfSwitch: "Letter Or Number"</h3>

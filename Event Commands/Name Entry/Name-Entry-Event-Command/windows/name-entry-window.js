@@ -5,6 +5,7 @@ var NameEntryWindow = defineObject(BaseWindow, {
 	_isUpperCase: false,
 	_scrollbar: null,
 	_currentString: null,
+	_spaceAllowed: false,
 	
 	setUp: function(keys, title, lengthLimit) {
 		this._keys = keys;
@@ -14,6 +15,7 @@ var NameEntryWindow = defineObject(BaseWindow, {
 		this._isUpperCase = true;
 		
 		this.createKeyArray();
+		this._spaceAllowed = this.hasSpaceKey();
 		
 		this._scrollbar = createScrollbarObject(KeysScrollbar, this);
 		this._scrollbar.setScrollFormation(10, 4);
@@ -33,7 +35,7 @@ var NameEntryWindow = defineObject(BaseWindow, {
 			if (this._scrollbar.getObject() == "DONE") {
 				result = MoveResult.END;
 			} else if (this._scrollbar.getObject() == "BACK") {
-				this._currentString = this._currentString.substring(0, this._currentString.length - 1)
+				this.backSpaceAction();
 			} else if (this._scrollbar.getObject() == "LWR") {
 				this.toggleUpperCase();
 			} else {
@@ -41,9 +43,22 @@ var NameEntryWindow = defineObject(BaseWindow, {
 					this._currentString += this._scrollbar.getObject();
 				}
 			}
-		}
-		if (input == ScrollbarInput.CANCEL) {
-			result = MoveResult.CANCEL;
+		} else if (input == ScrollbarInput.CANCEL) {
+			if (this._currentString.length > 0) {
+				this.backSpaceAction();
+				MediaControl.soundDirect('commandcancel');
+			}
+			else {
+				result = MoveResult.CANCEL;
+			}
+		} else if (InputControl.isRightPadAction() || InputControl.isLeftPadAction()) {
+			this.toggleUpperCase();
+		} else if (InputControl.isStartAction()) {
+			result = MoveResult.END;
+			MediaControl.soundDirect('commandselect');
+		} else if (InputControl.isOptionAction() && this._spaceAllowed) {
+			this._currentString += " ";
+			MediaControl.soundDirect('commandselect');
 		}
 		
 		return result;
@@ -51,6 +66,19 @@ var NameEntryWindow = defineObject(BaseWindow, {
 	
 	drawWindowContent: function(x, y) {
 		this._scrollbar.drawScrollbar(x, y);
+	},
+	
+	hasSpaceKey: function() {
+		for (i = 0; i < this._keyArray.length; i++) {
+			if (this._keyArray[i] == " ") {
+				return true;
+			}
+		}
+		return false;
+	},
+	
+	backSpaceAction: function() {
+		this._currentString = this._currentString.substring(0, this._currentString.length - 1);
 	},
 	
 	toggleUpperCase: function() {

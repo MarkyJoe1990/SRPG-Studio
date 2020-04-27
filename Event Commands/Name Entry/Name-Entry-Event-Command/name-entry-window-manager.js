@@ -56,8 +56,7 @@ var NameEntryWindowManager = defineObject(BaseWindowManager, {
 					MediaControl.soundDirect('commandcancel');
 				}
 			}
-		}
-		if (this._nameEntryMode == NameEntry.CONFIRM) {
+		} else if (this._nameEntryMode == NameEntry.CONFIRM) {
 			result = this._nameEntryConfirm.moveWindow();
 			if (result == MoveResult.CANCEL) {
 				this._nameEntryMode = NameEntry.ENTRY;
