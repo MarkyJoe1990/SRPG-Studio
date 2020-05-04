@@ -8,10 +8,9 @@
 	your opponent, you will attack twice instead of them.
 	
 	While this skill doesn't overwrite any functions, it may
-	bypass the limitations of other plugins when a unit has
-	the skill. For example, Goinza's Combat Art's prevent
-	you from doing follow up attacks, but this plugin re-enables
-	follow ups.
+	bypass the limitations of other plugins that calculate
+	round count, particularly if the unit has the Trick Room
+	skill.
 
 */
 
@@ -19,6 +18,7 @@
 	var alias1 = Calculator.calculateRoundCount;
 	Calculator.calculateRoundCount = function (active, passive, weapon) {
 		var rndCnt = alias1.call(this, active, passive, weapon) ;
+		var art;
 		
 		activeSkill = SkillControl.getPossessionCustomSkill(active, "TrickRoom");
 		passiveSkill = SkillControl.getPossessionCustomSkill(passive, "TrickRoom");
@@ -35,6 +35,13 @@
 			activeAgi = AbilityCalculator.getAgility(active, weapon);
 			passiveAgi = AbilityCalculator.getAgility(passive, ItemControl.getEquippedWeapon(passive));
 			value = this.getDifference();
+			
+			//Compatibility with Goinza's Combat Art Plugin
+			art = root.getMetaSession().global.combatArt;
+			
+			if (art != null && art) {
+				return rndCnt;
+			}
 			
 			return (activeAgi - passiveAgi) <= (value*-1) ? 2 : 1;
 		}
