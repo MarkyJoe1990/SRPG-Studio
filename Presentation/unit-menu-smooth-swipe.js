@@ -1,3 +1,18 @@
+/*
+	Version 1.0
+	Made by MarkyJoe1990
+	
+	When you check a unit's stats, the windows will swipe
+	in instead of just appearing.
+	
+	This plugin overrides the original functions for:
+	
+	* UnitMenuScreen.drawScreenCycle
+	
+	Be weary of any new plugins that change this function, as they
+	might not be compatible with this plugin.
+*/
+
 (function () {
 	
 	var alias1 = UnitMenuScreen.setScreenData;
