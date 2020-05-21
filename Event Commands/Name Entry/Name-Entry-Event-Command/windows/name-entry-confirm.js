@@ -27,6 +27,17 @@ var NameEntryConfirm = defineObject(BaseWindow, {
 		}
 		
 		if (result == MoveResult.SELECT) {
+			if (this._unit.getUnitType() == UnitType.PLAYER) {
+				playerList = root.getBaseData().getPlayerList();
+				//Get the right unit
+				for (i = 0; i < playerList.getCount(); i++) {
+					currentUnit = playerList.getData(i);
+					if (currentUnit.getBaseId() == this._unit.getBaseId()) {
+						break;
+					}
+				}
+				currentUnit.setName(this._currentString);
+			}
 			this._unit.setName(this._currentString);
 		}
 		
