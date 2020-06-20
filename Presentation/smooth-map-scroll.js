@@ -2,6 +2,8 @@
 	Version 2.0
 	Made by MarkyJoe1990
 	
+	WARNING: NEEDS SCROLLER.JS IN THE PLUGINS FOLDER IN ORDER TO WORK
+	
 	This makes the map screen scroll smoothly when you are using a keyboard
 	While this does not apply to enemies, the game already has a config
 	option that allows it for them. Look for "Scroll Speed" and set it to
