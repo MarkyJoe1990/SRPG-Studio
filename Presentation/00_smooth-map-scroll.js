@@ -3,8 +3,6 @@
 	Made by MarkyJoe1990
 	
 	WARNING: NEEDS SCROLLER.JS IN THE PLUGINS FOLDER IN ORDER TO WORK
-	THIS FILE HAS "00_" AT THE BEGINNING TO ENSURE IT PLAYS NICE WITH
-	CURSOR-SLIDE.JS
 	
 	This makes the map screen scroll smoothly when you are using a keyboard
 	While this does not apply to enemies, the game already has a config

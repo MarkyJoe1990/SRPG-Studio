@@ -29,24 +29,25 @@
 		var y = (session.getMapCursorY() * GraphicsFormat.MAPCHIP_HEIGHT) - session.getScrollPixelY() + this._displayedy;
 		var pic = root.queryUI('mapcursor');
 		
+		//If you moved right
+		if (this._displayedx < 0 ) {
+			this._displayedx += Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (4 - (MapCursor._isAccelerate() *2) ));
+		}
+		else if (this._displayedx > 0) {
+			this._displayedx -= Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (4 - (MapCursor._isAccelerate() *2)))
+		}
+		
+		if (this._displayedy < 0) {
+			this._displayedy += Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (4 - (MapCursor._isAccelerate() *2)));
+		}
+		else if (this._displayedy > 0) {
+			this._displayedy -= Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (4 - (MapCursor._isAccelerate() *2)));
+		}
+
 		if (pic !== null) {
 			pic.drawStretchParts(x, y, GraphicsFormat.MAPCHIP_WIDTH, GraphicsFormat.MAPCHIP_HEIGHT, this._mapCursorSrcIndex * width, 0, width, height);
 		}
 		
-		//If you moved right
-		if (this._displayedx < 0 ) {
-			this._displayedx += Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (2 - MapCursor._isAccelerate()));
-		}
-		else if (this._displayedx > 0) {
-			this._displayedx -= Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (2 - MapCursor._isAccelerate()))
-		}
-		
-		if (this._displayedy < 0) {
-			this._displayedy += Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (2 - MapCursor._isAccelerate()));
-		}
-		else if (this._displayedy > 0) {
-			this._displayedy -= Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (2 - MapCursor._isAccelerate()));
-		}
 		
 	}
 	
