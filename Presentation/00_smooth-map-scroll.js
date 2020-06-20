@@ -22,7 +22,7 @@
 	var alias1 = MapCursor.initialize;
 	MapCursor.initialize = function() {
 		alias1.call(this);
-		this._scroller = createObject(Scroller);
+		this._scroller = createObject(MarkyJoeScroller);
 	}
 	
 	var alias2 = MapCursor.moveCursor;
