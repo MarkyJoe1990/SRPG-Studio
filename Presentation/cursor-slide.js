@@ -1,5 +1,5 @@
 /*
-	Version 1.1
+	Version 1.2
 	Made by MarkyJoe1990
 	
 	When you press a direction on your keyboard, the map cursor will
@@ -35,17 +35,17 @@
 		
 		//If you moved right
 		if (this._displayedx < 0 ) {
-			this._displayedx += this._isAccelerate() ? (this._displayedx % UIFormat.MAPCURSOR_HEIGHT != 0 ? -this._displayedx : UIFormat.MAPCURSOR_HEIGHT) : (UIFormat.MAPCURSOR_HEIGHT / 4);
+			this._displayedx += Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (2 - MapCursor._isAccelerate()));
 		}
 		else if (this._displayedx > 0) {
-			this._displayedx -= this._isAccelerate() ? (this._displayedx % UIFormat.MAPCURSOR_HEIGHT != 0 ? this._displayedx : UIFormat.MAPCURSOR_HEIGHT) : (UIFormat.MAPCURSOR_HEIGHT / 4)
+			this._displayedx -= Math.ceil(Math.abs(Math.abs(this._displayedx) - 0) / (2 - MapCursor._isAccelerate()))
 		}
 		
 		if (this._displayedy < 0) {
-			this._displayedy += this._isAccelerate() ? (this._displayedy % UIFormat.MAPCURSOR_HEIGHT != 0 ? -this._displayedy : UIFormat.MAPCURSOR_HEIGHT) : (UIFormat.MAPCURSOR_HEIGHT / 4);
+			this._displayedy += Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (2 - MapCursor._isAccelerate()));
 		}
 		else if (this._displayedy > 0) {
-			this._displayedy -= this._isAccelerate() ? (this._displayedy % UIFormat.MAPCURSOR_HEIGHT != 0 ? this._displayedy : UIFormat.MAPCURSOR_HEIGHT) : (UIFormat.MAPCURSOR_HEIGHT / 4);
+			this._displayedy -= Math.ceil(Math.abs(Math.abs(this._displayedy) - 0) / (2 - MapCursor._isAccelerate()));
 		}
 		
 	}
