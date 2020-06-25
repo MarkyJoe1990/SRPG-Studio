@@ -3,6 +3,10 @@ function selfSwitchInterpret(selfSwitch) {
 		return selfSwitch;
 	}
 	
+	if (selfSwitch == null) {
+		return selfSwitch;
+	}
+	
 	result = selfSwitch.toLowerCase();
 	
 	return result.charCodeAt(0) - 97;
