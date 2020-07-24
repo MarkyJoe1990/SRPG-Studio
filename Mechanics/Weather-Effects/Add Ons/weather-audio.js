@@ -1,4 +1,6 @@
 /*
+Made by Piketrcechillas
+
 Weather's Sound, a standalone add-on to MarkyJoe's weather plugin pack
 Can work alone, doesn't require Marky's weather, but works best with his weather.
 Usage:
