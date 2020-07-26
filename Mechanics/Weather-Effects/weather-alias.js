@@ -37,14 +37,6 @@
 			textY += 16;
 			TextRenderer.drawText(textX,textY,"Weather Object Count: " + MyWeatherGenerator._rainArray.length, -1, color, font)
 			textY += 16;
-			if (MyWeatherGenerator._weatherType != null) {
-				TextRenderer.drawText(textX,textY,"Current Weather: " + MyWeatherGenerator._weatherType.getName(), -1, color, font)
-				textY += 16;
-				TextRenderer.drawText(textX,textY,"Spawn Rate: " + MyWeatherGenerator._weatherType.getSpawnRate(), -1, color, font)
-				textY += 16;
-				TextRenderer.drawText(textX,textY,"Max Limit: " + MyWeatherGenerator._weatherType.getMaxCount(), -1, color, font)
-				textY += 16;
-			}
 			cacheString = "Weather Cache: "
 			count = MyWeatherGenerator._imageCache.length
 			for (i = 0; i < count; i++) {
@@ -53,6 +45,16 @@
 			}
 			TextRenderer.drawText(textX,textY,cacheString, -1, color, font)
 			textY += 16;
+			if (MyWeatherGenerator._weatherType != null) {
+				TextRenderer.drawText(textX,textY,"Current Weather: " + MyWeatherGenerator._weatherType.getName(), -1, color, font)
+				textY += 16;
+				TextRenderer.drawText(textX,textY,"Spawn Rate: " + MyWeatherGenerator._weatherType.getSpawnRate(), -1, color, font)
+				textY += 16;
+				TextRenderer.drawText(textX,textY,"Max Limit: " + MyWeatherGenerator._weatherType.getMaxCount(), -1, color, font)
+				textY += 16;
+				TextRenderer.drawText(textX,textY,"Wind Multiplier: " + MyWeatherGenerator._weatherType.getWindMultiplier(), -1, color, font)
+				textY += 16;
+			}
 			TextRenderer.drawText(textX,textY,"Wind Current: " + MyWeatherGenerator._windCurrent, -1, color, font)
 			textY += 16;
 			TextRenderer.drawText(textX,textY,"No. Of Weather Types: " + MyWeatherGenerator._weatherArray.length, -1, color, font)
