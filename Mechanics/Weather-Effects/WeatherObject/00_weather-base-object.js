@@ -104,9 +104,9 @@ var WeatherObject = defineObject(BaseObject, {
 	//as well as in moveSpecificWeatherObject()
 	moveWeatherObject: function() {
 		this.moveSpecificWeatherObject();
-		var windCurrent = this.getParentInstance()._windCurrent;
+		var windInfluence = this.getParentInstance()._windCurrent * this.getWindMultiplier();
 		
-		this._posX += this._velX + windCurrent;
+		this._posX += this._velX + windInfluence;
 		this._posY += this._velY;
 		this._velX += this._accelX;
 		this._velY += this._accelY;
@@ -137,6 +137,12 @@ var WeatherObject = defineObject(BaseObject, {
 	//OPTIONAL. You can set any additional physics for your
 	//weather object here.
 	moveSpecificWeatherObject: function() {
+	},
+	
+	//OPTIONAL. This determines how much your weather object is
+	//effected by the wind current
+	getWindMultiplier: function() {
+		return 1;
 	},
 	
 	//OPTIONAL. You can set the spawn rate of your weather object.
@@ -291,7 +297,7 @@ var WeatherObject = defineObject(BaseObject, {
 		}
 		
 		var difference = end - start + 1;
-		return Math.floor(Math.random() * difference) + start;
+		return (Math.random() * difference) + start;
 	},
 	
 	//DO NOT OVERWRITE. Fetches the number of frames the weather

@@ -2,7 +2,7 @@ var WeatherBall = defineObject(WeatherObject, {
 	resetSelf: function() {
 		var range = this.getBox();
 		var direction = this.randomNumber(0,3);
-		this._ballColor = this.randomNumber(0,2);
+		this._ballColor = Math.floor(this.randomNumber(0,2));
 		this._bounceCount = 0;
 		
 		switch(direction) {
