@@ -11,7 +11,7 @@ var WeatherSnow = defineObject(WeatherObject, {
 	},
 	
 	moveSpecificWeatherObject: function() {
-		this.setAccelerationX((Math.random() * -0.2) + 0.1);
+		this.setAccelerationX(this.randomNumber(-0.1,0.1));
 	},
 	
 	getName: function() {

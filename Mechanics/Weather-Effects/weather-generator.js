@@ -35,11 +35,11 @@ var WeatherGenerator = defineObject(BaseObject, {
 		}
 		
 		var weather = root.getCurrentSession().getCurrentMapInfo().custom.weather;
-		this._weatherType = WeatherNothing;
+		this._weatherType = createObjectEx(WeatherNothing, this);
 		if (weather != undefined) {
 			for (i = 0; i < this._weatherArray.length; i++) {
 				if (weather.toLowerCase() == this._weatherArray[i].getName().toLowerCase()) {
-					this._weatherType = this._weatherArray[i];
+					this._weatherType = createObjectEx(this._weatherArray[i], this);
 					//newImage = this._weatherType.createImage();
 					this.setWeatherId(this._weatherType);
 					this._weatherType.setImage(this._imageCache[this._weatherType._id].image);

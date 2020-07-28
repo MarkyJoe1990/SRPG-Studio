@@ -17,5 +17,6 @@ WeatherGenerator.configureWeatherArray = function(groupArray) {
 	groupArray.appendObject(WeatherSand);
 	groupArray.appendObject(WeatherBubble);
 	groupArray.appendObject(WeatherBall);
+	groupArray.appendObject(WeatherTest);
 	//YOUR WEATHER OBJECTS HERE
 }

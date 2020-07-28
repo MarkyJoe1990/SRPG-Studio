@@ -173,6 +173,49 @@ var WeatherObject = defineObject(BaseObject, {
 		this._image.drawParts(x, y, imageParts.x, imageParts.y, imageParts.width, imageParts.height);
 	},
 	
+	//DO NOT OVERWRITE. Repeats the same image horizontally, vertically, or both.
+	//Also has an option to stretch the image to fit the screen.
+	drawLoopedImage: function(image, x, y, loopHorizantal, loopVertical, isStretch) {
+		var width = image.getWidth();
+		var height = image.getHeight();
+		var stretchWidth, stretchHeight;
+		var screenWidth = root.getWindowWidth();
+		var screenHeight = root.getWindowHeight();
+		var drawVert = function(baseX, baseY, baseStretchX, baseStretchY, baseWidth, baseHeight) {
+			if (loopVertical) {
+				for (drawY = baseY - baseStretchY; drawY >= 0 - baseStretchY; drawY -= baseStretchY) {
+					image.drawStretchParts(baseX, drawY, baseStretchX, baseStretchY, 0, 0, baseWidth, baseHeight);
+				}
+				for (drawY = baseY + baseStretchY; drawY <= screenHeight + baseStretchY; drawY += baseStretchY) {
+					image.drawStretchParts(baseX, drawY, baseStretchX, baseStretchY, 0, 0, baseWidth, baseHeight);
+				}
+			}
+		}
+		
+		if (isStretch == true) {
+			stretchWidth = screenWidth;
+			stretchHeight = screenHeight;
+		} else {
+			stretchWidth = width;
+			stretchHeight = height;
+		}
+		
+		image.drawStretchParts(x, y, stretchWidth, stretchHeight, 0, 0, width, height);
+		drawVert(x, y, stretchWidth, stretchHeight, width, height);
+		
+		if (loopHorizantal) {
+			for (drawX = x - stretchWidth; drawX >= 0 - stretchWidth; drawX -= stretchWidth) {
+				image.drawStretchParts(drawX, y, stretchWidth, stretchHeight, 0, 0, width, height);
+				drawVert(drawX, y, stretchWidth, stretchHeight, width, height);
+			}
+			for (drawX = x + stretchWidth; drawX <= screenWidth + stretchWidth; drawX += stretchWidth) {
+				image.drawStretchParts(drawX, y, stretchWidth, stretchHeight, 0, 0, width, height);
+				drawVert(drawX, y, stretchWidth, stretchHeight, width, height);
+			}
+		}
+		
+	},
+	
 	//OPTIONAL. Sets the exact coordinates and dimensions of
 	//the weather object's graphics inside weather.png of the
 	//"weather-material" folder. By default, it treats weather.png
@@ -222,6 +265,12 @@ var WeatherObject = defineObject(BaseObject, {
 		this._posY = y;
 	},
 	
+	//DO NOT OVERWRITE. Sets both the horizantal and vertical position of the weather object.
+	setPosition: function(x, y) {
+		this.setX(x);
+		this.setY(y);
+	},
+	
 	//DO NOT OVERWRITE. Gets the horizantal position of the weather object.
 	getX: function() {
 		return this._posX;
@@ -232,7 +281,7 @@ var WeatherObject = defineObject(BaseObject, {
 		return this._posY;
 	},
 	
-	//DO NOT OVERWRITE. Gets the horizantal velocity of the weather object.
+	//DO NOT OVERWRITE. Gets the horizontal velocity of the weather object.
 	getVelocityX: function() {
 		return this._velX;
 	},
@@ -242,7 +291,7 @@ var WeatherObject = defineObject(BaseObject, {
 		return this._velY;
 	},
 	
-	//DO NOT OVERWRITE. Sets the horizantal velocity of the weather object.
+	//DO NOT OVERWRITE. Sets the horizontal velocity of the weather object.
 	setVelocityX: function(velX) {
 		this._velX = velX;
 	},
@@ -252,7 +301,13 @@ var WeatherObject = defineObject(BaseObject, {
 		this._velY = velY;
 	},
 	
-	//DO NOT OVERWRITE. Sets the horizantal acceleration speed of the weather object.
+	//DO NOT OVERWRITE. Sets both the horizontal and vertical velocity of the weather object.
+	setVelocity: function(velX, velY) {
+		this.setVelocityX(velX);
+		this.setVelocityY(velY);
+	},
+	
+	//DO NOT OVERWRITE. Sets the horizontal acceleration speed of the weather object.
 	setAccelerationX: function(accelX) {
 		this._accelX = accelX;
 	},
@@ -262,7 +317,13 @@ var WeatherObject = defineObject(BaseObject, {
 		this._accelY = accelY;
 	},
 	
-	//DO NOT OVERWRITE. Sets the maximum horizantal velocity of the weather object.
+	//DO NOT OVERWRITE. Sets both the horizontal and vertical acceleration speed of the weather object.
+	setAcceleration: function(accelX, accelY) {
+		this.setAccelerationX(accelX);
+		this.setAccelerationY(accelY);
+	},
+	
+	//DO NOT OVERWRITE. Sets the maximum horizontal velocity of the weather object.
 	setMaximumVelocityX: function(maxVelX) {
 		this._maxVelX = maxVelX;
 	},
@@ -270,6 +331,12 @@ var WeatherObject = defineObject(BaseObject, {
 	//DO NOT OVERWRITE. Sets the maximum vertical velocity of the weather object.
 	setMaximumVelocityY: function(maxVelY) {
 		this._maxVelY = maxVelY;
+	},
+	
+	//DO NOT OVERWRITE. Sets both the maximum horizontal and vertical velocity of the weather object.
+	setMaximumVelocity: function(maxVelX, maxVelY) {
+		this.setMaximumVelocityX(maxVelX);
+		this.setMaximumVelocityY(maxVelY);
 	},
 	
 	//DO NOT OVERWRITE. Sets the weather object's image.
@@ -296,7 +363,7 @@ var WeatherObject = defineObject(BaseObject, {
 			root.endGame();
 		}
 		
-		var difference = end - start + 1;
+		var difference = end - start;
 		return (Math.random() * difference) + start;
 	},
 	
