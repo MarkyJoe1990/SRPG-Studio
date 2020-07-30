@@ -6,20 +6,17 @@
 	Compared to the Japanese script, this version has significantly higher
 	performance, but no further bells and whistles.
 	
-	The biggest reason for this is that it only changes the array of "spots"
-	the enemy can attack when the script detects enemies have moved, been
-	killed, or have a different weapon range. It otherwise skips the
-	process of finding every spot the enemy can attack, which saves a lot
-	of memory.
+	The biggest reason for the improved performance is that the attack index
+	of all enemies is only received at the start of enemy phase.
 	
-	There is one caveat however. The script does not factor map chip changes
-	in its criteria for whether to skip the enemy attack tile detection or not.
-	Because of this, I recommend making an execute script event command that runs
-	the following code to force an update whenever you have map changes.
+	There is one caveat however. Any map chip changes done mid-turn, such as
+	villages, will not be factored into the targeting line criteria until
+	the start of next player phase. However, you can mitigate this by adding
+	a script execute event command with the following code:
 	
 	LineGenerator.forceUpdateEnemyAttackers(EnemyList.getAliveDefaultList());
 	
-	
+	Make sure you place it AFTER the map changes or it won't work.
 */
 
 LINE_DEBUG_ENABLED = false;
@@ -50,8 +47,7 @@ var LineGenerator = defineObject(BaseObject, {
 	},
 	
 	updateList: function(enemyList) {
-		this._attackArray = [];
-		
+		/*
 		matchingList = true;
 		if (root.getMetaSession().global.targetingLineList == undefined) {
 			root.getMetaSession().global.targetingLineList = this.poolOldList(enemyList);
@@ -75,10 +71,12 @@ var LineGenerator = defineObject(BaseObject, {
 		}
 
 		if (matchingList) {return;}
+		*/
 		this.forceUpdateEnemyAttackers(enemyList);
 	},
 	
 	forceUpdateEnemyAttackers: function(enemyList) {
+		this._attackArray = [];
 		var session = root.getCurrentSession();
 		var mapSim = session.createMapSimulator();
 		for (i = 0; i < enemyList.getCount(); i++) {
@@ -148,6 +146,7 @@ var LineGenerator = defineObject(BaseObject, {
 		color = 0xFF0000;
 		
 		for (i = 0; i < this._enemiesInRange.length; i++) {
+			if (this._enemiesInRange[i].getAliveState() != AliveType.ALIVE) {continue;}
 			currentX = (this._enemiesInRange[i].getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
 			currentY = (this._enemiesInRange[i].getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
 			//FIGURE
@@ -222,11 +221,11 @@ var LineGenerator = defineObject(BaseObject, {
 		this._lineGenerator.drawLineGenerator();
 	}
 	
-	var alias4 = PlayerTurn._doEventEndAction;
-	PlayerTurn._doEventEndAction = function() {
-		alias4.call(this);
-		this.updateEnemySimulation();
-	}
+	//var alias4 = PlayerTurn._doEventEndAction;
+	//PlayerTurn._doEventEndAction = function() {
+	//	alias4.call(this);
+	//	//this.updateEnemySimulation();
+	//}
 	
 	var alias5 = PlayerTurn._prepareTurnMemberData;
 	PlayerTurn._prepareTurnMemberData = function() {
