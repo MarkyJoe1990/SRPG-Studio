@@ -35,7 +35,6 @@ var LineGenerator = defineObject(BaseObject, {
 		this._enemiesInRange = [];
 		this._badIndex = [];
 		this._mapSim = root.getCurrentSession().createMapSimulator();
-		this._mapSim.disableMapUnit();
 	},
 	
 	setUnit: function(unit) {
