@@ -35,6 +35,11 @@ var LineGenerator = defineObject(BaseObject, {
 		this._enemiesInRange = [];
 		this._badIndex = [];
 		this._mapSim = root.getCurrentSession().createMapSimulator();
+		this._mapSim.disableMapUnit();
+	},
+	
+	setUnit: function(unit) {
+		this._unit = unit;
 	},
 	
 	getValidEnemyList: function(list) {
@@ -150,8 +155,8 @@ var LineGenerator = defineObject(BaseObject, {
 			TextRenderer.drawText(textX,textY,"Enemy Count: " + this._badIndex.length, -1, color, font)
 			textY += 16;
 		}
-		if (this.getParentInstance()._targetUnit != null) {
-			TextRenderer.drawText(textX,textY,"Current Unit: " + this.getParentInstance()._targetUnit.getName(), -1, color, font)
+		if (this._unit != null) {
+			TextRenderer.drawText(textX,textY,"Current Unit: " + this._unit.getName(), -1, color, font)
 			textY += 16;
 		}
 		TextRenderer.drawText(textX,textY,"Current X, Y: " + MapCursor.getX() + ", " + MapCursor.getY(), -1, color, font)
@@ -189,9 +194,17 @@ var LineGenerator = defineObject(BaseObject, {
 	var alias3 = PlayerTurn._drawArea;
 	PlayerTurn._drawArea = function() {
 		alias3.call(this);
-		if (this._mapSequenceArea.getCycleMode() == MapSequenceAreaMode.AREA) {
+		if (this._mapSequenceArea.getCycleMode() == MapSequenceAreaMode.AREA && this._targetUnit.getUnitType() == UnitType.PLAYER) {
 			this._lineGenerator.drawLineGenerator();	
 		}
+	}
+	
+	var alias8 = PlayerTurn._moveArea;
+	PlayerTurn._moveArea = function() {
+		result = alias8.call(this);
+		this._lineGenerator.setUnit(this.getTurnTargetUnit);
+		return result;
+		
 	}
 	
 	var alias4 = PlayerTurn._doEventEndAction;
