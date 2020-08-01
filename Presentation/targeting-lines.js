@@ -6,20 +6,17 @@
 	Compared to the Japanese script, this version has significantly higher
 	performance, but no further bells and whistles.
 	
-	The biggest reason for the improved performance is that the attack index
-	of all enemies is only received at the start of enemy phase.
+	The biggest reason for the improved performance is how the enemy attack
+	ranges are retrieved. For every second frame, a single enemy from the
+	enemy list is retrieved, and their attack ranges are appended to an array.
+	Once all enemies have been checked, the game stops loading new ones.
 	
-	There is one caveat however. Any map chip changes done mid-turn, such as
-	villages, will not be factored into the targeting line criteria until
-	the start of next player phase. However, you can mitigate this by adding
-	a script execute event command with the following code:
-	
-	LineGenerator.forceUpdateEnemyAttackers(EnemyList.getAliveList());
-	
-	Make sure you place it AFTER the map changes or it won't work.
+	In order to keep the attack arrays up to date, it resets at the start of
+	every player phase, and whenever the player commits to a move with one of
+	their units. This creates targeting lines that are both accurate and non-laggy.
 */
 
-LINE_DEBUG_ENABLED = false;
+LINE_DEBUG_ENABLED = false; //Set to true to enable debug mode
 
 var LineGenerator = defineObject(BaseObject, {
 	_enemyList: null,
@@ -29,7 +26,7 @@ var LineGenerator = defineObject(BaseObject, {
 	_badIndex: null,
 	
 	resetEverything: function() {
-		this._enemyList = EnemyList.getAliveList()//this.getValidEnemyList(root.getCurrentSession().getEnemyList())
+		this._enemyList = EnemyList.getAliveList();
 		this._enemyCount = this._enemyList.getCount();
 		this._timePassed = 0;
 		this._enemiesInRange = [];
@@ -60,10 +57,7 @@ var LineGenerator = defineObject(BaseObject, {
 		var index = Math.floor(this._timePassed / TIME_MODDER);
 		var timeMod = this._timePassed % TIME_MODDER;
 		
-		//Every frame until you reach the end of the enemy list, add a new attack index array
 		if (index < this._enemyCount && timeMod == 0) {
-			//Grab an enemy from the enemy list
-			//Then push them to the bad Index
 			currentEnemy = this._enemyList.getData(index);
 			attackRange = UnitRangePanel.getUnitAttackRange(currentEnemy);
 			
@@ -118,7 +112,7 @@ var LineGenerator = defineObject(BaseObject, {
 		for (i = 0; i < this._enemiesInRange.length; i++) {
 			currentX = (this._enemiesInRange[i].getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
 			currentY = (this._enemiesInRange[i].getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
-			//FIGURE
+			
 			figure = canvas.createFigure();
 			figure.beginFigure(currentX, currentY);
 			
@@ -136,9 +130,6 @@ var LineGenerator = defineObject(BaseObject, {
 			canvas.setStrokeInfo(color, 128, 3, false);
 			canvas.setFillColor(0xFFFFFF, 128);
 			canvas.drawFigure(0, 0, figure);
-			
-			//END FIGURE
-			//canvas.drawLine(currentX, currentY, myX, myY, 3);
 		}
 	},
 	
@@ -168,22 +159,16 @@ var LineGenerator = defineObject(BaseObject, {
 
 
 (function () {
-	
-	//var alias1 = PlayerTurn._prepareSequenceMemberData;
-	//PlayerTurn._prepareSequenceMemberData = function (parentTurnObject) {
-	//	alias1.call(this, parentTurnObject);
-	//}
-	
-	var alias2 = PlayerTurn.moveTurnCycle;
+	var alias1 = PlayerTurn.moveTurnCycle;
 	PlayerTurn.moveTurnCycle = function() {
-		var result = alias2.call(this);
+		var result = alias1.call(this);
 		this._lineGenerator.moveLineGenerator();
 		return result;
 	}
 	
-	var alias7 = PlayerTurn.drawTurnCycle;
+	var alias2 = PlayerTurn.drawTurnCycle;
 	PlayerTurn.drawTurnCycle = function() {
-		var result = alias7.call(this);
+		var result = alias2.call(this);
 		if (LINE_DEBUG_ENABLED) {
 			this._lineGenerator.drawDebug();
 		}
@@ -198,40 +183,25 @@ var LineGenerator = defineObject(BaseObject, {
 		}
 	}
 	
-	var alias8 = PlayerTurn._moveArea;
+	var alias4 = PlayerTurn._moveArea;
 	PlayerTurn._moveArea = function() {
-		result = alias8.call(this);
+		result = alias4.call(this);
 		this._lineGenerator.setUnit(this.getTurnTargetUnit);
 		return result;
-		
 	}
 	
-	var alias4 = PlayerTurn._doEventEndAction;
+	var alias5 = PlayerTurn._doEventEndAction;
 	PlayerTurn._doEventEndAction = function() {
-		alias4.call(this);
+		alias5.call(this);
 		if (!InputControl.isCancelAction()) {
 			this._lineGenerator.resetEverything();
 		}
 	}
 	
-	//var alias6 = SimulateMove._endMove;
-	//SimulateMove._endMove = function(unit) {
-	//	alias6.call(this, unit);
-	//	if (unit.getUnitType() == UnitType.PLAYER) {
-	//		LineGenerator.forceUpdateEnemyAttackers();
-	//	}
-	//}
-	
-	var alias5 = PlayerTurn._prepareTurnMemberData;
+	var alias6 = PlayerTurn._prepareTurnMemberData;
 	PlayerTurn._prepareTurnMemberData = function() {
-		alias5.call(this);
-		//this.updateEnemySimulation();
+		alias6.call(this);
 		this._lineGenerator = createObjectEx(LineGenerator, this);
-		//this._lineGenerator.resetEverything();
-	}
-	
-	PlayerTurn.updateEnemySimulation = function() {
-		this._lineGenerator.forceUpdateEnemyAttackers();
 	}
 	
 }) ();
