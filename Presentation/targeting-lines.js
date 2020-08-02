@@ -24,9 +24,18 @@ var LineGenerator = defineObject(BaseObject, {
 	_enemiesInRange: [],
 	_timePassed: 0,
 	_badIndex: null,
+	_mapSim: null,
+	_graphicsManager: null,
+	_canvas: null,
+	_currentUnitIndex: null,
+	
+	setUp: function() {
+		this._graphicsManager = root.getGraphicsManager();
+		this._canvas = this._graphicsManager.getCanvas();
+	},
 	
 	resetEverything: function() {
-		this._enemyList = EnemyList.getAliveList();
+		this._enemyList = root.getCurrentSession().getEnemyList();
 		this._enemyCount = this._enemyList.getCount();
 		this._timePassed = 0;
 		this._enemiesInRange = [];
@@ -38,22 +47,21 @@ var LineGenerator = defineObject(BaseObject, {
 		this._unit = unit;
 	},
 	
-	getValidEnemyList: function(list) {
-		var funcCondition = function(unit) {
-			result = true;
-			if (unit.getAliveState() != AliveType.ALIVE) {result = false};
-			if (unit.isInvisible()) {result = false};
-			var attackRange = UnitRangePanel.getUnitAttackRange(unit)
-			if (attackRange.endRange == 0) {result = false};
-			
-			return result;
-		}
-		return AllUnitList.getList(list, funcCondition);
+	isValidEnemy: function(unit, attackRange) {
+		if (unit.getAliveState() != AliveType.ALIVE) {return false;};
+		if (unit.isInvisible()) {return false};
+		if (attackRange.endRange == 0) {return false};
+		
+		var aiPattern = currentEnemy.createAIPattern();
+		if (aiPattern.getPatternType() == PatternType.MOVE && aiPattern.getMovePatternInfo().getMoveAIType() == MoveAIType.MOVEONLY) {return false};
+		if (aiPattern.getPatternType() == PatternType.WAIT && aiPattern.getWaitPatternInfo().isWaitOnly()) {return false};
+		
+		return true;
 	},
 	
 	moveLineGenerator: function() {
 		this._enemiesInRange = [];
-		TIME_MODDER = 2
+		TIME_MODDER = 2;
 		var index = Math.floor(this._timePassed / TIME_MODDER);
 		var timeMod = this._timePassed % TIME_MODDER;
 		
@@ -61,28 +69,40 @@ var LineGenerator = defineObject(BaseObject, {
 			currentEnemy = this._enemyList.getData(index);
 			attackRange = UnitRangePanel.getUnitAttackRange(currentEnemy);
 			
-			this._mapSim.startSimulationWeapon(currentEnemy, attackRange.mov, attackRange.startRange, attackRange.endRange);
 			this._badIndex[index] = {
-				unit: currentEnemy,
-				weaponArray: this._mapSim.getSimulationWeaponIndexArray(),
-				walkArray: this._mapSim.getSimulationIndexArray()
+				unit: currentEnemy
 			};
+			
+			if (this.isValidEnemy(currentEnemy, attackRange)) {
+				this._mapSim.startSimulationWeapon(currentEnemy, attackRange.mov, attackRange.startRange, attackRange.endRange);
+				this._badIndex[index].weaponArray = this._mapSim.getSimulationWeaponIndexArray();
+				this._badIndex[index].walkArray = this._mapSim.getSimulationIndexArray();
+			} else {
+				this._badIndex[index].weaponArray = [];
+				this._badIndex[index].walkArray = [];
+			}
 		}
 		
-		this._currentUnitIndex = CurrentMap.getIndex(MapCursor.getX(), MapCursor.getY());
-		var isSelectable = false;
+		this._currentUnitIndex = {
+			x: MapCursor.getX(),
+			y: MapCursor.getY()
+		}
+		this._currentUnitIndex.index = CurrentMap.getIndex(this._currentUnitIndex.x, this._currentUnitIndex.y)
+		
+		var isSelectable;
 		if (this.getParentInstance()._mapSequenceArea._mapCursor != null) {
 			isSelectable = this.getParentInstance()._mapSequenceArea._isPlaceSelectable();
 		} else {
 			isSelectable = false;
 		}
+		
 		found = false;
-
 		if (isSelectable) {
 			for (i = 0; i < this._badIndex.length; i++) {
+				
 				found = false;
 				for (x = 0; x < this._badIndex[i].weaponArray.length; x++) {
-					if (this._currentUnitIndex == this._badIndex[i].weaponArray[x]) {
+					if (this._currentUnitIndex.index == this._badIndex[i].weaponArray[x]) {
 						found = true;
 						this._enemiesInRange.push(this._badIndex[i].unit);
 						break;
@@ -90,7 +110,7 @@ var LineGenerator = defineObject(BaseObject, {
 				}
 				if (!found) {
 					for (x = 0; x < this._badIndex[i].walkArray.length; x++) {
-						if (this._currentUnitIndex == this._badIndex[i].walkArray[x]) {
+						if (this._currentUnitIndex.index == this._badIndex[i].walkArray[x]) {
 							this._enemiesInRange.push(this._badIndex[i].unit);
 							break;
 						}
@@ -102,10 +122,8 @@ var LineGenerator = defineObject(BaseObject, {
 	},
 	
 	drawLineGenerator: function() {
-		gManager = root.getGraphicsManager();
-		canvas = gManager.getCanvas();
-		myX = (CurrentMap.getX(this._currentUnitIndex) * 32) - root.getCurrentSession().getScrollPixelX() + 16;
-		myY = (CurrentMap.getY(this._currentUnitIndex) * 32) - root.getCurrentSession().getScrollPixelY() + 16;
+		myX = (this._currentUnitIndex.x * 32) - root.getCurrentSession().getScrollPixelX() + 16;
+		myY = (this._currentUnitIndex.y * 32) - root.getCurrentSession().getScrollPixelY() + 16;
 		
 		color = 0xFF0000;
 		
@@ -113,7 +131,7 @@ var LineGenerator = defineObject(BaseObject, {
 			currentX = (this._enemiesInRange[i].getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
 			currentY = (this._enemiesInRange[i].getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
 			
-			figure = canvas.createFigure();
+			figure = this._canvas.createFigure();
 			figure.beginFigure(currentX, currentY);
 			
 			distance = Math.floor((currentX + myX) / 2);
@@ -127,9 +145,9 @@ var LineGenerator = defineObject(BaseObject, {
 			figure.addBezier(myX, myY, myFocus.x, myFocus.y, currentX, currentY);
 			figure.endFigure()
 			
-			canvas.setStrokeInfo(color, 128, 3, false);
-			canvas.setFillColor(0xFFFFFF, 128);
-			canvas.drawFigure(0, 0, figure);
+			this._canvas.setStrokeInfo(color, 128, 3, false);
+			this._canvas.setFillColor(0xFFFFFF, 128);
+			this._canvas.drawFigure(0, 0, figure);
 		}
 	},
 	
@@ -186,7 +204,7 @@ var LineGenerator = defineObject(BaseObject, {
 	var alias4 = PlayerTurn._moveArea;
 	PlayerTurn._moveArea = function() {
 		result = alias4.call(this);
-		this._lineGenerator.setUnit(this.getTurnTargetUnit);
+		this._lineGenerator.setUnit(this.getTurnTargetUnit());
 		return result;
 	}
 	
@@ -202,6 +220,7 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._prepareTurnMemberData = function() {
 		alias6.call(this);
 		this._lineGenerator = createObjectEx(LineGenerator, this);
+		this._lineGenerator.setUp();
 	}
 	
 }) ();
