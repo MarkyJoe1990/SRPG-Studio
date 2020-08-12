@@ -1,6 +1,6 @@
 /*
 	Crowd Control
-	Made by MarkyJoe1990 with help from PurpleManDown
+	Made by MarkyJoe1990 with help from PurpleManDown & Piketrcechillas
 	
 	This allows your game to accept crowd control commands made by users on fecentral.org. These commands
 	include setting unit HP, and adding/removing items, weapons, status effects, skills and combat arts (if
