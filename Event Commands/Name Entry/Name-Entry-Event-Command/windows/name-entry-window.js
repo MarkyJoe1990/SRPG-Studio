@@ -7,11 +7,11 @@ var NameEntryWindow = defineObject(BaseWindow, {
 	_currentString: null,
 	_spaceAllowed: false,
 	
-	setUp: function(keys, title, lengthLimit) {
+	setUp: function(keys, title, lengthLimit, defaultName) {
 		this._keys = keys;
 		this._title = title;
 		this._lengthLimit = lengthLimit;
-		this._currentString = '';
+		this._currentString = defaultName;
 		this._isUpperCase = true;
 		
 		this.createKeyArray();

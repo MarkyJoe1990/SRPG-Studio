@@ -14,18 +14,18 @@ var NameEntryWindowManager = defineObject(BaseWindowManager, {
 	_selfSwitch: null,
 	_lengthLimit: null,
 	
-	setUp: function(title, keys, selfSwitch, lengthLimit, unit) {
+	setUp: function(title, keys, selfSwitch, lengthLimit, unit, defaultName) {
 		this._title = title;
 		this._keys = keys;
-		this._currentString = '';
 		this._selfSwitch = selfSwitch;
 		this._lengthLimit = lengthLimit;
 		this._unit = unit;
+		this._currentString = defaultName;
 		
 		this._nameEntryMode = 0;
 		//Set up the windows
 		this._nameEntryWindow = createObject(NameEntryWindow);
-		this._nameEntryWindow.setUp(this._keys, this._title, this._lengthLimit);
+		this._nameEntryWindow.setUp(this._keys, this._title, this._lengthLimit, this._currentString);
 		
 		this._nameEntryPreview = createObject(NameEntryPreview);
 		this._nameEntryPreview.setUp(this._currentString);

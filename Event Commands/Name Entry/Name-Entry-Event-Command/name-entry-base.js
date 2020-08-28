@@ -4,6 +4,7 @@ var NameEntryEventCommand = defineObject(BaseEventCommand,{
 	_keys: null,
 	_selfSwitch: null,
 	_lengthLimit: null,
+	_defaultName: null,
 	_unit: null,
 	
 	enterEventCommandCycle: function() {
@@ -28,12 +29,13 @@ var NameEntryEventCommand = defineObject(BaseEventCommand,{
 		//Last three buttons are always back space, lowercase and finish
 		this._selfSwitch = args.selfSwitch == undefined ? null : args.selfSwitch; //Optional. If this isn't set, you can't cancel out of the entry.
 		this._lengthLimit = args.lengthLimit == undefined ? 20 : args.lengthLimit; //Optional. Defaults to 20
+		this._defaultName = args.defaultName == undefined ? "" : args.defaultName; //Optional. Defaults to ""
 		this._unit = root.getEventCommandObject().getOriginalContent().getUnit();
 	},
 	
 	_completeEventCommandMemberData: function() {
 		this._selfSwitch = selfSwitchInterpret(this._selfSwitch)
-		this._windowManager.setUp(this._title, this._keys, this._selfSwitch, this._lengthLimit, this._unit);
+		this._windowManager.setUp(this._title, this._keys, this._selfSwitch, this._lengthLimit, this._unit, this._defaultName);
 		
 		return EnterResult.OK;
 	},
@@ -62,6 +64,9 @@ var NameEntryEventCommand = defineObject(BaseEventCommand,{
 		}
 		if (typeof this._lengthLimit != "number") {
 			reason = "Make sure your lengthLimit parameter is a number";
+		}
+		if (typeof this._defaultName != "string") {
+			reason = "Make sure your default name is a string!";
 		}
 		
 		if (reason != null) {
