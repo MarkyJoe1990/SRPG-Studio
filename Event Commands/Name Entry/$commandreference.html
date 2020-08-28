@@ -24,7 +24,8 @@
 	title: "Name Entry",
 	keys: "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
 	selfSwitch: "A",
-	lengthLimit: 20
+	lengthLimit: 20,
+	defaultName: "Jeffrey"
 }</pre>
 			<h2>Event Commands<h2>
 			<table width="100%">
@@ -38,7 +39,7 @@
 					<td>Name Entry</td>
 					<td>Enter a string to be used in other event commands or scripts.</td>
 					<td>Unit</td>
-					<td>title, keys, selfSwitch, lengthLimit</td>
+					<td>title, keys, selfSwitch, lengthLimit, defaultName</td>
 				</tr>
 			</table>
 			<h2>Properties</h2>
@@ -50,6 +51,8 @@
 			<p>String or Number. Optional. Determines what self switch will be set to true if the player cancels the name entry event. If you don't set this, the player will not be allowed to cancel the event.</p>
 			<h3>lengthLimit : "number"</h3>
 			<p>Number. Optional. Sets the maximum number of characters the player can type in. Default is 20.</p>
+			<h3>defaultName : "String"</h3>
+			<p>String. Optional. Sets the default name to be placed in the name entry field. Default is nothing.</p>
 		</div>
 	</body>
 </html>
