@@ -1,5 +1,5 @@
 /*
-	Version 2.0
+	Version 2.1
 	Made by MarkyJoe1990
 	
 	WARNING: NEEDS SCROLLER.JS IN THE PLUGINS FOLDER IN ORDER TO WORK
@@ -13,6 +13,9 @@
 	
 	* MapCursor._changeCursorValue
 	* MapParts.Terrain._getPositionY
+	* MapEdit._setFocus
+	* PlayerTurn.setPosValue
+	* MapSequenceArea._doCancelAction
 	
 	Be weary of any new plugins that change these two functions, as they
 	might not be compatible with this plugin.
@@ -123,7 +126,6 @@
 		return result;
 	}
 	
-	//FIGURE THIS OUT SOMEHOW
 	var alias7 = PlayerTurn.setPosValue;
 	PlayerTurn.setPosValue = function(unit) {
 		unit.setMapX(this._xCursorSave);
