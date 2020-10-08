@@ -37,12 +37,17 @@ var MarkyJoeScroller = defineObject(BaseObject, {
 			
 			//Turn off scroll
 			if (this._prevX == this._goalX && this._prevY == this._goalY) {
-				this._prevX = null;
-				this._prevY = null;
-				this._goalX = null;
-				this._goalY = null;
+				this.resetScroller();
 			}
 		}
+	},
+	
+	drawScroller: function() {
+		var font = root.queryTextUI("default_window").getFont();
+		TextRenderer.drawText(16, 16, "goalX: " + this._goalX, -1, 0xFFFFFF, font);
+		TextRenderer.drawText(16, 32, "goalY: " + this._goalY, -1, 0xFFFFFF, font);
+		TextRenderer.drawText(16, 48, "prevX: " + this._prevX, -1, 0xFFFFFF, font);
+		TextRenderer.drawText(16, 64, "prevY: " + this._prevY, -1, 0xFFFFFF, font);
 	},
 	
 	setScroll: function (x, y) {
@@ -80,6 +85,25 @@ var MarkyJoeScroller = defineObject(BaseObject, {
 		}
 		
 		return this._prevX !== pos.x || this._prevY !== pos.y;
+	},
+	
+	forceSetScroll: function (x, y) {
+		this.forceSetScrollPixel(x * GraphicsFormat.MAPCHIP_WIDTH, y * GraphicsFormat.MAPCHIP_HEIGHT);
+	},
+	
+	forceSetScrollPixel: function(x, y) {
+		var session = root.getCurrentSession();
+		this._prevX = session.getScrollPixelX();
+		this._prevY = session.getScrollPixelY();
+		this._goalX = x;
+		this._goalY = y;
+	},
+	
+	resetScroller: function() {
+		this._prevX = null;
+		this._prevY = null;
+		this._goalX = null;
+		this._goalY = null;
 	},
 	
 	_coordinatesDefined: function() {
