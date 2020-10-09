@@ -114,7 +114,7 @@
 		this._targetUnit.setDirection(DirectionType.NULL);
 		this._playMapUnitCancelSound();
 		
-		if (parentTurnObject._mapEdit) {
+		if (this._parentTurnObject._mapEdit) {
 			this._parentTurnObject._mapEdit._mapCursor._scroller.setScroll(this._targetUnit.getMapX(), this._targetUnit.getMapY());
 		}
 		
