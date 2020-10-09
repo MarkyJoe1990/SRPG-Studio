@@ -99,7 +99,9 @@
 	MapSequenceArea.openSequence = function(parentTurnObject) {
 		alias5.call(this, parentTurnObject);
 		
-		this._mapCursor._scroller = parentTurnObject._mapEdit._mapCursor._scroller;
+		if (parentTurnObject._mapEdit) {
+			this._mapCursor._scroller = parentTurnObject._mapEdit._mapCursor._scroller;
+		}
 		
 		//return result;
 	}
@@ -112,7 +114,9 @@
 		this._targetUnit.setDirection(DirectionType.NULL);
 		this._playMapUnitCancelSound();
 		
-		this._parentTurnObject._mapEdit._mapCursor._scroller.setScroll(this._targetUnit.getMapX(), this._targetUnit.getMapY());
+		if (parentTurnObject._mapEdit) {
+			this._parentTurnObject._mapEdit._mapCursor._scroller.setScroll(this._targetUnit.getMapX(), this._targetUnit.getMapY());
+		}
 		
 		//MapView.setScroll(this._targetUnit.getMapX(), this._targetUnit.getMapY());
 	}
