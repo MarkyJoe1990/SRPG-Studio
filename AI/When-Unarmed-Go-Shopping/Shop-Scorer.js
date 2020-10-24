@@ -177,7 +177,7 @@ AIScorer.Shop = defineObject(BaseAIScorer, {
 		return score + StateScoreChecker._getDopingValue(state);
 	},
 	
-	_getProhibitedActions: function(state) {
+	_scoreProhibitedActions: function(state) {
 		var score = 0;
 		
 		//Does it disable physical attacks?
