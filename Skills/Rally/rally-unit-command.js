@@ -333,7 +333,7 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	},
 	
 	_drawSelect: function() {
-		this._windowManager.drawWindowManager(0,0);
+		this._windowManager.drawWindowManager();
 	},
 	
 	_drawSingle: function() {
