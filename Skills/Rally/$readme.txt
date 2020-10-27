@@ -8,6 +8,12 @@
 	
 	Custom Parameters:
 	
+	stateId:
+	Determines the status effect to inflict. Make sure you have
+	your database set to show Ids. You can go to tools ->
+	options -> data -> display Id next to data name if you haven't
+	done so already
+	
 	canCombo:
 	If set to true, then the rally will be used at the same
 	time as other rallies the unit has, so long as they have
