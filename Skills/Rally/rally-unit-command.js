@@ -31,12 +31,12 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	_unit: null,
 	_stackableRallies: null,
 	_unstackableRallies: null,
-	_chosenRally: null,
 	_targetUnit: null,
 	_chosenFilter: null,
 	_windowManager: null,
 	_rallySelection: null,
 	_rallyQueue: null,
+	_exp: 0,
 	
 	openCommand: function() {
 		this._prepareData();
@@ -257,21 +257,33 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	},
 	
 	_enactRallyQueue: function() {
-		var i, currentRally;
+		var i, currentRally, exp;
+		var exp = 0;
+		var division = this._rallyQueue.length;
 		
 		for (i = 0; i < this._rallyQueue.length; i++) {
 			currentRally = this._rallyQueue[i];
+			currentExp = currentRally.custom.exp;
+			
+			if (currentExp != undefined) {
+				exp += currentRally.custom.exp;
+			}
+			
 			this._enactRallyAction(currentRally);
 		}
+		this._exp = Math.floor(exp / division);
 	},
 	
 	_enactRallyAction: function(rally) {
 		var currentRally = rally;
-		var currentState = root.getBaseData().getStateList().getDataFromId(currentRally.custom.stateId);
+		var stateId = currentRally.custom.stateId;
+		var currentState;
 		var unitX = this._unit.getMapX();
 		var unitY = this._unit.getMapY();
 		var startRange = currentRally.custom.startRange;
 		var endRange = currentRally.custom.endRange;
+		var x, i;
+		var currentFilter = this._getUnitFilter(currentRally);
 		
 		currentIndexArray = IndexArray.getBestIndexArray(unitX, unitY, startRange, endRange);
 		//Check if unit is in range for single target
@@ -284,8 +296,16 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 				
 				var possibleUnit = PosChecker.getUnitFromPos(currentX, currentY);
 				
-				if (possibleUnit == this._targetUnit && this._isFilterMatch(possibleUnit.getUnitType(), this._chosenFilter)) {
-					StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+				if (possibleUnit == this._targetUnit && this._isFilterMatch(possibleUnit.getUnitType(), currentFilter)) {
+					if (typeof stateId == "number") {
+						currentState = root.getBaseData().getStateList().getDataFromId(stateId);
+						StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+					} else {
+						for (i = 0; i < stateId.length; i++) {
+							currentState = root.getBaseData().getStateList().getDataFromId(stateId[i]);
+							StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+						}
+					}
 					break;
 				}
 			}
@@ -298,8 +318,16 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 				
 				var possibleUnit = PosChecker.getUnitFromPos(currentX, currentY);
 				
-				if (possibleUnit != null && this._isFilterMatch(possibleUnit.getUnitType(), this._chosenFilter)) {
-					StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+				if (possibleUnit != null && this._isFilterMatch(possibleUnit.getUnitType(), currentFilter)) {
+					if (typeof stateId == "number") {
+						currentState = root.getBaseData().getStateList().getDataFromId(stateId);
+						StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+					} else {
+						for (i = 0; i < stateId.length; i++) {
+							currentState = root.getBaseData().getStateList().getDataFromId(stateId[i]);
+							StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+						}
+					}
 				}
 			}
 		}
@@ -307,7 +335,7 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	
 	_moveExp: function() {
 		var generator = root.getEventGenerator();
-		generator.experiencePlus(this._unit, 10, false);
+		generator.experiencePlus(this._unit, this._exp, false);
 		generator.execute();
 		
 		return MoveResult.END;
@@ -360,25 +388,6 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	_isComboRally: function(rallyArray) {
 		var name = rallyArray.getName();
 		return name == "Rally Player" || name == "Rally Enemy" || name == "Rally All";
-	},
-	
-	_grabAffiliatedRallies: function() {
-		var filter;
-		if (this._isComboRally(this._chosenRally)) {
-			filter = this._chosenRally.array[0].custom.unitFilter;
-		} else {
-			filter = this._chosenRally.custom.unitFilter;
-		}
-		
-		//Take chosen rally... Check its RallyFilterType
-		if (filter == RallyFilterType.PLAYER) {
-			return this._stackableRallies.player.array;
-		} else if (filter == RallyFilterType.ENEMY) {
-			return this._stackableRallies.enemy.array;
-		} else {
-			return this._stackableRallies.all.array;
-		}
-		
 	},
 	
 	_allRalliesWorkTogether: function() {
@@ -438,14 +447,24 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 			}
 		}
 		
+		for (i = 0; i < this._rallySkills.length;i++) {
+			var currentRally = this._rallySkills[i];
+			if (!this._hasTargetInRange(currentRally)) {
+				continue;
+			}
+			if (currentRally.custom.forceCombo == true) {
+				this._forcePushRallyAffiliation(currentRally);
+			}
+		}
+		
 		if (this._stackableRallies.player.array.length > 0) {
-			this._rallySelection.push(this._stackableRallies.player); 
+			this._rallySelection.push(this._stackableRallies.player);
 		}
 		if (this._stackableRallies.enemy.array.length > 0) {
-			this._rallySelection.push(this._stackableRallies.enemy); 
+			this._rallySelection.push(this._stackableRallies.enemy);
 		}
 		if (this._stackableRallies.all.array.length > 0) {
-			this._rallySelection.push(this._stackableRallies.all); 
+			this._rallySelection.push(this._stackableRallies.all);
 		}
 		
 		for (i = 0; i < this._unstackableRallies.length; i++) {
@@ -459,6 +478,18 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 		} else if (rally.custom.unitFilter == RallyFilterType.ENEMY) {
 			this._stackableRallies.enemy.array.push(rally);
 		} else {
+			this._stackableRallies.all.array.push(rally);
+		}
+	},
+	
+	_forcePushRallyAffiliation: function(rally) {
+		if (this._stackableRallies.player.array.length > 0) {
+			this._stackableRallies.player.array.push(rally);
+		}
+		if (this._stackableRallies.enemy.array.length > 0) {
+			this._stackableRallies.enemy.array.push(rally);
+		}
+		if (this._stackableRallies.all.array.length > 0) {
 			this._stackableRallies.all.array.push(rally);
 		}
 	},

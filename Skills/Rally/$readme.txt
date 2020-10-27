@@ -18,6 +18,11 @@
 	If set to true, then the rally will be used at the same
 	time as other rallies the unit has, so long as they have
 	the same unitFilter value, and both are set to true.
+
+	forceCombo:
+	If set to true, then this rally will combo with any
+	other rally, regardless of whether they have the same
+	unitFilter or not. This allows for mixed rally combos.
 	
 	rangeType:
 	Do you choose a single target in range, or does it get everyone?
