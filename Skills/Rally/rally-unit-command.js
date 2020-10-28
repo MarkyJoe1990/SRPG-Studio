@@ -605,8 +605,6 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 		} else {
 			return UnitFilterFlag.PLAYER | UnitFilterFlag.ENEMY | UnitFilterFlag.ALLY;
 		}
-		
-		
 	},
 	
 	//GOOD
