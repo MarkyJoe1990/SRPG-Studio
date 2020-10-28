@@ -6,6 +6,12 @@
 	If your unit has a skill with the custom keyword "Rally",
 	you will gain a new command that inflicts status effects.
 	
+	This plugin also adds AI implementation for Rallies, which
+	means that if an enemy has a Rally skill, they can and will
+	use it. While the enemy doesn't have access to features such
+	as rally comboing, it's easy enough to work around this by
+	creating enemy exclusive rallies that fill the same role.
+	
 	Custom Parameters:
 	
 	stateId:
@@ -47,6 +53,5 @@
 	
 	
 	Hopeful Future Updates:
-	- AI Implementation
 	- Animating status infliction
 */
