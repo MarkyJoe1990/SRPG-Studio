@@ -10,6 +10,10 @@ AIScorer.Rally = defineObject(BaseAIScorer,{
 			return 0;
 		}
 		
+		if (combination.skill.custom.rangeType != RallyRangeType.MULTI) {
+			return 0;
+		}
+		
 		destIndex = combination.posIndex;
 		var x = CurrentMap.getX(destIndex);
 		var y = CurrentMap.getY(destIndex);
@@ -26,7 +30,7 @@ AIScorer.Rally = defineObject(BaseAIScorer,{
 				score += 10;
 			}
 		}
-		return score;
+		return score + this._getPlusScore(unit, combination);
 	}
 });
 

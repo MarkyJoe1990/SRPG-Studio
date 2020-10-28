@@ -2,17 +2,58 @@ var RallyAI = defineObject(BaseItemAI, {
 	getItemScore: function(unit, combination) {
 		var i, indexArray, currentUnit;
 		var score = 0;
+		var unitCount = 0;
+		var isMulti = combination.skill.custom.rangeType == RallyRangeType.MULTI;
+		var filter = RallyControl.getUnitFilter(unit, combination.skill);
 		
 		if (combination.targetUnit.isWait()) {
 			return AIValue.MIN_SCORE;
 		}
-		//First. get the destintion posIndex.
-		//Get the coordinates from that, then generate
-		//An indexArray from that.
 		
-		// The high leveled unit is more a target to act again.
-		return combination.targetUnit.getLv() * 7;
-		//return score;
+		if (isMulti) {
+			var walkIndexArray = combination.simulator.getSimulationIndexArray();
+			
+			//Check every tile for the best one
+			var highestScore = 0;
+			
+			//Check every walk tile
+			for (i = 0; i < walkIndexArray.length; i++) {
+				currentWalk = walkIndexArray[i];
+				
+				currentWalkX = CurrentMap.getX(currentWalk);
+				currentWalkY = CurrentMap.getY(currentWalk);
+				
+				var rangeMetrics = combination.rangeMetrics;
+				
+				indexArray = IndexArray.getBestIndexArray(currentWalkX, currentWalkY, rangeMetrics.startRange, rangeMetrics.endRange);
+				
+				var currentScore = 0;
+				var unitCount = 0;
+				for (x = 0; x < indexArray.length; x++) {
+					currentIndex = indexArray[x];
+					currentX = CurrentMap.getX(currentIndex);
+					currentY = CurrentMap.getY(currentIndex);
+					
+					currentUnit = PosChecker.getUnitFromPos(currentX, currentY);
+					if (currentUnit != null && currentUnit != unit && RallyControl.isFilterMatch(currentUnit.getUnitType(), filter)) {
+						unitCount++;
+						currentScore += 280;
+					}
+				}
+				
+				//Change highest score if currentScore is higher
+				if (currentScore > highestScore) {
+					highestScore = currentScore;
+					bestWalk = currentWalk;
+					highestUnitCount = unitCount;
+				}
+			}
+			
+			score = highestScore;
+			return score;
+		} else {
+			return combination.targetUnit.getLv() * 7;
+		}
 	}
 });
 
