@@ -1,12 +1,18 @@
 var RallyAI = defineObject(BaseItemAI, {
 	getItemScore: function(unit, combination) {
+		var i, indexArray, currentUnit;
+		var score = 0;
+		
 		if (combination.targetUnit.isWait()) {
 			return AIValue.MIN_SCORE;
 		}
-		
+		//First. get the destintion posIndex.
+		//Get the coordinates from that, then generate
+		//An indexArray from that.
 		
 		// The high leveled unit is more a target to act again.
 		return combination.targetUnit.getLv() * 7;
+		//return score;
 	}
 });
 
@@ -52,15 +58,56 @@ var RallyAI = defineObject(BaseItemAI, {
 	
 	SkillAutoAction._enterRally = function() {
 		var stateId = this._skill.custom.stateId;
+		var isMulti = this._skill.custom.rangeType == RallyRangeType.MULTI;
+		var filter = RallyControl.getUnitFilter(this._unit, this._skill);
+		var rangeMetrics, x, y, i;
+		
 		var state, i, currentState;
 		
-		if (typeof stateId == "number") {
-			state = root.getBaseData().getStateList().getDataFromId(stateId);
-			StateControl.arrangeState(this._targetUnit, state, IncreaseType.INCREASE);
+		if (isMulti) {
+			//Take every unit in range that meets the affiliation requirements
+			//Then hit them with every status effect in the book;
+			//get x, y and ranges
+			
+			x = this._unit.getMapX();
+			y = this._unit.getMapY();
+			
+			rangeMetrics = StructureBuilder.buildRangeMetrics();
+			rangeMetrics.startRange = this._skill.custom.startRange;
+			rangeMetrics.endRange = this._skill.custom.endRange;
+			
+			indexArray = IndexArray.getBestIndexArray(x, y, rangeMetrics.startRange, rangeMetrics.endRange);
+			
+			for (i = 0; i < indexArray.length; i++) {
+				currentIndex = indexArray[i];
+				currentX = CurrentMap.getX(currentIndex);
+				currentY = CurrentMap.getY(currentIndex);
+				
+				possibleUnit = PosChecker.getUnitFromPos(currentX, currentY);
+				isValidUnit = possibleUnit != null && RallyControl.isFilterMatch(possibleUnit.getUnitType(), filter);
+				
+				if (isValidUnit) {
+					if (typeof stateId == "number") {
+						state = root.getBaseData().getStateList().getDataFromId(stateId);
+						StateControl.arrangeState(possibleUnit, state, IncreaseType.INCREASE);
+					} else {
+						for (i = 0; i < stateId.length; i++) {
+							currentState = root.getBaseData().getStateList().getData(stateId[i]);
+							StateControl.arrangeState(possibleUnit, currentState, IncreaseType.INCREASE);
+						}
+					}
+				}
+			}
+			
 		} else {
-			for (i = 0; i < stateId.length; i++) {
-				currentState = root.getBaseData().getStateList().getData(stateId[i]);
-				StateControl.arrangeState(this._targetUnit, currentState, IncreaseType.INCREASE);
+			if (typeof stateId == "number") {
+				state = root.getBaseData().getStateList().getDataFromId(stateId);
+				StateControl.arrangeState(this._targetUnit, state, IncreaseType.INCREASE);
+			} else {
+				for (i = 0; i < stateId.length; i++) {
+					currentState = root.getBaseData().getStateList().getData(stateId[i]);
+					StateControl.arrangeState(this._targetUnit, currentState, IncreaseType.INCREASE);
+				}
 			}
 		}
 		
