@@ -7,6 +7,10 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 		//root.log("AI for: " + name);
 		//root.log("AI Search Mode: " + searchMode);
 		
+		if (targetUnit == null) {
+			return AIValue.MIN_SCORE;
+		}
+		
 		if (searchMode == undefined) {
 			//root.log("UNDEFINED! Skipping " + name + ".");
 			return AIValue.MIN_SCORE;
@@ -45,6 +49,10 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 	_getBestSpareWeapon: function(unit, targetUnit, combination) {
 		var i, highestScore, currentWeapon, currentScore;
 		var offLimitsWeapon = ItemControl.getEquippedWeapon(targetUnit);
+		
+		if (offLimitsWeapon == null) {
+			return 0;
+		}
 		var count = UnitItemControl.getPossessionItemCount(targetUnit);
 		
 		combination.bestWeapon = null;

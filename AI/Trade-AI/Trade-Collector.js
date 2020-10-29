@@ -63,12 +63,17 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 					continue;
 				}
 				
-				if (searchMode & ItemSearchMode.WEAPON && !this._hasSpareWeapons(unit, targetUnit)) {
+				if (searchMode == ItemSearchMode.WEAPON && !this._hasSpareWeapons(unit, targetUnit)) {
 					root.log("Nope Weapon");
 					continue;
 				}
 				
-				if (searchMode & ItemSearchMode.HEALING && !this._hasHealingItem(unit, targetUnit)) {
+				if (searchMode == ItemSearchMode.HEALING && !this._hasHealingItem(unit, targetUnit)) {
+					root.log("Nope Heal");
+					continue;
+				}
+				
+				if (searchMode & ItemSearchMode.WEAPON && searchMode & ItemSearchMode.HEALING && !this._hasSpareWeapons(unit, targetUnit) && !this._hasHealingItem(unit, targetUnit)) {
 					root.log("Nope Heal");
 					continue;
 				}
