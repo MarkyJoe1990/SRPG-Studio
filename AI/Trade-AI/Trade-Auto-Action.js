@@ -11,29 +11,21 @@ var TradeAutoAction = defineObject(BaseAutoAction, {
 	enterAutoAction: function() {
 		if (this._weaponToGet != null && this._itemToGet != null) {
 			//Determine which one to get first
-			root.log("Weapon Index: " + this._weaponIndex);
-			root.log("Item Index: " + this._itemIndex);
-			
 			if (this._weaponIndex < this._itemIndex) {
-				root.log("Take item first");
 				this._takeItem();
 				this._takeWeapon();
 			} else {
-				root.log("Take weapon first");
 				this._takeWeapon();
 				this._takeItem();
 			}
 			
-			root.log("Took both");
 			return EnterResult.NOTENTER;
 		}
 		
 		if (this._weaponToGet != null) {
-			root.log("Take only weapon?");
 			this._takeWeapon();
 		}
 		if (this._itemToGet != null) {
-			root.log("Take only item?");
 			this._takeItem();
 		}
 		

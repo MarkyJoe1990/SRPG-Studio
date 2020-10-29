@@ -12,8 +12,6 @@ AIScorer.TradeAttack = defineObject(BaseAIScorer ,{
 			return AIValue.MIN_SCORE;
 		}
 		
-		root.log("Is it?");
-		
 		//use posIndex to determine theoretical range from the new position
 		var currentIndex = combination.posIndex;
 		var x = CurrentMap.getX(currentIndex);

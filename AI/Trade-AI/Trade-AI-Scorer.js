@@ -4,44 +4,36 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 		var searchMode = combination.searchMode;
 		var targetUnit = combination.targetUnit;
 		var name = unit.getName();
-		//root.log("AI for: " + name);
-		//root.log("AI Search Mode: " + searchMode);
 		
 		if (targetUnit == null) {
 			return AIValue.MIN_SCORE;
 		}
 		
 		if (searchMode == undefined) {
-			//root.log("UNDEFINED! Skipping " + name + ".");
 			return AIValue.MIN_SCORE;
 		}
 		
 		if (typeof searchMode != "number" || searchMode == ItemSearchMode.NONE) {
-			//root.log("Skipping " + name + ".");
 			return AIValue.MIN_SCORE;
 		}
 		
-		root.log("Doin' it: " + name);
+		
 		
 		//If you're looking for a spare weapon and the target has none
 		if (searchMode & ItemSearchMode.WEAPON) {
-			//root.log("I want weapon!");
 			score += this._getBestSpareWeapon(unit, targetUnit, combination);
 			if (score < 0) {score = 0};
 		}
 		//If you're looking for a healing item and the target has none
 		if (searchMode & ItemSearchMode.HEALING) {
-			//root.log("I want heal!");
 			score += this._getBestHealingItem(unit, targetUnit, combination);
 			if (score < 0) {score = 0};
 		}
 		
 		if (score <= 0) {
-			//root.log("OOF");
 			return AIValue.MIN_SCORE;
 		}
 		
-		//root.log(targetUnit.getName() + " is VALID");
 		return score;
 	},
 	
@@ -246,7 +238,6 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 	},
 	
 	_getHealingScore: function(unit, item) {
-		//root.log("FUCK: " + item.getName());
 		var plus = Calculator.calculateRecoveryItemPlus(unit, unit, item);
 		var recoveryInfo = item.getRecoveryInfo();
 		var score = this._getHealScore(unit);

@@ -12,26 +12,23 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 		var searchMode = ItemSearchMode.NONE;
 		
 		var name = unit.getName();
-		root.log("==============");
-		root.log("Current Unit: " + name);
+		
 		//If unit lacks a weapon, enable weapon search mode
 		if (weapon == null) {
 			searchMode = searchMode | ItemSearchMode.WEAPON;
-			root.log(name + " lacks a weapon!");
+			
 		}
 		
 		//If unit lacks an item with the item types
 		//for healing, enable item search mode
 		if (unit.getHp() <= 10 && !this._hasHealingItem(unit, unit)) {
 			searchMode = searchMode | ItemSearchMode.HEALING;
-			root.log(name + " lacks a healing item and is low!");
+			
 		}
-		
-		root.log(name + "'s mode: " + searchMode);
 		
 		//If neither of these are true, return
 		if (typeof searchMode != "number" || searchMode == ItemSearchMode.NONE) {
-			root.log("Fuck off, " + name + "!");
+			
 			return;
 		}
 		
@@ -57,30 +54,26 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 			targetCount = list.getCount();
 			for (j = 0; j < targetCount; j++) {
 				targetUnit = list.getData(j);
-				root.log("Checking... " + targetUnit.getName());
+				
 				if (unit === targetUnit) {
-					root.log("Nope Unit");
 					continue;
 				}
 				
 				if (searchMode == ItemSearchMode.WEAPON && !this._hasSpareWeapons(unit, targetUnit)) {
-					root.log("Nope Weapon");
 					continue;
 				}
 				
 				if (searchMode == ItemSearchMode.HEALING && !this._hasHealingItem(unit, targetUnit)) {
-					root.log("Nope Heal");
 					continue;
 				}
 				
 				if (searchMode & ItemSearchMode.WEAPON && searchMode & ItemSearchMode.HEALING && !this._hasSpareWeapons(unit, targetUnit) && !this._hasHealingItem(unit, targetUnit)) {
-					root.log("Nope Heal");
 					continue;
 				}
 				
 				score = this._checkTargetScore(unit, targetUnit);
 				if (score < 0) {
-					root.log("Noper");
+					
 					continue;
 				}
 				
@@ -118,15 +111,11 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 			currentItem = UnitItemControl.getItem(targetUnit, i);
 			
 			if (currentItem == offLimitsWeapon) {
-				root.log("Current item matches!");
 				continue;
 			}
-			root.log("Current item NOT match!");
-			root.log("Is it available? " + ItemControl.isWeaponAvailable(unit, currentItem));
 			
 			if (ItemControl.isWeaponAvailable(unit, currentItem)) {
 				hasSpareWeapons = true;
-				root.log("Weapon is available!");
 				break;
 			}
 		}
