@@ -10,3 +10,5 @@ QBE256P: https://github.com/QBE256
 McMagister: https://github.com/McMagister
 
 TheRepeat: https://github.com/TheRepeat/SRPG-Studio
+
+Piketrcechillas: https://github.com/piketrcechillas/Scripts-for-SPRG-Studios
