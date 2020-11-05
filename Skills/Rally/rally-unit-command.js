@@ -609,7 +609,7 @@ UnitCommand.Rally = defineObject(UnitListCommand, {
 	
 	//GOOD
 	getCommandName: function() {
-		return 'Rally';
+		return RALLY_COMMAND_NAME;
 	}
 });
 

@@ -2,18 +2,11 @@ AIScorer.Rally = defineObject(BaseAIScorer,{
 	getScore: function(unit, combination) {
 		var score = 50;
 		
-		if (combination.skill == null) {
+		if (!RallyControl.isRallySkill(combination) && !RallyControl.isRallyItem(combination)) {
+			return 0;
+		} else if (RallyControl.isRallySkill(combination) && combination.skill.custom.rangeType != RallyRangeType.MULTI) {
 			return 0;
 		}
-		
-		if (combination.skill.getSkillType() != SkillType.CUSTOM || combination.skill.getCustomKeyword() != "Rally") {
-			return 0;
-		}
-		
-		if (combination.skill.custom.rangeType != RallyRangeType.MULTI) {
-			return 0;
-		}
-		
 		destIndex = combination.posIndex;
 		var x = CurrentMap.getX(destIndex);
 		var y = CurrentMap.getY(destIndex);

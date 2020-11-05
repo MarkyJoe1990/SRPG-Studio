@@ -28,6 +28,34 @@ var RallyControl = {
 		}
 		
 		return false;
+	},
+	
+	isRallyItem: function(combination) {
+		var item = combination.item;
+		
+		if (item == null) {
+			return false;
+		}
+		
+		if (item.getItemType() != ItemType.CUSTOM) {
+			return false;
+		}
+		
+		return item.getCustomKeyword() == "Rally";
+	},
+	
+	isRallySkill: function(combination) {
+		var skill = combination.skill;
+		
+		if (skill == null) {
+			return false;
+		}
+		
+		if (skill.getSkillType() != SkillType.CUSTOM) {
+			return false;
+		}
+		
+		return skill.getCustomKeyword() == "Rally";
 	}
 	
 }

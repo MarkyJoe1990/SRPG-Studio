@@ -3,8 +3,21 @@ var RallyAI = defineObject(BaseItemAI, {
 		var i, indexArray, currentUnit;
 		var score = 0;
 		var unitCount = 0;
-		var isMulti = combination.skill.custom.rangeType == RallyRangeType.MULTI;
-		var filter = RallyControl.getUnitFilter(unit, combination.skill);
+		var isMulti, filter, includeSelf;
+		var isSkill, isItem;
+		
+		isSkill = RallyControl.isRallySkill(combination);
+		isItem = RallyControl.isRallyItem(combination)
+		
+		if (isSkill) {
+			isMulti = combination.skill.custom.rangeType == RallyRangeType.MULTI;
+			filter = RallyControl.getUnitFilter(unit, combination.skill);
+			includeSelf = combination.skill.custom.includeSelf == true;
+		} else if (isItem) {
+			isMulti = true;
+			filter = combination.item.getFilterFlag();
+			includeSelf = combination.item.custom.includeSelf == true;
+		}
 		
 		if (combination.targetUnit.isWait()) {
 			return AIValue.MIN_SCORE;
@@ -35,7 +48,21 @@ var RallyAI = defineObject(BaseItemAI, {
 					currentY = CurrentMap.getY(currentIndex);
 					
 					currentUnit = PosChecker.getUnitFromPos(currentX, currentY);
-					if (currentUnit != null && currentUnit != unit && RallyControl.isFilterMatch(currentUnit.getUnitType(), filter)) {
+					
+					if (currentUnit == null) {
+						continue;
+					}
+					
+					if (currentUnit == unit && !includeSelf) {
+						continue;
+					}
+					
+					if (isSkill && RallyControl.isFilterMatch(currentUnit.getUnitType(), filter)) {
+						unitCount++;
+						currentScore += 280;
+					}
+					
+					if (isItem && FilterControl.isBestUnitTypeAllowed(unit.getUnitType(), currentUnit.getUnitType(), filter)) {
 						unitCount++;
 						currentScore += 280;
 					}

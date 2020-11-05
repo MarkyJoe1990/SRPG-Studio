@@ -1,0 +1,1 @@
+var RALLY_COMMAND_NAME = "Rally";
