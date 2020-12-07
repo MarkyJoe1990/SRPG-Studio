@@ -107,7 +107,9 @@ UnitCommand.SubUnitEvent = defineObject(UnitListCommand, {
 		if (this._capsuleEvent.moveCapsuleEvent() !== MoveResult.CONTINUE) {
 			if (!UnitEventChecker.isCancelFlag()) {
 				// Cancel doesn't occur, it means that some operation is done, so end it.
-				if (!this._event.custom.freeAction && !SkillControl.getPossessionCustomSkill(this._unit, "Free-Action")) {
+				if (this._event.custom.freeAction || SkillControl.getPossessionCustomSkill(this._unit, "Free-Action")) {
+					this.setExitCommand(this);
+				} else {
 					this.endCommandAction();
 				}
 			}
