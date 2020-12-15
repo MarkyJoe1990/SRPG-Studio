@@ -1,6 +1,6 @@
 /*
 	Version 1.0
-	Made by MarkyJoe1990
+	Made by MarkyJoe1990 (Additions by Stephen Molen)
 	
 	This plugin interpolates movement during battle animations, making them
 	significantly smoother and allowing them to display at 60 FPS without
@@ -38,6 +38,12 @@
 		
 		if ( (motionCategoryType == MotionCategoryType.SHOOT || motionCategoryType == MotionCategoryType.THROW) && !weaponThrown) {
 			return 0;
+		}
+		
+		//Credit to Stephen Molen
+		if (motionCategoryType === MotionCategoryType.MAGICATTACK  && spriteType != spriteType.KEY)
+		{
+			return 0;	
 		}
 		
 		var currentX = animeMotion._animeData.getSpriteX(animeMotion._motionId, animeMotion._frameIndex, i);
