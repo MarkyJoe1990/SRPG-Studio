@@ -1,5 +1,5 @@
 /*
-	Version 1.0
+	Version 1.1
 	Made by MarkyJoe1990
 	
 	This implements enemy targeting lines similar to Fire Emblem: Three Houses.
@@ -29,9 +29,10 @@ var LineGenerator = defineObject(BaseObject, {
 	_canvas: null,
 	_currentUnitIndex: null,
 	
-	setUp: function() {
+	initialize: function() {
 		this._graphicsManager = root.getGraphicsManager();
 		this._canvas = this._graphicsManager.getCanvas();
+		this._badIndex = [];
 	},
 	
 	resetEverything: function() {
@@ -52,7 +53,14 @@ var LineGenerator = defineObject(BaseObject, {
 		if (unit.isInvisible()) {return false};
 		if (attackRange.endRange == 0) {return false};
 		
-		var aiPattern = currentEnemy.createAIPattern();
+		if (unit == null) {return false;}
+		
+		var aiPattern = unit.createAIPattern();
+		
+		if (aiPattern == null) {
+			return false;
+		}
+		
 		if (aiPattern.getPatternType() == PatternType.MOVE && aiPattern.getMovePatternInfo().getMoveAIType() == MoveAIType.MOVEONLY) {return false};
 		if (aiPattern.getPatternType() == PatternType.WAIT && aiPattern.getWaitPatternInfo().isWaitOnly()) {return false};
 		
@@ -128,8 +136,14 @@ var LineGenerator = defineObject(BaseObject, {
 		color = 0xFF0000;
 		
 		for (i = 0; i < this._enemiesInRange.length; i++) {
-			currentX = (this._enemiesInRange[i].getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
-			currentY = (this._enemiesInRange[i].getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
+			var currentUnit = this._enemiesInRange[i];
+			
+			if (currentUnit.getAliveState() != AliveType.ALIVE) {
+				continue;
+			}
+			
+			currentX = (currentUnit.getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
+			currentY = (currentUnit.getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
 			
 			figure = this._canvas.createFigure();
 			figure.beginFigure(currentX, currentY);
@@ -197,7 +211,7 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._drawArea = function() {
 		alias3.call(this);
 		if (this._mapSequenceArea.getCycleMode() == MapSequenceAreaMode.AREA && this._targetUnit.getUnitType() == UnitType.PLAYER) {
-			this._lineGenerator.drawLineGenerator();	
+			this._lineGenerator.drawLineGenerator();
 		}
 	}
 	
@@ -220,7 +234,32 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._prepareTurnMemberData = function() {
 		alias6.call(this);
 		this._lineGenerator = createObjectEx(LineGenerator, this);
-		this._lineGenerator.setUp();
+	}
+	
+	var alias7 = RepeatMoveFlowEntry.enterFlowEntry;
+	RepeatMoveFlowEntry.enterFlowEntry = function(playerTurn) {
+		var result = alias7.call(this, playerTurn);
+		
+		return result;
+	};
+	
+	var alias8 = RepeatMoveFlowEntry.moveFlowEntry;
+	RepeatMoveFlowEntry.moveFlowEntry = function() {
+		var result = alias8.call(this);
+		
+		this._playerTurn._lineGenerator.moveLineGenerator();
+		
+		return result;
+	};
+	
+	var alias9 = RepeatMoveFlowEntry.drawFlowEntry;
+	RepeatMoveFlowEntry.drawFlowEntry = function() {
+		
+		if (this._mapSequenceArea.getCycleMode() == MapSequenceAreaMode.AREA) {
+			this._playerTurn._lineGenerator.drawLineGenerator();
+		}
+		
+		alias9.call(this);
 	}
 	
 }) ();
