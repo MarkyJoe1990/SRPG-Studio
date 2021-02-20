@@ -26,9 +26,20 @@ var StatInfluencerControl = {
 		var itemCount = UnitItemControl.getPossessionItemCount(active);
 		var itemStatInfluencerArray = this.createStatInfluencerArray();
 		var statInfCount = itemStatInfluencerArray.length;
+		var checkerArray = []
+		var equippedWeapon = ItemControl.getEquippedWeapon(active);
 		
 		for (i = 0; i < itemCount; i++) {
 			currentItem = UnitItemControl.getItem(active, i);
+			
+			if (!currentItem.isWeapon() && !ItemControl.isItemUsable(active, currentItem)) {
+				continue;
+			}
+			
+			if (currentItem.isWeapon() && currentItem != equippedWeapon) {
+				continue;
+			}
+			
 			currentItemInfArray = StatInfluencerControl.getStatInfluencerArray(currentItem);
 			
 			for (x = 0; x < statInfCount; x++) {
