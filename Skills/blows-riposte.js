@@ -62,21 +62,31 @@
 (function () {
 	var isBlowBonus = function(unit) {
 		var unitType = unit.getUnitType();
-		var turnType = root.getCurrentSession().getTurnType();
+		var scene = root.getCurrentScene();
 		
-		if (unitType == turnType && root.getCurrentScene() != SceneType.REST) {
-			return true;
+		if (scene != SceneType.REST) {
+			var turnType = root.getCurrentSession().getTurnType();
+			
+			if (unitType == turnType) {
+				return true
+			}
 		}
+		
 		return false;
 	}
 	
 	var isRiposteBonus = function(unit) {
 		var unitType = unit.getUnitType();
-		var turnType = root.getCurrentSession().getTurnType();
+		var scene = root.getCurrentScene();
 		
-		if (unitType != turnType && root.getCurrentScene() != SceneType.REST) {
-			return true;
+		if (scene != SceneType.REST) {
+			var turnType = root.getCurrentSession().getTurnType();
+			
+			if (unitType != turnType) {
+				return true
+			}
 		}
+		
 		return false;
 	}
 	
