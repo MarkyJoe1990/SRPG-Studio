@@ -33,7 +33,7 @@ var RallyControl = {
 	isRallyItem: function(combination) {
 		var item = combination.item;
 		
-		if (item == null) {
+		if (item == null || item.isWeapon()) {
 			return false;
 		}
 		
