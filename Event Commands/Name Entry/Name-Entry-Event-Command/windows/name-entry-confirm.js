@@ -32,11 +32,13 @@ var NameEntryConfirm = defineObject(BaseWindow, {
 				//Get the right unit
 				for (i = 0; i < playerList.getCount(); i++) {
 					currentUnit = playerList.getData(i);
-					if (currentUnit.getBaseId() == this._unit.getBaseId()) {
+					if (currentUnit.getId() == this._unit.getBaseId()) {
+						currentUnit.setName(this._currentString);
+						
+						NameEntrySaveManager.saveName(currentUnit, this._currentString);
 						break;
 					}
 				}
-				currentUnit.setName(this._currentString);
 			}
 			this._unit.setName(this._currentString);
 		}
