@@ -13,14 +13,8 @@ var TradeAutoAction = defineObject(BaseAutoAction, {
 		this._notificationWindow.setTradeInfo(this._tradeInfo);
 		this._autoActionCursor = createObject(AutoActionCursor);
 		
-		
-		
 		if (this.isSkipMode() || !this._isPosVisible()) {
-			if (this._doTradeAction() === EnterResult.NOTENTER) {
-				return EnterResult.NOTENTER;
-			}
-			
-			this.changeCycleMode(1);
+			return EnterResult.NOTENTER;
 		}
 		else {
 			if (this._tradeInfo !== null) {
@@ -75,6 +69,9 @@ var TradeAutoAction = defineObject(BaseAutoAction, {
 	
 	_moveCurosrShow: function() {
 		if (this._autoActionCursor.moveAutoActionCursor() !== MoveResult.CONTINUE) {
+			if (this.isSkipMode()) {
+				return MoveResult.END;
+			}
 			this.changeCycleMode(1);
 		}
 		

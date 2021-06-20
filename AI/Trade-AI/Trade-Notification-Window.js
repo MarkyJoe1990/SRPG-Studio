@@ -12,7 +12,7 @@ var TradeNotificationWindow = defineObject(BaseWindow, {
 			this._soundPlayed = true;
 		}
 		
-		if (InputControl.isSelectAction()) {
+		if (InputControl.isSelectAction() || Miscellaneous.isGameAcceleration() || CurrentMap.isTurnSkipMode()) {
 			return MoveResult.END;
 		}
 		
