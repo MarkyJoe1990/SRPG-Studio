@@ -35,6 +35,7 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 			var bestWeaponInfo = this._createTradeInfo();
 			var bestHealingInfo = this._createTradeInfo();
 			var bestGiveInfo = this._createTradeInfo();
+			var plusScore = 0;
 			var currentTradeQueue = [];
 			
 			//IN CURRENT POSITION
@@ -73,6 +74,7 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 					
 					if (currentGiveInfo.score > bestGiveInfo.score) {
 						bestGiveInfo = currentGiveInfo;
+						plusScore = 10;
 					}
 				}
 			}
@@ -93,7 +95,7 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 			
 			//If current position score is higher than best position score...
 			//Set best position to current position, complete with new trade queue
-			combinedScore = bestWeaponInfo.score + bestHealingInfo.score;
+			combinedScore = bestWeaponInfo.score + bestHealingInfo.score + plusScore;
 			if (combinedScore > score) {
 				//root.log("Scored");
 				score = combinedScore;
