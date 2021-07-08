@@ -1,26 +1,20 @@
 AIScorer.Trade = defineObject(BaseAIScorer,{
 	getScore: function(unit, combination) {
 		var searchMode = combination.searchMode;
-		var name = unit.getName();
-		
-		//root.log(name);
-		//root.log(searchMode);
-		//root.msg(name);
+		var unitType = unit.getUnitType();
 		
 		if (searchMode == undefined) {
-			//root.log("Fail 1");
 			return AIValue.MIN_SCORE;
 		}
 		
 		if (typeof searchMode != "number" || searchMode == ItemSearchMode.NONE) {
-			//root.log("Fail 2");
 			return AIValue.MIN_SCORE;
 		}
 		
 		var i, count = combination.costArray.length;
 		var j, directionCount = XPoint.length;
 		
-		var score = 0; //Score of best position, which is based on best weapon and healing
+		var score = 0;
 		
 		//Check every position this unit can walk to... Judge the merits
 		for (i = 0; i < count; i++) {
@@ -45,7 +39,11 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 				
 				//If there isn't a unit here, don't bother;
 				if (targetUnit == null) {
-					//root.log("Fail 3");
+					continue;
+				}
+				
+				var targetUnitType = targetUnit.getUnitType();
+				if (!FilterControl.isUnitTypeAllowed(unitType, targetUnitType)) {
 					continue;
 				}
 				
@@ -54,7 +52,6 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 					var currentWeaponInfo = this._getBestWeaponInfo(unit, targetUnit);
 					
 					if (currentWeaponInfo.score > bestWeaponInfo.score) {
-						//root.log("Weapon scored");
 						bestWeaponInfo = currentWeaponInfo;
 					}
 				}
