@@ -43,7 +43,7 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 				}
 				
 				var targetUnitType = targetUnit.getUnitType();
-				if (!FilterControl.isUnitTypeAllowed(unitType, targetUnitType)) {
+				if (!FilterControl.isUnitTypeAllowed(unit, targetUnit)) {
 					continue;
 				}
 				
