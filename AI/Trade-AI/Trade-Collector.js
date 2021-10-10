@@ -34,14 +34,23 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 		rangeMetrics = StructureBuilder.buildRangeMetrics();
 		rangeMetrics.startRange = 1;
 		rangeMetrics.endRange = 1;
-		filter = FilterControl.getNormalFilter(unit.getUnitType());
+		
+		var unitType;
+		
+		if (typeof NeutralControl !== 'undefined') {
+			unitType = NeutralControl.getUnitType(unit);
+		} else {
+			unitType = unit.getUnitType();
+		}
+		
+		filter = FilterControl.getNormalFilter(unitType);
 		misc.searchMode = searchMode
 		
 		this._setTradeRangeCombination(misc, filter, rangeMetrics);
 	},
 	
 	_setTradeRangeCombination: function(misc, filter, rangeMetrics) {
-		var i, j, indexArray, list, targetUnit, importance, targetCount, score, combination, aggregation;
+		var i, j, indexArray, list, targetUnit, importance, targetCount, score, combination, aggregation, additionalIndexArray;
 		var unit = misc.unit;
 		var filterNew = this._arrangeFilter(unit, filter);
 		var listArray = this._getTargetListArray(filterNew, misc);
@@ -168,21 +177,26 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 	},
 	
 	_combineIndexArrays: function(indexArray, additionalIndexArray) {
-		var i, count1 = indexArray.length;
-		var j, count2 = additionalIndexArray.length;
+		var i, count = additionalIndexArray.length;
 		
-		for (j = 0; j < count2; j++) {
-			var currentIndex = additionalIndexArray[j]
-			
-			for (i = 0; i < count1; i++) {
-				if (currentIndex < indexArray[i]) {
-					break;
-				}
+		for (i = 0; i < count; i++) {
+			this._nonRedundantAdd(additionalIndexArray[i], indexArray);
+		}
+	},
+	
+	_nonRedundantAdd: function(element, array) {
+		var low, mid, high;
+		for (low = 0, high = array.length; low < high;) {
+			mid = low + high >>> 1
+			if (array[mid] < element) {
+				low = mid + 1;
+			} else {
+				high = mid;
 			}
-			
-			if (currentIndex != indexArray[i - 1]) {
-				indexArray.splice(i, 0, currentIndex);
-			}
+		}
+		
+		if (element != array[low]) {
+			array.splice(low, 0, element)
 		}
 	}
 });

@@ -1,7 +1,13 @@
 AIScorer.Trade = defineObject(BaseAIScorer,{
 	getScore: function(unit, combination) {
 		var searchMode = combination.searchMode;
-		var unitType = unit.getUnitType();
+		var unitType;
+		
+		if (typeof NeutralControl !== 'undefined') {
+			unitType = NeutralControl.getUnitType(unit);
+		} else {
+			unitType = unit.getUnitType();
+		}
 		
 		if (searchMode == undefined) {
 			return AIValue.MIN_SCORE;
@@ -24,6 +30,11 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 			currentPos.x = CurrentMap.getX(currentIndex);
 			currentPos.y = CurrentMap.getY(currentIndex);
 			
+			var invalidUnit = PosChecker.getUnitFromPos(currentPos.x, currentPos.y);
+			if (invalidUnit != null && invalidUnit != unit) {
+				continue;
+			}
+			
 			var combinedScore = 0; //Score of current position
 			//Best weapon score and best healing score of this position...
 			var bestWeaponInfo = this._createTradeInfo();
@@ -43,6 +54,7 @@ AIScorer.Trade = defineObject(BaseAIScorer,{
 				}
 				
 				var targetUnitType = targetUnit.getUnitType();
+				
 				if (!FilterControl.isUnitTypeAllowed(unit, targetUnit)) {
 					continue;
 				}
