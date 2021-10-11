@@ -33,61 +33,92 @@ var LineGenerator = defineObject(BaseObject, {
 		this._graphicsManager = root.getGraphicsManager();
 		this._canvas = this._graphicsManager.getCanvas();
 		this._badIndex = [];
+		
+		this._enemyList = root.getCurrentSession().getEnemyList();
+		this._enemiesInRange = [];
+		this._mapSim = root.getCurrentSession().createMapSimulator();
 	},
 	
-	resetEverything: function() {
-		this._enemyList = root.getCurrentSession().getEnemyList();
+	resetTimer: function() {
 		this._enemyCount = this._enemyList.getCount();
 		this._timePassed = 0;
-		this._enemiesInRange = [];
-		this._badIndex = [];
-		this._mapSim = root.getCurrentSession().createMapSimulator();
 	},
 	
 	setUnit: function(unit) {
 		this._unit = unit;
 	},
 	
-	isValidEnemy: function(unit, attackRange) {
-		if (unit.getAliveState() != AliveType.ALIVE) {return false;};
-		if (unit.isInvisible()) {return false};
-		if (attackRange.endRange == 0) {return false};
-		
-		if (unit == null) {return false;}
-		
-		var aiPattern = unit.createAIPattern();
-		
-		if (aiPattern == null) {
-			return false;
-		}
-		
-		if (aiPattern.getPatternType() == PatternType.MOVE && aiPattern.getMovePatternInfo().getMoveAIType() == MoveAIType.MOVEONLY) {return false};
-		if (aiPattern.getPatternType() == PatternType.WAIT && aiPattern.getWaitPatternInfo().isWaitOnly()) {return false};
-		
-		return true;
-	},
-	
 	moveLineGenerator: function() {
 		this._enemiesInRange = [];
-		TIME_MODDER = 2;
+		var TIME_MODDER = 2;
 		var index = Math.floor(this._timePassed / TIME_MODDER);
 		var timeMod = this._timePassed % TIME_MODDER;
 		
 		if (index < this._enemyCount && timeMod == 0) {
-			currentEnemy = this._enemyList.getData(index);
-			attackRange = UnitRangePanel.getUnitAttackRange(currentEnemy);
+			var currentEnemy = this._enemyList.getData(index);
+			var attackRange = UnitRangePanel.getUnitAttackRange(currentEnemy);
 			
-			this._badIndex[index] = {
-				unit: currentEnemy
-			};
+			if (this._badIndex[index] == undefined) {
+				this._badIndex[index] = {
+					unit: currentEnemy,
+					walkArray: [],
+					weaponArray: []
+				};
+			}
 			
-			if (this.isValidEnemy(currentEnemy, attackRange)) {
+			var isSkippable = true;
+			//var reason = "";
+			
+			if (this._badIndex[index].walkArray == undefined) {
+				//reason = "BadIndex Undefined.";
+				isSkippable = false;
+			}
+			
+			if (isSkippable && this._currentPositionChanged(this._badIndex[index])) {
+				//reason = "Pos Change.";
+				isSkippable = false;
+			}
+			
+			if (isSkippable && this._terrainIsDifferent(this._badIndex[index])) {
+				//reason = "Terrain Change.";
+				isSkippable = false;
+			}
+			
+			if (isSkippable && this._unitsInRangeChange(this._badIndex[index])) {
+				//reason = "InRange Target Change.";
+				isSkippable = false;
+			}
+			
+			if (!this._isValidEnemy(currentEnemy, attackRange)) {
+				//reason = "Invalid Unit.";
+				isSkippable = true;
+			}
+			
+			if (!isSkippable) {
 				this._mapSim.startSimulationWeapon(currentEnemy, attackRange.mov, attackRange.startRange, attackRange.endRange);
 				this._badIndex[index].weaponArray = this._mapSim.getSimulationWeaponIndexArray();
 				this._badIndex[index].walkArray = this._mapSim.getSimulationIndexArray();
+				
+				//Grab unit's coordinates for later.
+				this._badIndex[index].x = currentEnemy.getMapX();
+				this._badIndex[index].y = currentEnemy.getMapY();
+				
+				//grab all movement consumption. Correspond them to the walkArray
+				var i, count = this._badIndex[index].walkArray.length;
+				this._badIndex[index].movePointArray = [];
+				for (i = 0; i < count; i++) {
+					var currentIndex = this._badIndex[index].walkArray[i];
+					var currentX = CurrentMap.getX(currentIndex);
+					var currentY = CurrentMap.getY(currentIndex);
+					
+					this._badIndex[index].movePointArray[i] = PosChecker.getMovePointFromUnit(currentX, currentY, currentEnemy)
+				}
+				
+				//Count all current targets in range
+				this._badIndex[index].targetCount = this._countTargetsInRange(this._badIndex[index]);
+				//root.log(index + ": " + reason + " Updating.");
 			} else {
-				this._badIndex[index].weaponArray = [];
-				this._badIndex[index].walkArray = [];
+				//root.log(index + ": " + reason + " Skipping.");
 			}
 		}
 		
@@ -104,7 +135,7 @@ var LineGenerator = defineObject(BaseObject, {
 			isSelectable = false;
 		}
 		
-		found = false;
+		var found = false;
 		if (isSelectable) {
 			for (i = 0; i < this._badIndex.length; i++) {
 				
@@ -130,10 +161,10 @@ var LineGenerator = defineObject(BaseObject, {
 	},
 	
 	drawLineGenerator: function() {
-		myX = (this._currentUnitIndex.x * 32) - root.getCurrentSession().getScrollPixelX() + 16;
-		myY = (this._currentUnitIndex.y * 32) - root.getCurrentSession().getScrollPixelY() + 16;
+		var myX = LayoutControl.getPixelX(this._currentUnitIndex.x) + 16;
+		var myY = LayoutControl.getPixelY(this._currentUnitIndex.y) + 16;
 		
-		color = 0xFF0000;
+		var color = 0xFF0000;
 		
 		for (i = 0; i < this._enemiesInRange.length; i++) {
 			var currentUnit = this._enemiesInRange[i];
@@ -142,15 +173,15 @@ var LineGenerator = defineObject(BaseObject, {
 				continue;
 			}
 			
-			currentX = (currentUnit.getMapX() * 32) - root.getCurrentSession().getScrollPixelX() + 16;
-			currentY = (currentUnit.getMapY() * 32) - root.getCurrentSession().getScrollPixelY() + 16;
+			var currentX = LayoutControl.getPixelX(currentUnit.getMapX()) + 16;
+			var currentY = LayoutControl.getPixelY(currentUnit.getMapY()) + 16;
 			
-			figure = this._canvas.createFigure();
+			var figure = this._canvas.createFigure();
 			figure.beginFigure(currentX, currentY);
 			
-			distance = Math.floor((currentX + myX) / 2);
+			var distance = Math.floor((currentX + myX) / 2);
 			
-			myFocus = {
+			var myFocus = {
 				x:distance,
 				y:myY - 100
 				}
@@ -185,6 +216,121 @@ var LineGenerator = defineObject(BaseObject, {
 		textY += 16;
 		TextRenderer.drawText(textX,textY,"Enemies in range: " + this._enemiesInRange.length, -1, color, font)
 		textY += 16;
+	},
+	
+	_isValidEnemy: function(unit, attackRange) {
+		if (unit.getAliveState() != AliveType.ALIVE) {return false;};
+		if (unit.isInvisible()) {return false};
+		if (attackRange.endRange == 0) {return false};
+		
+		if (unit == null) {return false;}
+		
+		var aiPattern = unit.createAIPattern();
+		
+		if (aiPattern == null) {
+			return false;
+		}
+		
+		if (aiPattern.getPatternType() == PatternType.MOVE && aiPattern.getMovePatternInfo().getMoveAIType() == MoveAIType.MOVEONLY) {return false};
+		if (aiPattern.getPatternType() == PatternType.WAIT && aiPattern.getWaitPatternInfo().isWaitOnly()) {return false};
+		
+		return true;
+	},
+	
+	_currentPositionChanged: function(badIndex) {
+		var unit = badIndex.unit;
+		var x = unit.getMapX();
+		var y = unit.getMapY();
+		
+		var oldX = badIndex.x;
+		var oldY = badIndex.y;
+		
+		if (x != oldX) {
+			return true;
+		}
+		
+		if (y != oldY) {
+			return true;
+		}
+		
+		return false;
+	},
+	
+	_terrainIsDifferent: function(badIndex) {
+		var walkArray = badIndex.walkArray;
+		var movePointArray = badIndex.movePointArray;
+		var i, count = walkArray.length;
+		var unit = badIndex.unit;
+		var unitType = unit.getUnitType();
+		
+		for (i = 0; i < count; i++) {
+			var currentWalkIndex = walkArray[i];
+			var oldMovePoint = movePointArray[i]
+			
+			var x = CurrentMap.getX(currentWalkIndex);
+			var y = CurrentMap.getY(currentWalkIndex);
+			
+			var movePoint = PosChecker.getMovePointFromUnit(x, y, unit);
+			
+			if (movePoint != oldMovePoint) {
+				return true;
+			}
+			
+			var targetUnit = PosChecker.getUnitFromPos(x, y);
+			if (targetUnit != null) {
+				var targetUnitType = targetUnit.getUnitType();
+				
+				if (targetUnitType != unitType && targetUnit != unit) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	},
+	
+	_unitsInRangeChange: function(badIndex) {
+		//You previously counted the number of units in the weaponIndex range.
+		//Count them again in case there's a change.
+		
+		var weaponArray = badIndex.weaponArray;
+		var i, count = weaponArray.length;
+		var prevCount = badIndex.targetCount;
+		
+		if (this._countTargetsInRange(badIndex) != prevCount) {
+			return true;
+		}
+		
+		return false;
+	},
+	
+	_countTargetsInRange: function(badIndex) {
+		var unit = badIndex.unit;
+		var unitType = unit.getUnitType();
+		
+		var weaponArray = badIndex.weaponArray;
+		var i, count = weaponArray.length;
+		var targetCount = 0;
+		
+		for (i = 0; i < count; i++) {
+			var currentWeaponIndex = weaponArray[i];
+			
+			var x = CurrentMap.getX(currentWeaponIndex);
+			var y = CurrentMap.getY(currentWeaponIndex);
+			
+			var targetUnit = PosChecker.getUnitFromPos(x, y);
+			if (targetUnit != null) {
+				//If they are the same unit, don't worry.
+				//If they are an ally, don't worry.
+				var targetUnitType = targetUnit.getUnitType();
+				
+				if (targetUnitType != unitType && targetUnit != unit) {
+					targetCount++;
+				}
+			}
+		}
+		
+		return targetCount;
 	}
 	
 });
@@ -217,7 +363,7 @@ var LineGenerator = defineObject(BaseObject, {
 	
 	var alias4 = PlayerTurn._moveArea;
 	PlayerTurn._moveArea = function() {
-		result = alias4.call(this);
+		var result = alias4.call(this);
 		this._lineGenerator.setUnit(this.getTurnTargetUnit());
 		return result;
 	}
@@ -226,7 +372,7 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._doEventEndAction = function() {
 		alias5.call(this);
 		if (!InputControl.isCancelAction()) {
-			this._lineGenerator.resetEverything();
+			this._lineGenerator.resetTimer();
 		}
 	}
 	
