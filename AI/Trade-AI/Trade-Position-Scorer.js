@@ -3,7 +3,7 @@ AIScorer.TradePosScorer = defineObject(BaseAIScorer, {
 		var score = 0;
 		
 		if (combination.tradeQueue == null) {
-			return AIValue.MIN_SCORE;
+			return score;
 		}
 		
 		currentIndex = combination.posIndex;

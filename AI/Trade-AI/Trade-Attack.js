@@ -4,7 +4,7 @@ AIScorer.TradeAttack = defineObject(BaseAIScorer ,{
 		
 		//If you lack a searchMode, or your search mode lacks weapon search
 		if (searchMode == undefined || !(searchMode & ItemSearchMode.WEAPON)) {
-			return AIValue.MIN_SCORE;
+			return 0;
 		}
 		
 		//If no weapon was found in first AIScorer
@@ -12,7 +12,7 @@ AIScorer.TradeAttack = defineObject(BaseAIScorer ,{
 		var bestWeapon = this._getWeaponFromQueue(combination.tradeQueue);
 		
 		if (bestWeapon == null) {
-			return AIValue.MIN_SCORE;
+			return 0;
 		}
 		
 		//use posIndex to determine theoretical range from the new position
@@ -53,7 +53,7 @@ AIScorer.TradeAttack = defineObject(BaseAIScorer ,{
 		}
 		
 		if (highestScore <= 0) {
-			return AIValue.MIN_SCORE;
+			return 0;
 		}
 		
 		return highestScore;
