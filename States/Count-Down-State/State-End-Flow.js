@@ -2,8 +2,6 @@ var StateEndFlow = defineObject(BaseFlowEntry, {
 	_dynamicEvent: null,
 	
 	enterFlowEntry: function() {
-		root.log("RUN");
-		
 		if (StateEndControl.getQueueCount() == 0) {
 			return EnterResult.NOTENTER;
 		}
