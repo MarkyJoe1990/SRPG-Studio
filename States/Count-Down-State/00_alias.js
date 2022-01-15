@@ -95,4 +95,16 @@
 		alias2.call(this, straightFlow);
 		straightFlow.pushFlowEntry(StateEndFlow);
 	}
+	
+	var alias3 = MapSequenceCommand._pushFlowEntries;
+	MapSequenceCommand._pushFlowEntries = function(straightFlow) {
+		alias3.call(this, straightFlow);
+		straightFlow.pushFlowEntry(StateEndFlow);
+	}
+	
+	var alias4 = WaitAutoAction._pushFlowEntries;
+	WaitAutoAction._pushFlowEntries = function(straightFlow) {
+		alias4.call(this, straightFlow);
+		straightFlow.pushFlowEntry(StateEndFlow);
+	}
 }) ();
