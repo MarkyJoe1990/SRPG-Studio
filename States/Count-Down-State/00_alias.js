@@ -1,5 +1,5 @@
 /*
-	Version 2.0
+	Version 2.1
 	Made by MarkyJoe1990
 	
 	This plugin allows states to have additional effects
@@ -8,8 +8,8 @@
 	status effect, or even running an event set up by
 	the user (more on that later)
 	
-	If this status effect is removed via an event command,
-	the effects will still apply, so be aware of this.
+	If this status effect is removed before its countdown
+	is complete, the exit effects will not occur.
 	
 	How to use:
 	- Create a status effect
@@ -61,28 +61,32 @@
 	var alias1 = StateControl.arrangeState;
 	StateControl.arrangeState = function(unit, state, increaseType) {
 		if (increaseType === IncreaseType.DECREASE) {
-			var exitEffectConditions = state.custom.exitEffectConditions || function(unit, state) { return true };
-			
-			if (exitEffectConditions(unit, state) == true) {
-				if (state.custom.exitState != undefined) {
-					var stateEndEffect = createObject(InflictStateEndEffect);
-					stateEndEffect.setStateEndEffect(unit, state);
-					
-					StateEndControl.addToQueue(stateEndEffect);
-				}
+			//Check if associated turn state's turn is 0 and that the original state has a finite duration
+			var turnState = this.getTurnState(unit, state);
+			if (turnState != null && turnState.getTurn() <= 0 && state.getTurn() > 0) {
+				var exitEffectConditions = state.custom.exitEffectConditions || function(unit, state) { return true };
 				
-				if (state.custom.exitDamage != undefined) {
-					var stateEndEffect = createObject(DamageStateEndEffect);
-					stateEndEffect.setStateEndEffect(unit, state);
+				if (exitEffectConditions(unit, state) == true) {
+					if (state.custom.exitState != undefined) {
+						var stateEndEffect = createObject(InflictStateEndEffect);
+						stateEndEffect.setStateEndEffect(unit, state);
+						
+						StateEndControl.addToQueue(stateEndEffect);
+					}
 					
-					StateEndControl.addToQueue(stateEndEffect);
-				}
-				
-				if (state.custom.isAutoEventCheck == true) {
-					var stateEndEffect = createObject(EventStateEndEffect);
-					stateEndEffect.setStateEndEffect(unit, state);
+					if (state.custom.exitDamage != undefined) {
+						var stateEndEffect = createObject(DamageStateEndEffect);
+						stateEndEffect.setStateEndEffect(unit, state);
+						
+						StateEndControl.addToQueue(stateEndEffect);
+					}
 					
-					StateEndControl.addToQueue(stateEndEffect);
+					if (state.custom.isAutoEventCheck == true) {
+						var stateEndEffect = createObject(EventStateEndEffect);
+						stateEndEffect.setStateEndEffect(unit, state);
+						
+						StateEndControl.addToQueue(stateEndEffect);
+					}
 				}
 			}
 		}
