@@ -1,0 +1,46 @@
+/*
+	Version 1.0
+	Made by MarkyJoe1990
+	
+	This plugin gives you additional settings to configure
+	when starting a new game. What the settings do
+	are up to you, and you can define what variables
+	and global switches it uses.
+	
+	How To Use:
+	- Go to your Database -> Config -> Script -> Global Parameters
+	- If you haven't already, add an open curly brace "{", and a closed curly brace "}"
+	- If you want to add global switches...
+		- add a property called "globalSwitchConfig". This is an array, so you will need to use []
+		- Inside the [], add the ID number of each global switch you want to use, and separate them with commas.
+		- The name and description of your global switches are used in the config screen.
+	- If you want to add variables...
+		- add a property called "variableConfig". This is an array, so you will need to use []
+		- Inside the [], add another set of curly braces.
+		- Include the curly braces, add the properties "table", "id", and "options".
+		- Add a colon after each, and put in the table number of your variable and its id
+			- Keep in mind that the first table is "0", NOT 1.
+			- For the options, it's another []. Add strings into this one.
+			- Example: ["Yes", "No", "Maybe"]
+		- For each variable, you will need to separate them with commas.
+	- In the end, your global script should look something like this:
+	
+	{
+		globalSwitchConfig: [0, 1],
+		variableConfig: [
+			{
+				table: 0,
+				id: 0,
+				options: ["Yes", "No", "Maybe"]
+			},
+			{
+				table: 0,
+				id: 1,
+				options: ["Red", "Blue", "Green"]
+			}
+		]
+	}
+	
+	To Do:
+	- Request by Repeat: Allow for option to increment variables (with min and max values) instead of having a set of options represented as strings.
+*/
