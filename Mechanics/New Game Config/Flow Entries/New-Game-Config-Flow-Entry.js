@@ -69,9 +69,15 @@ var NewGameConfigFlowEntry = defineObject(BaseFlowEntry, {
 		var i, count = scrollBar.getObjectCount();
 		
 		for (i = 0; i < count; i++) {
-			var currentObject = scrollBar.getObjectFromIndex(i);
-			var currentValue = currentObject._configScrollbar.getIndex();
-			currentObject.setConfigValue(currentValue);
+			var currentConfig = scrollBar.getObjectFromIndex(i);
+			var currentValue = currentConfig.getConfigValue();
+			var currentIndex = currentConfig.getConfigIndex();
+			
+			if (typeof currentValue == "number") {
+				currentConfig.setConfigValue(currentValue);
+			} else {
+				currentConfig.setConfigValue(currentIndex);
+			}
 		}
 	},
 	

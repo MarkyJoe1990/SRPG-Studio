@@ -1,18 +1,20 @@
 var BaseNewGameConfig = defineObject(BaseObject, {
 	_configScrollbar: null,
+	_index: -1,
 	
 	initialize: function() {
 		this._configScrollbar = createScrollbarObject(NewGameConfigOptionScrollbar, this);
 		this._configScrollbar.setScrollFormation(2, 1);
 		this._configScrollbar.setObjectArray(this.getConfigOptions());
-		this.setConfigValue(0);
+		this.setConfigIndex(0);
 	},
 	
 	moveConfig: function() {
-		var result = this._configScrollbar.moveInput();
+		var result = this.getConfigScrollbar().moveInput();
 		
 		if (result == ScrollbarInput.SELECT) {
-			this.setConfigValue(this._configScrollbar.getIndex());
+			this.setConfigIndex(this.getConfigScrollbar().getIndex());
+			
 		}
 		
 		if (result == ScrollbarInput.CANCEL) {
@@ -30,7 +32,7 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 		
 		TextRenderer.drawText(x, y, text, -1, color, font);
 		
-		this._configScrollbar.drawScrollbar(x + 240, y);
+		this.getConfigScrollbar().drawScrollbar(x + 240, y);
 	},
 	
 	getConfigTitle: function() {
@@ -50,7 +52,19 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 	},
 	
 	getConfigValue: function() {
-		return 0; //You must also set this;
+		return this.getConfigScrollbar().getObject();
+	},
+	
+	getConfigIndex: function() {
+		return this._index;
+	},
+	
+	setConfigIndex: function(value) {
+		this._index = value;
+	},
+	
+	getConfigScrollbar: function() {
+		return this._configScrollbar;
 	}
 })
 
@@ -94,12 +108,7 @@ var GlobalSwitchConfig = defineObject(BaseNewGameConfig, {
 	},
 	
 	getConfigValue: function() {
-		var value = this.getGlobalSwitchTable().isSwitchOn(this.getGlobalSwitchIndex());
-		if (value == true) {
-			return 0;
-		} else {
-			return 1;
-		}
+		return this.getConfigScrollbar().getIndex();
 	}
 });
 
@@ -150,7 +159,9 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	},
 	
 	getConfigValue: function() {
-		return this.getVariableTable().getVariable(this.getVariableIndex());
+		return this.getConfigScrollbar().getObject();
+		
+		//return this.getVariableTable().getVariable(this.getVariableIndex());
 	}
 })
 

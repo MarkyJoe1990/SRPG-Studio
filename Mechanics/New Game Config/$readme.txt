@@ -1,5 +1,5 @@
 /*
-	Version 1.0
+	Version 1.1
 	Made by MarkyJoe1990
 	
 	This plugin gives you additional settings to configure
@@ -20,8 +20,12 @@
 		- Include the curly braces, add the properties "table", "id", and "options".
 		- Add a colon after each, and put in the table number of your variable and its id
 			- Keep in mind that the first table is "0", NOT 1.
-			- For the options, it's another []. Add strings into this one.
+			- For the options, it's another []. Add either strings or numbers in this one.
 			- Example: ["Yes", "No", "Maybe"]
+			- Example 2: [25, 50, 75]
+			- If you use strings, the variable's value will be set to the position the option was in the array.
+				- For example, if you selected "Yes", it would be 0. If you selected "Maybe", it would be 2.
+			- If you use numbers, the variable's value will instead be set to the value you put in, rather than the position of the option.
 		- For each variable, you will need to separate them with commas.
 	- In the end, your global script should look something like this:
 	
@@ -36,11 +40,11 @@
 			{
 				table: 0,
 				id: 1,
-				options: ["Red", "Blue", "Green"]
+				options: [25, 50, 75]
 			}
 		]
 	}
 	
 	To Do:
-	- Request by Repeat: Allow for option to increment variables (with min and max values) instead of having a set of options represented as strings.
+	- Request by Repeat: Allow for option to increment variables (with min and max values) instead of having a set of options.
 */
