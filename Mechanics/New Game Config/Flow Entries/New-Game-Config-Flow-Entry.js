@@ -3,7 +3,19 @@ var NewGameConfigFlowEntry = defineObject(BaseFlowEntry, {
 	_questionWindow: null,
 	
 	enterFlowEntry: function(newGameCommand) {
+		var metaSession = root.getMetaSession();
+		var variableConfig = metaSession.global.variableConfig;
+		var globalSwitchConfig = metaSession.global.globalSwitchConfig;
+		var localSwitchConfig = metaSession.global.localSwitchConfig;
+		var name = metaSession.global.configName || "New Game Configuration";
+		
 		this._windowManager = createObject(NewGameConfigWindowManager);
+		this._windowManager.setUp(variableConfig, globalSwitchConfig, null, name);
+		
+		if (this._windowManager.getConfigArray().length == 0) {
+			return EnterResult.NOTENTER;
+		}
+		
 		this._questionWindow = createObject(QuestionWindow);
 		this._questionWindow.setQuestionMessage("Move forward with these settings?");
 		

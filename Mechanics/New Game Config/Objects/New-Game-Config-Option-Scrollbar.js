@@ -29,7 +29,7 @@ var NewGameConfigOptionScrollbar = defineObject(BaseScrollbar, {
 	},
 	
 	getScrollbarWidth: function() {
-		return (this._col * this._objectWidth) + ((this._col - 1) * this.getSpaceX()) + 40;
+		return (this._col * this._objectWidth) + ((this._col - 1) * this.getSpaceX()) + 20;
 	},
 	
 	getSpaceX: function() {

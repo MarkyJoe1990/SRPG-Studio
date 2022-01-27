@@ -1,7 +1,16 @@
 var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 	_scrollbar: null,
+	_variableConfig: null,
+	_localSwitchConfig: null,
+	_globalSwitchConfig: null,
+	_name: null,
 	
-	initialize: function() {
+	setUp: function(variableConfig, globalSwitchConfig, localSwitchConfig, name) {
+		this._variableConfig = variableConfig;
+		this._localSwitchConfig = localSwitchConfig;
+		this._globalSwitchConfig = globalSwitchConfig;
+		this._name = name;
+		
 		this._configArray = [];
 		this._configureArray(this._configArray);
 		
@@ -35,12 +44,20 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 		var object = this.getObject();
 		var description = object.getConfigDescription();
 		
-		TextRenderer.drawScreenTopText("New Game Configuration", textuiTop);
+		TextRenderer.drawScreenTopText(this.getConfigMenuTitle(), textuiTop);
 		TextRenderer.drawScreenBottomText(description, textui);
 	},
 	
 	getObject: function() {
 		return this._scrollbar.getObject()
+	},
+	
+	getConfigArray: function() {
+		return this._configArray;
+	},
+	
+	getConfigMenuTitle: function() {
+		return this._name;
 	},
 	
 	getTotalWindowWidth: function() {
@@ -112,34 +129,57 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 	_configureArray: function(groupArray) {
 		this._addVariables(groupArray);
 		this._addGlobalSwitches(groupArray);
+		
+		if (this._localSwitchConfig != null) {
+			this._addLocalSwitches(groupArray);
+		}
 	},
 	
 	_addVariables: function(groupArray) {
-		var metaSession = root.getMetaSession();
+		var variableConfig = this._variableConfig;
 		
-		var variableConfigArray = metaSession.global.variableConfig;
-		var i, count = variableConfigArray.length;
+		if (variableConfig == undefined) {
+			return;
+		}
+		
+		var i, count = variableConfig.length;
 		for (i = 0; i < count; i++) {
-			var currentVariable = variableConfigArray[i];
+			var currentVariable = variableConfig[i];
 			var table = currentVariable.table;
 			var id = currentVariable.id;
 			var options = currentVariable.options;
 			
-			var variableConfig = createVariableConfig(table, id, options);
+			var variableConfigObject = createVariableConfig(table, id, options);
 			
-			groupArray.appendObject(variableConfig);
+			groupArray.appendObject(variableConfigObject);
 		}
 	},
 	
 	_addGlobalSwitches: function(groupArray) {
-		var metaSession = root.getMetaSession();
+		var globalSwitchConfig = this._globalSwitchConfig;
 		
-		var globalSwitchConfigArray = metaSession.global.globalSwitchConfig;
+		if (globalSwitchConfig == undefined) {
+			return;
+		}
 		
-		var i, count = globalSwitchConfigArray.length;
+		var i, count = globalSwitchConfig.length;
 		for (i = 0; i < count; i++) {
-			var currentGlobalSwitch = globalSwitchConfigArray[i];
+			var currentGlobalSwitch = globalSwitchConfig[i];
 			groupArray.appendObject(createGlobalSwitchConfig(currentGlobalSwitch));
+		}
+	},
+	
+	_addLocalSwitches: function(groupArray) {
+		var localSwitchConfig = this._localSwitchConfig;
+		
+		if (localSwitchConfig == undefined) {
+			return;
+		}
+		
+		var i, count = localSwitchConfig.length;
+		for (i = 0; i < count; i++) {
+			var currentLocalSwitch = localSwitchConfig[i];
+			groupArray.appendObject(createLocalSwitchConfig(currentLocalSwitch));
 		}
 	}
 });

@@ -29,10 +29,17 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 		var textui = root.queryTextUI("default_window");
 		var color = textui.getColor();
 		var font = textui.getFont();
+		var icon = this.getConfigIcon();
+		var dx = x;
 		
-		TextRenderer.drawText(x, y, text, -1, color, font);
+		if ( !icon.isNullHandle() ) {
+			GraphicsRenderer.drawImage(dx, y-2, icon, GraphicsType.ICON);
+			dx += 32;
+		}
 		
-		this.getConfigScrollbar().drawScrollbar(x + 240, y);
+		TextRenderer.drawText(dx, y, text, -1, color, font);
+		
+		this.getConfigScrollbar().drawScrollbar(x + 280, y);
 	},
 	
 	getConfigTitle: function() {
@@ -65,6 +72,10 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 	
 	getConfigScrollbar: function() {
 		return this._configScrollbar;
+	},
+	
+	getConfigIcon: function() {
+		return null; //You have to set this
 	}
 })
 
@@ -109,6 +120,69 @@ var GlobalSwitchConfig = defineObject(BaseNewGameConfig, {
 	
 	getConfigValue: function() {
 		return this.getConfigScrollbar().getIndex();
+	},
+	
+	getConfigIcon: function() {
+		return this.getGlobalSwitchTable().getSwitchResourceHandle(this.getGlobalSwitchIndex());
+	}
+});
+
+var LocalSwitchConfig = defineObject(BaseNewGameConfig, {
+	_localSwitchId: 0,
+	
+	setLocalSwitchId: function(value) {
+		this._localSwitchId = value;
+	},
+	
+	getLocalSwitchIndex: function() {
+		return this.getLocalSwitchTable().getSwitchIndexFromId(this.getLocalSwitchId());
+	},
+	
+	getLocalSwitchId: function() {
+		return this._localSwitchId;
+	},
+	
+	getLocalSwitchTable: function() {
+		var session = root.getCurrentSession();
+		
+		if (session == null) {
+			root.msg("You cannot use local switches here.");
+			root.endGame();
+		}
+		
+		if (root.getBaseScene() === SceneType.REST) {
+			return root.getCurrentSession().getLocalSwitchTable();
+		}
+		
+		return root.getCurrentSession().getCurrentMapInfo().getLocalSwitchTable();
+	},
+	
+	getConfigTitle: function() {
+		return this.getLocalSwitchTable().getSwitchName(this.getLocalSwitchIndex());
+	},
+	
+	getConfigOptions: function() {
+		return ["Yes", "No"];
+	},
+	
+	getConfigDescription: function() {
+		return this.getLocalSwitchTable().getSwitchDescription(this.getLocalSwitchIndex());
+	},
+	
+	setConfigValue: function(value) {
+		if (value == 0) {
+			this.getLocalSwitchTable().setSwitch(this.getLocalSwitchIndex(), true);
+		} else {
+			this.getLocalSwitchTable().setSwitch(this.getLocalSwitchIndex(), false);
+		}
+	},
+	
+	getConfigValue: function() {
+		return this.getConfigScrollbar().getIndex();
+	},
+	
+	getConfigIcon: function() {
+		return this.getLocalSwitchTable().getSwitchResourceHandle(this.getLocalSwitchIndex());
 	}
 });
 
@@ -160,8 +234,10 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	
 	getConfigValue: function() {
 		return this.getConfigScrollbar().getObject();
-		
-		//return this.getVariableTable().getVariable(this.getVariableIndex());
+	},
+	
+	getConfigIcon: function() {
+		return this.getVariableTable().getVariableResourceHandle(this.getVariableIndex());
 	}
 })
 
@@ -170,6 +246,13 @@ var createGlobalSwitchConfig = function(id) {
 	globalSwitchConfig.setGlobalSwitchId(id);
 	
 	return globalSwitchConfig;
+}
+
+var createLocalSwitchConfig = function(id) {
+	var localSwitchConfig = createObject(LocalSwitchConfig);
+	localSwitchConfig.setLocalSwitchId(id);
+	
+	return localSwitchConfig;
 }
 
 var createVariableConfig = function(table, id, options) {
