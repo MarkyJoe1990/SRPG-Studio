@@ -12,3 +12,5 @@ McMagister: https://github.com/McMagister
 TheRepeat: https://github.com/TheRepeat/SRPG-Studio
 
 Piketrcechillas: https://github.com/piketrcechillas/Scripts-for-SPRG-Studios
+
+Anarch16sync: https://github.com/Anarch16Sync/SRPG-Studio-Plugins
