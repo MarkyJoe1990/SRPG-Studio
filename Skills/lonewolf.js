@@ -21,8 +21,8 @@
 	Determines how many tiles away all allies need to be
 	for the skill to not activate
 	
-	attack (optional)
-	Your unit's attack power. Displays on the stat screen.
+	power (optional)
+	Your unit's power. Displays on the stat screen.
 	
 	hit (optional)
 	Your unit's hit rate. Displays on the stat screen.
