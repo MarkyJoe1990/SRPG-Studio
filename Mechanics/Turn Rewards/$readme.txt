@@ -1,5 +1,5 @@
 /*
-	Version 1.1
+	Version 2.0
 	Made by MarkyJoe1990
 
 	This plugin designates the rewards you get at the end of
@@ -8,7 +8,7 @@
 	get - as well as the conditions to obtain them - by
 	looking at the "Objective" screen.
 	
-	If all prizes have the same turn conditions, they will be
+	If all prizes have the same conditions, they will be
 	displayed in a simplified format that allows room for more
 	rewards to be shown.
 
@@ -26,7 +26,7 @@
 			{
 				type: TurnRewardType.ITEM,
 				id: 3,
-				turn: 9
+				turn: -1
 			},
 			{
 				type: TurnRewardType.WEAPON,
@@ -41,7 +41,7 @@
 			{
 				type: TurnRewardType.BONUS,
 				amount: 100,
-				turn: 9
+				switchId: 2
 			}
 		]
 	}
@@ -69,9 +69,16 @@
 	Amount of gold or bonus to give.
 	
 	turn
-	Required. Designates the turn count the player must meet or be
+	Designates the turn count the player must meet or be
 	under in order to receive the reward at the end of the chapter.
 	Set this to -1 to make the reward unconditional.
+	
+	switchId
+	Designates the local chapter switch that needs to be
+	on in order to receive the reward at the end of the chapter.
+	Set this to -1 to make the reward unconditional.
+	Objective Screen will use the switch's description to
+	explain to the player how to get the reward.
 
 	This plugin overrides the original functions for:
 	ObjectiveWindow._drawObjectiveArea
@@ -84,7 +91,7 @@
 	might not be compatible with this plugin.
 	
 	Possible Future Features:
-	- Allow for use of switches and variables instead of turns.
+	- Allow for use of variables.
 		- Allow >=, >, ==, !=, <=, and < for variable conditions.
 	- Allow option to hide identity of rewards while showing reward conditions.
 	- Add a checkmark or cross to indicate when a player has succeeded or failed

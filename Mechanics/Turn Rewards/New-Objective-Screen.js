@@ -5,7 +5,8 @@
 	
 	ObjectiveWindow = defineObject(ObjectiveWindow, {
 		_isMatch: false,
-		_matchTurn: false,
+		_matchTurn: -1,
+		_matchSwitchId: -1,
 		
 		moveWindowContent: function() {
 			this._checkInput();
@@ -56,11 +57,13 @@
 			this._edgeCursor.setEdgeRange(32, 0);
 			
 			var i, count = turnRewards.length;
-			this._matchTurn = turnRewards[0].turn;
+			this._matchTurn = turnRewards[0].turn == undefined ? -1 : turnRewards[0].turn;
+			this._matchSwitchId = turnRewards[0].switchId == undefined ? -1 : turnRewards[0].switchId;
 			for (i = 1; i < count; i++) {
 				var currentReward = turnRewards[i];
-				var currentTurn = currentReward.turn;
-				if (currentTurn != this._matchTurn) {
+				var currentTurn = currentReward.turn == undefined ? -1 : currentReward.turn;
+				var currentSwitchId = currentReward.switchId == undefined ? -1 : currentReward.switchId;
+				if (currentTurn != this._matchTurn || currentSwitchId != this._matchSwitchId) {
 					this._isMatch = false;
 					break;
 				}
@@ -129,19 +132,38 @@
 					var currentReward = turnRewards[i];
 					var currentType = currentReward.type;
 					
-					var currentTurn = currentReward.turn;
+					var currentTurn = currentReward.turn == undefined ? -1 : currentReward.turn;
+					var currentSwitchId = currentReward.switchId == undefined ? -1 : currentReward.switchId;
+					
+					var currentSwitchTable = session.getCurrentMapInfo().getLocalSwitchTable();
+					var currentSwitchIndex = currentSwitchTable.getSwitchIndexFromId(currentSwitchId);
+					var currentSwitchDescription = currentSwitchTable.getSwitchDescription(currentSwitchIndex);
+					var currentSwitchOn = currentSwitchTable.isSwitchOn(currentSwitchIndex);
+					
 					var id = currentReward.id;
 					var type = currentReward.type;
 					var amount = currentReward.amount;
 					
 					var range = createRangeObject(x + 200, y-3, 320, 32);
 					var plural = currentTurn == 1 ? "" : "s";
-					var conditionMet = turnCount <= currentTurn || currentTurn == -1;
+
+					var conditionMet;
+					if (currentTurn == -1 && currentSwitchId != -1) {
+						conditionMet = currentSwitchOn;
+					} else {
+						conditionMet = turnCount <= currentTurn || currentTurn == -1;
+					}
+					
 					var currentColor = conditionMet ? ColorValue.INFO : ColorValue.DISABLE;
 					var otherColor = conditionMet ? ColorValue.KEYWORD : ColorValue.DISABLE;
 					
 					if (currentTurn == -1) {
-						TextRenderer.drawRangeText(range, TextFormat.RIGHT, "Complete this chapter", -1, otherColor, font);
+						// Allow use of switches
+						if (currentSwitchId != -1) {
+							TextRenderer.drawRangeText(range, TextFormat.RIGHT, currentSwitchDescription, -1, otherColor, font);
+						} else {
+							TextRenderer.drawRangeText(range, TextFormat.RIGHT, "Complete this chapter", -1, otherColor, font);
+						}
 					} else {
 						TextRenderer.drawRangeText(range, TextFormat.RIGHT, "Complete this chapter within " + currentTurn + " turn" + plural, -1, otherColor, font);
 					}
@@ -167,12 +189,28 @@
 				}
 			} else {
 				var plural = this._matchTurn == 1 ? "" : "s";
-				var conditionMet = turnCount <= this._matchTurn || this._matchTurn == -1;
+				
+				var currentSwitchId = this._matchSwitchId == undefined ? -1 : this._matchSwitchId;
+				var currentSwitchTable = session.getCurrentMapInfo().getLocalSwitchTable();
+				var currentSwitchIndex = currentSwitchTable.getSwitchIndexFromId(currentSwitchId);
+				var currentSwitchDescription = currentSwitchTable.getSwitchDescription(currentSwitchIndex);
+				var currentSwitchOn = currentSwitchTable.isSwitchOn(currentSwitchIndex);
+				
+				var conditionMet;
+				if (this._matchTurn == -1 && this._matchSwitchId != -1) {
+					conditionMet = currentSwitchOn;
+				} else {
+					conditionMet = turnCount <= this._matchTurn || this._matchTurn == -1;
+				}
 				var currentColor = conditionMet ? ColorValue.INFO : ColorValue.DISABLE;
 				var otherColor = conditionMet ? ColorValue.KEYWORD : ColorValue.DISABLE;
 				
 				if (this._matchTurn == -1) {
-					TextRenderer.drawText(x, y, "Complete this chapter to receive:", -1, otherColor, font);
+					if (this._matchSwitchId != -1) {
+						TextRenderer.drawText(x, y, currentSwitchDescription, -1, otherColor, font);
+					} else {
+						TextRenderer.drawText(x, y, "Complete this chapter to receive:", -1, otherColor, font);
+					}
 				} else {
 					TextRenderer.drawText(x, y, "Complete this chapter within " + this._matchTurn + " turn" + plural + " to receive:", -1, otherColor, font);
 				}

@@ -25,14 +25,28 @@
 			for (i = 0; i < count; i++) {
 				var currentReward = turnRewards[i];
 				
-				var currentTurn = currentReward.turn;
+				var currentTurn = currentReward.turn == undefined ? -1 : currentReward.turn;
+				var currentSwitchId = currentReward.switchId == undefined ? -1 : currentReward.switchId;
+				
+				var currentSwitchTable = session.getCurrentMapInfo().getLocalSwitchTable();
+				var currentSwitchIndex = currentSwitchTable.getSwitchIndexFromId(currentSwitchId);
+				var currentSwitchDescription = currentSwitchTable.getSwitchDescription(currentSwitchIndex);
+				var currentSwitchOn = currentSwitchTable.isSwitchOn(currentSwitchIndex);
+				
 				var id = currentReward.id;
 				var type = currentReward.type;
 				var amount = currentReward.amount;
 				
 				var turnCount = session.getTurnCount();
+				var conditionsMet;
 				
-				if (turnCount <= currentTurn || currentTurn == -1) {
+				if (currentTurn == -1 && currentSwitchId != -1) {
+					conditionsMet = currentSwitchOn;
+				} else {
+					conditionsMet = turnCount <= currentTurn || currentTurn == -1;
+				}
+				
+				if (conditionsMet) {
 					switch (type) {
 						case TurnRewardType.ITEM:
 						var item = baseData.getItemList().getDataFromId(id)
