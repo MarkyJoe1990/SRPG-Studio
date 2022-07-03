@@ -71,6 +71,8 @@ var ItemSelectManager = defineObject(BaseWindowManager,
 			this._itemInfoWindow.setInfoItem(this._itemWindow.getSelectedItem());
 		} else if (this._listType == SelectorListType.ART) {
 			this._itemInfoWindow.setCombatArt(this._itemWindow.getSelectedItem());
+		} else if (this._listType == SelectorListType.SKILL) {
+			this._itemInfoWindow.setSkillInfoData(this._itemWindow.getSelectedItem(), this._itemWindow.getSelectedItem().getSkillType());
 		}
 		return result;
 	},
