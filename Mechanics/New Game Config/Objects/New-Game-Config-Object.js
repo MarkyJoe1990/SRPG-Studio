@@ -202,6 +202,10 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	getVariableId: function() {
 		return this._variableId;
 	},
+
+	getVariable: function() {
+		return this.getVariableTable().getVariable(this.getVariableIndex());
+	},
 	
 	setVariableTable: function(value) {
 		this._variableTable = value;
@@ -263,6 +267,8 @@ var createVariableConfig = function(table, id, options) {
 			this._configOptions = options;
 			
 			BaseNewGameConfig.initialize.call(this);
+
+			this.setConfigIndex(this.getVariable());
 		}
 	});
 	
