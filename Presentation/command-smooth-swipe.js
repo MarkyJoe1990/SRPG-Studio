@@ -33,6 +33,11 @@
 	
 	var alias3 = BaseListCommandManager._drawTitle;
 	BaseListCommandManager._drawTitle = function () {
+		if (EnvironmentControl.isMouseOperation() && EnvironmentControl.isMouseCursorTracking()) {
+			alias3.call(this);
+			return;
+		}
+
 		var x = this.getPositionX();
 		var y = this.getPositionY();
 		
@@ -43,6 +48,5 @@
 		thing2 = SWIPE_LENGTH / this._timePassed;
 		doop = x - (thing1 * thing2) + thing1;
 		this._commandScrollbar.drawScrollbar(doop, y);
-		//root.log(doop);
 	}
 }) ();
