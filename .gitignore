@@ -1,5 +1,5 @@
 *.srpgs
-*.png
+/*.png
 desktop.ini
 Next Patch.txt
 environment.evs
