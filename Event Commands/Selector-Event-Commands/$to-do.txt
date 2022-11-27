@@ -1,3 +1,0 @@
-Unit selector, but for dead units
-Unit selector, but for alive units
-be able to select the team and possibly unit type (such as reinforcement and guest ally)

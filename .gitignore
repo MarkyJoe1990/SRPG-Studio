@@ -1,0 +1,17 @@
+*.srpgs
+*.png
+desktop.ini
+Next Patch.txt
+environment.evs
+Assets and Concepts/
+Audio/
+Backup/
+Fonts/
+Graphics/
+Localization/
+Save/
+Screenshots/
+Script/
+UI/
+Video/
+srpg_log.*
