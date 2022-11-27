@@ -18,3 +18,5 @@ Anarch16sync: https://github.com/Anarch16Sync/SRPG-Studio-Plugins
 crazyli825: https://github.com/CrazyLi825/SRPGstudio
 
 Claris: https://github.com/RogueClaris/SRPGStudioScripts/
+
+PurpleManDown: https://github.com/Purplemandown/SRPGS-stuff

@@ -385,10 +385,12 @@ SkillSentence.Range = defineObject(BaseSkillSentence, {
 	drawSkillSentence: function(x, y, skill) {
 		var skill = this.getSpiritEvent(skill);
 
-		var text = root.queryCommand('range_capacity');
-		ItemInfoRenderer.drawKeyword(x, y, text);
-		var dx = ItemInfoRenderer.getSpaceX();
-		this._drawRange(x + dx, y, skill);
+		if (this.isUsefulValue(skill.custom.startRange) || this.isUsefulValue(skill.custom.endRange)) {
+			var text = root.queryCommand('range_capacity');
+			ItemInfoRenderer.drawKeyword(x, y, text);
+			var dx = ItemInfoRenderer.getSpaceX();
+			this._drawRange(x + dx, y, skill);
+		}
 	},
 	getSkillSentenceCount: function(skill) {
 		var skill = this.getSpiritEvent(skill);
