@@ -3,5 +3,5 @@
 //will display information about the current weather on screen,
 //and you can toggle between different weathers with the
 //OPTION2 (default: shift) key
-ENABLE_WEATHER_DEBUG = true;
+ENABLE_WEATHER_DEBUG = false;
 DEFAULT_MAX_WEATHER_COUNT = 100; //Recommended is 100
