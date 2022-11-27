@@ -82,6 +82,10 @@
 		var score = alias3.call(this, unit, combination);
 		
 		var targetUnit = combination.targetUnit;
+		if (targetUnit == null) {
+			return score;
+		}
+
 		var i, turnStateList = unit.getTurnStateList();
 		var count = turnStateList.getCount();
 		
