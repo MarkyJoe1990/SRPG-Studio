@@ -86,18 +86,21 @@
 		var pow = alias1.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.power == undefined ? 0 : currentSkill.custom.power;
-			if (amount <= 0) {
-				pow += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.power == undefined ? 0 : currentSkill.custom.power;
+				if (amount <= 0) {
+					pow += bonus;
+				}
 			}
 		}
+
 		return pow;
 	}
 	
@@ -107,18 +110,21 @@
 		var hit = alias2.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.hit == undefined ? 0 : currentSkill.custom.hit;
-			if (amount <= 0) {
-				hit += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.hit == undefined ? 0 : currentSkill.custom.hit;
+				if (amount <= 0) {
+					hit += bonus;
+				}
 			}
 		}
+
 		return hit;
 	}
 	
@@ -128,18 +134,21 @@
 		var avo = alias3.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.avoid == undefined ? 0 : currentSkill.custom.avoid;
-			if (amount <= 0) {
-				avo += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.avoid == undefined ? 0 : currentSkill.custom.avoid;
+				if (amount <= 0) {
+					avo += bonus;
+				}
 			}
 		}
+
 		return avo;
 	}
 	
@@ -149,18 +158,21 @@
 		var crit = alias4.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.critical == undefined ? 0 : currentSkill.custom.critical;
-			if (amount <= 0) {
-				crit += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.critical == undefined ? 0 : currentSkill.custom.critical;
+				if (amount <= 0) {
+					crit += bonus;
+				}
 			}
 		}
+
 		return crit;
 	}
 	
@@ -170,18 +182,21 @@
 		var cavo = alias5.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.criticalAvoid == undefined ? 0 : currentSkill.custom.criticalAvoid;
-			if (amount <= 0) {
-				cavo += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.criticalAvoid == undefined ? 0 : currentSkill.custom.criticalAvoid;
+				if (amount <= 0) {
+					cavo += bonus;
+				}
 			}
 		}
+
 		return cavo;
 	}
 	
@@ -191,18 +206,21 @@
 		var agi = alias6.call(this, unit, weapon);
 		var skillArray = SkillControl.getDirectSkillArray(unit, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(unit, scope);
-			bonus = currentSkill.custom.agility == undefined ? 0 : currentSkill.custom.agility;
-			if (amount <= 0) {
-				agi += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(unit, scope);
+				bonus = currentSkill.custom.agility == undefined ? 0 : currentSkill.custom.agility;
+				if (amount <= 0) {
+					agi += bonus;
+				}
 			}
 		}
+
 		return agi;
 	}
 	
@@ -213,24 +231,27 @@
 		var def = alias7.call(this, active, passive, weapon, isCritical, totalStatus, trueHitValue);
 		var skillArray = SkillControl.getDirectSkillArray(passive, SkillType.CUSTOM, "LoneWolf");
 		
-		for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
-			currentSkill = skillArray[i].skill;
-			if (currentSkill.custom.scope == undefined) {
-				scopeError(currentSkill);
-			}
-			scope = currentSkill.custom.scope;
-			amount = alliesInRange(passive, scope);
-			
-			if (Miscellaneous.isPhysicsBattle(weapon)) {
-				bonus = currentSkill.custom.defense == undefined ? 0 : currentSkill.custom.defense;
-			} else {
-				bonus = currentSkill.custom.resistance == undefined ? 0 : currentSkill.custom.resistance;
-			}
-			
-			if (amount <= 0) {
-				def += bonus;
+		if (root.getCurrentScene() != SceneType.REST) {
+			for (i = 0; i < skillArray.length && skillArray.length > 0; i++) {
+				currentSkill = skillArray[i].skill;
+				if (currentSkill.custom.scope == undefined) {
+					scopeError(currentSkill);
+				}
+				scope = currentSkill.custom.scope;
+				amount = alliesInRange(passive, scope);
+				
+				if (Miscellaneous.isPhysicsBattle(weapon)) {
+					bonus = currentSkill.custom.defense == undefined ? 0 : currentSkill.custom.defense;
+				} else {
+					bonus = currentSkill.custom.resistance == undefined ? 0 : currentSkill.custom.resistance;
+				}
+				
+				if (amount <= 0) {
+					def += bonus;
+				}
 			}
 		}
+		
 		return def;
 	}
 }) ();
