@@ -1,0 +1,313 @@
+<html>
+    <head>
+        <script>
+            const schema = {
+                "title": "",
+                "settings": [
+                    {
+                        "type": "number",
+                        "label": "Start Range",
+                        "id": "startRange",
+                        "info": "Min is 0. Max is 5.",
+                        "required": true,
+                        "min": 0,
+                        "max": 5,
+                        "default": 1
+                    },
+                    {
+                        "type": "text",
+                        "label": "Test Text",
+                        "id": "test_text",
+                        "info": "Not usable",
+                        "required": true,
+                        "default": "Doop dooper"
+                    },
+                    {
+                        "type": "checkbox",
+                        "label": "Checkbox Test",
+                        "id": "checkbox_test",
+                        "info": "Checkbox info",
+                        "default": true
+                    },
+                    {
+                        "type": "dropdown",
+                        "label": "Dropdown Test",
+                        "id": "dropdown_test",
+                        "info": "Dropdown Info",
+                        "options": [
+                            {
+                                "label": "Option 1",
+                                "value": "option_1"
+                            },
+                            {
+                                "label": "Option 2",
+                                "value": "option_2"
+                            },
+                            {
+                                "label": "Option 3",
+                                "value": "option_3"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "array",
+                        "label": "Array Test",
+                        "id": "array_test",
+                        "info": "Array Test Info",
+                        "blocks" : [
+                            {
+                                "type": "text",
+                                "label": "String"
+                            },
+                            {
+                                "type": "number",
+                                "label": "Number"
+                            },
+                            {
+                                "type": "array",
+                                "label": "Array",
+                                "blocks": [
+                                    {
+                                        "type": "text",
+                                        "label": "String"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "label": "Object Test",
+                        "id": "object_test",
+                        "info": "Object Test Info",
+                        "settings": [
+                            {
+                                "type": "number",
+                                "id": "x",
+                                "label": "X"
+                            },
+                            {
+                                "type": "number",
+                                "id": "y",
+                                "label": "Y"
+                            }
+                        ]
+                    }
+                ]
+            }
+        </script>
+        <script src="https://unpkg.com/react@16.12.0/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+        <style>
+            .field {
+                padding: 12px;
+                border: solid black 1px;
+            }
+            .info {
+                color: #999999;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script type="text/babel">
+            // Initialize
+            const rootElement = document.getElementById('root');
+            const components = [];
+
+            const DeleteHandleContext = React.createContext();
+
+            // Functions
+            function buttonHandle(event) {
+                event.preventDefault();
+            }
+
+            function TypeField(props) {
+                const settings = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+
+                switch(settings.type) {
+                    case "number":
+                        return <NumberField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                    case "text":
+                        return <TextField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                    case "checkbox":
+                        return <CheckboxField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                    case "dropdown":
+                        return <DropdownField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                    case "array":
+                        return <ArrayField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                    default:
+                        return <UnknownField key={ settings.key } level={level} settings={ settings } arrayIndex={ arrayIndex } />;
+                }
+            }
+
+            function InputField(props) {
+                const settings = props.settings;
+                const { label, info, key } = settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const deleteBlockHandle = React.useContext(DeleteHandleContext)
+                const fullId = props.fullId;
+                const labelComponent = label != undefined ? <label htmlFor={ fullId }>{ label + " " }</label> : null;
+                const infoComponent = info != undefined ? <div className="info">{ info }</div> : null;
+                const inputComponent = props.inputComponent;
+                const deleteButton = level > 1 && deleteBlockHandle && <button type="button" data-array-block-index={ arrayIndex } onClick={ deleteBlockHandle }>Delete</button>;
+
+                return <div key={ key } data-level={ level } className="field number-field">{ labelComponent }{ inputComponent }{ infoComponent }{ deleteButton }</div>;
+            }
+
+            function NumberField(props) {
+                const { type, id, label, key, required, min, max, info } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "NumberInput" + key;
+
+                const inputComponent = <input data-parameter={id} className="number-input" type="number" min={min} max={max} defaultValue={defaultValue} id={ fullId } required={required} />;
+                return <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />;
+            }
+
+            function TextField(props) {
+                const { type, id, label, key, required, placeholder, info } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "TextInput" + key;
+
+                const inputComponent = <input data-parameter={id} className="text-input" type="text" defaultValue={defaultValue} id={ fullId } required={required} />;
+                return <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />;
+            }
+
+            function CheckboxField(props) {
+                const { type, id, label, key, info } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "CheckboxInput" + key;
+
+                const inputComponent = <input data-parameter={id} className="checkbox-input" type="checkbox" defaultChecked={defaultValue} id={ fullId } />;
+                return <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />;
+            }
+
+            function DropdownField(props) {
+                const { type, id, label, key, info, options } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "DropdownInput" + key;
+                const optionsList = [];
+
+                var i, count = options.length;
+                for (i = 0; i < count; i++) {
+                    var option = options[i];
+                    optionsList.push(<option key={key + "-" + i} value={ option.value }>{option.label}</option>);
+                }
+
+                const inputComponent = <select data-parameter={id} className="dropdown-input" id={ fullId } >{ optionsList }</select>;
+                return <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />;
+            }
+
+            function ArrayField(props) {
+                const { type, id, label, key, info, blocks } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const arrayBlockIndex = props.arrayBlockIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "ArrayInput" + key;
+                const [fieldList, setFieldList] = React.useState([]);
+                const currentLevel = level;
+                const [counter, setCounter] = React.useState(0);
+                // useEffect to update the stuff...?
+
+                function deleteBlockHandle(event) {
+                    event.preventDefault();
+                    var arr = fieldList || [];
+                    var arrayBlockIndex = parseInt(event.currentTarget.dataset.arrayBlockIndex);
+
+                    arr[arrayBlockIndex] = null;
+
+                    setFieldList(arr.map((e, i) => {
+                        return e;
+                    }));
+
+                    console.log("Field List", fieldList);
+                }
+
+                // Nested arrays can't be deleted for some reason.
+                function addBlockHandle(event) {
+                    event.preventDefault();
+                    let arr = fieldList || [];
+                    var arrayBlockIndex = parseInt(event.currentTarget.dataset.arrayBlockIndex);
+                    var currentKey = event.currentTarget.dataset.currentKey;
+                    var nextLevel = parseInt(level) + 1;
+                    var newKey = currentKey + "-" + arrayBlockIndex + "[" + counter + "]";
+                    var settings = props.settings.blocks[arrayBlockIndex]
+                    
+                    var newSettings = JSON.parse(JSON.stringify(settings));
+                    newSettings.key = newKey;
+
+                    arr[counter] = <TypeField key={ newKey } level={ nextLevel } settings={ newSettings } arrayIndex={ counter } />;
+
+                    setCounter(counter + 1);
+
+                    setFieldList(arr.map((e, i) => {
+                        return e;
+                    }));
+
+                    console.log("Field List", fieldList);
+                }
+
+                const inputComponent = [];
+
+                var i, count = blocks.length;
+                for (i = 0; i < count; i++) {
+                    let currentBlock = blocks[i];
+                    inputComponent.push(<button type="button" data-array-block-index={i} data-current-key={ props.settings.key + "-" + i } key={ key + "-" + i } data-type={ currentBlock.type } onClick={ addBlockHandle }>{"Add " + currentBlock.label}</button>);
+                }
+
+                inputComponent.push(<div className="array-items" key={"array-" + key}>{ fieldList }</div>);
+
+                return (
+                <DeleteHandleContext.Provider value={ deleteBlockHandle }>
+                    <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />
+                </DeleteHandleContext.Provider>
+                );
+            }
+
+            function UnknownField(props) {
+                const { type, id, label, key, required, min, max, info } = props.settings;
+                const level = props.level;
+                const arrayIndex = props.arrayIndex;
+                const defaultValue = props.settings.default;
+                const fullId = "UnknownInput" + key;
+
+                const inputComponent = <div data-parameter={id} className="unknown-input" id={ fullId } >Unknown Field</div>;
+                return <InputField key={ key } level={ level } settings={ props.settings } inputComponent={ inputComponent } fullId={ fullId } arrayIndex={ arrayIndex } />;
+            }
+
+            // Start
+            var i, count = schema.settings.length;
+            for (i = 0; i < count; i++) {
+                let currentSettings = schema.settings[i];
+                let newSettings = JSON.parse(JSON.stringify(currentSettings));
+                newSettings.key = i + 1;
+
+                components.push(<TypeField key={ newSettings.key } level="1" settings={ newSettings } />)
+            }
+
+            const element = <form className="container">
+                { components }
+                <button className="button" id="submitButton" type="submit" onClick={ buttonHandle }>Submit</button>
+                <pre className="textarea-container"></pre>
+            </form>;
+
+            document.title = schema.title || "UI Generator For Custom Parameters";
+            ReactDOM.render(element, rootElement);
+        </script>
+</body>
+</html>
