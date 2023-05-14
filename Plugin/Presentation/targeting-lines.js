@@ -15,7 +15,7 @@
 	every player phase, and whenever the player commits to a move with one of
 	their units. This creates targeting lines that are both accurate and non-laggy.
 */
-
+GlobalLineGenerator = null;
 LINE_DEBUG_ENABLED = false; //Set to true to enable debug mode
 
 var LineGenerator = defineObject(BaseObject, {
@@ -62,42 +62,53 @@ var LineGenerator = defineObject(BaseObject, {
 				this._badIndex[index] = {
 					unit: currentEnemy,
 					walkArray: [],
-					weaponArray: []
+					weaponArray: [],
+					stepArray: []
 				};
 			}
 			
 			var isSkippable = true;
-			//var reason = "";
-			
+			var reason = "";
+
 			if (this._badIndex[index].walkArray == undefined) {
-				//reason = "BadIndex Undefined.";
+				reason = "BadIndex Undefined.";
 				isSkippable = false;
 			}
 			
 			if (isSkippable && this._currentPositionChanged(this._badIndex[index])) {
-				//reason = "Pos Change.";
+				reason = "Pos Change.";
 				isSkippable = false;
 			}
 			
 			if (isSkippable && this._terrainIsDifferent(this._badIndex[index])) {
-				//reason = "Terrain Change.";
+				reason = "Terrain Change.";
 				isSkippable = false;
 			}
 			
 			if (isSkippable && this._unitsInRangeChange(this._badIndex[index])) {
-				//reason = "InRange Target Change.";
+				reason = "InRange Target Change.";
 				isSkippable = false;
 			}
 			
 			if (!this._isValidEnemy(currentEnemy, attackRange)) {
-				//reason = "Invalid Unit.";
+				reason = "Invalid Unit.";
 				isSkippable = true;
 			}
 			
 			if (!isSkippable) {
 				this._mapSim.startSimulationWeapon(currentEnemy, attackRange.mov, attackRange.startRange, attackRange.endRange);
-				this._badIndex[index].weaponArray = this._mapSim.getSimulationWeaponIndexArray();
 				this._badIndex[index].walkArray = this._mapSim.getSimulationIndexArray();
+				this._addToStepArray(this._badIndex[index].stepArray, this._badIndex[index].walkArray)
+				
+				var weapon = ItemControl.getEquippedWeapon(currentEnemy);
+				if (typeof SplashControl != "undefined" && weapon && SplashControl.hasSplashTiles(weapon)) {
+					this._badIndex[index].weaponArray = this._getSplashArray(this._badIndex[index].walkArray, weapon);
+					//SplashControl.createSplashRangeIndexArray();
+				} else {
+					this._badIndex[index].weaponArray = this._mapSim.getSimulationWeaponIndexArray();
+				}
+				
+				this._addToStepArray(this._badIndex[index].stepArray, this._badIndex[index].weaponArray);
 				
 				//Grab unit's coordinates for later.
 				this._badIndex[index].x = currentEnemy.getMapX();
@@ -126,16 +137,18 @@ var LineGenerator = defineObject(BaseObject, {
 			x: MapCursor.getX(),
 			y: MapCursor.getY()
 		}
+		
 		this._currentUnitIndex.index = CurrentMap.getIndex(this._currentUnitIndex.x, this._currentUnitIndex.y)
 		
 		var isSelectable;
-		if (this.getParentInstance()._mapSequenceArea._mapCursor != null) {
+		var playerTurn = this.getParentInstance();
+		if (playerTurn.getCycleMode() == PlayerTurnMode.AREA || playerTurn.getCycleMode() == PlayerTurnMode.UNITCOMMAND) {
 			isSelectable = this.getParentInstance()._mapSequenceArea._isPlaceSelectable();
 		} else {
 			isSelectable = false;
 		}
 		
-		var found = false;
+		var found;
 		if (isSelectable) {
 			for (i = 0; i < this._badIndex.length; i++) {
 				
@@ -160,21 +173,102 @@ var LineGenerator = defineObject(BaseObject, {
 		this._timePassed++;
 	},
 	
-	drawLineGenerator: function() {
-		var myX = LayoutControl.getPixelX(this._currentUnitIndex.x) + 16;
-		var myY = LayoutControl.getPixelY(this._currentUnitIndex.y) + 16;
+	_addToStepArray: function(stepArray, indexArray) {
+		var i, count = indexArray.length;
 		
-		var color = 0xFF0000;
+		for (i = 0; i < count; i++) {
+			stepArray[indexArray[i]] = true;
+		}
+	},
+	
+	_getSplashArray: function(moveIndex, weapon) {
+		var filteredMoveIndex = this._filterMoveIndex(moveIndex);
+		
+		var indexArray = [];
+		var prevAllowedArray = [];
+		var disallowedArray = SplashControl.createDisallowedArray(moveIndex);
+			
+		var allowedTiles = SplashControl.getAllowedTiles(weapon);
+		
+		if (!allowedTiles) {
+			allowedTiles = SplashControl.generateAllowedTilesFromRange(weapon);
+		}
+		
+		var splashTiles = SplashControl.getSplashTiles(weapon);
+		var flipType = SplashControl.getFlipType(weapon);
+		
+		var i, count = filteredMoveIndex.length;
+		for (i = 0; i < count; i++) {
+			var x = CurrentMap.getX(filteredMoveIndex[i]);
+			var y = CurrentMap.getY(filteredMoveIndex[i]);
+			
+			indexArray = SplashControl.createSplashRangeIndexArray(x, y, allowedTiles, splashTiles, flipType, indexArray, prevAllowedArray, disallowedArray);
+		}
+		
+		return indexArray;
+	},
+	
+	_filterMoveIndex: function(indexArray) {
+		//Grab indexArray. Check if any tiles adjacent 
+		var newMoveIndex = [];
+		var yFactor = root.getCurrentSession().getCurrentMapInfo().getMapWidth();
+		var relativeIndex = [-1, 1, yFactor, yFactor * -1];
+		var relCount = relativeIndex.length;
+		var i, count = indexArray.length;
+		
+		
+		for (i = 0; i < count; i++) {
+			var currentIndex = indexArray[i]
+			
+			for (j = 0; j < relCount; j++) {
+				var relIndex = currentIndex + relativeIndex[j];
+				
+				this.nonRedundantAdd(currentIndex, newMoveIndex)
+			}
+		}
+		
+		return newMoveIndex;
+	},
+	
+	nonRedundantAdd: function(element, array) {
+		var low, mid, high;
+		for (low = 0, high = array.length; low < high;) {
+			mid = low + high >>> 1
+			if (array[mid] < element) {
+				low = mid + 1;
+			} else {
+				high = mid;
+			}
+		}
+		
+		if (element != array[low]) {
+			array.splice(low, 0, element)
+		}
+	},
+	
+	drawLineGenerator: function() {
+		var myX = LayoutControl.getPixelX(this._currentUnitIndex.x) + Math.floor(GraphicsFormat.MAPCHIP_WIDTH / 2);
+		var myY = LayoutControl.getPixelY(this._currentUnitIndex.y) + Math.floor(GraphicsFormat.MAPCHIP_HEIGHT / 2);
 		
 		for (i = 0; i < this._enemiesInRange.length; i++) {
 			var currentUnit = this._enemiesInRange[i];
+
+			var color = 0xFF0000;
+
+			var weapon = ItemControl.getEquippedWeapon(currentUnit);
+			if (weapon != null) {
+				var targetingLineColor = weapon.custom.targetingLineColor;
+				if (targetingLineColor != undefined) {
+					color = targetingLineColor;
+				}
+			}
 			
 			if (currentUnit.getAliveState() != AliveType.ALIVE) {
 				continue;
 			}
 			
-			var currentX = LayoutControl.getPixelX(currentUnit.getMapX()) + 16;
-			var currentY = LayoutControl.getPixelY(currentUnit.getMapY()) + 16;
+			var currentX = LayoutControl.getPixelX(currentUnit.getMapX()) + Math.floor(GraphicsFormat.MAPCHIP_WIDTH / 2);
+			var currentY = LayoutControl.getPixelY(currentUnit.getMapY()) + Math.floor(GraphicsFormat.MAPCHIP_HEIGHT / 2);
 			
 			var figure = this._canvas.createFigure();
 			figure.beginFigure(currentX, currentY);
@@ -219,11 +313,16 @@ var LineGenerator = defineObject(BaseObject, {
 	},
 	
 	_isValidEnemy: function(unit, attackRange) {
-		if (unit.getAliveState() != AliveType.ALIVE) {return false;};
-		if (unit.isInvisible()) {return false};
-		if (attackRange.endRange == 0) {return false};
-		
-		if (unit == null) {return false;}
+		if (unit == null ||
+			unit.getAliveState() != AliveType.ALIVE ||
+			attackRange.endRange == 0 ||
+			unit.isActionStop() ||
+			unit.isWait() ||
+			unit.isInvisible() ||
+			StateControl.isBadStateOption(unit, BadStateOption.NOACTION)
+		) {
+			return false
+		};
 		
 		var aiPattern = unit.createAIPattern();
 		
@@ -233,6 +332,8 @@ var LineGenerator = defineObject(BaseObject, {
 		
 		if (aiPattern.getPatternType() == PatternType.MOVE && aiPattern.getMovePatternInfo().getMoveAIType() == MoveAIType.MOVEONLY) {return false};
 		if (aiPattern.getPatternType() == PatternType.WAIT && aiPattern.getWaitPatternInfo().isWaitOnly()) {return false};
+		
+		//Check to see if there 
 		
 		return true;
 	},
@@ -277,6 +378,7 @@ var LineGenerator = defineObject(BaseObject, {
 			}
 			
 			var targetUnit = PosChecker.getUnitFromPos(x, y);
+
 			if (targetUnit != null) {
 				var targetUnitType = targetUnit.getUnitType();
 				
@@ -319,6 +421,7 @@ var LineGenerator = defineObject(BaseObject, {
 			var y = CurrentMap.getY(currentWeaponIndex);
 			
 			var targetUnit = PosChecker.getUnitFromPos(x, y);
+			
 			if (targetUnit != null) {
 				//If they are the same unit, don't worry.
 				//If they are an ally, don't worry.
@@ -331,6 +434,31 @@ var LineGenerator = defineObject(BaseObject, {
 		}
 		
 		return targetCount;
+	},
+	
+	_combineArrays: function(srcArray, destArray) {
+		var i, count = srcArray.length;
+		
+		for (i = 0; i < count; i++) {
+			var currentIndex = srcArray[i];
+			this._sortedAdd(currentIndex, destArray);
+		}
+	},
+	
+	_sortedAdd: function(element, array) {
+		var low, mid, high;
+		for (low = 0, high = array.length; low < high;) {
+			mid = low + high >>> 1
+			if (array[mid] < element) {
+				low = mid + 1;
+			} else {
+				high = mid;
+			}
+		}
+		
+		if (element != array[low]) {
+			array.splice(low, 0, element)
+		}
 	}
 	
 });
@@ -380,6 +508,7 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._prepareTurnMemberData = function() {
 		alias6.call(this);
 		this._lineGenerator = createObjectEx(LineGenerator, this);
+		GlobalLineGenerator = this._lineGenerator;
 	}
 	
 	var alias7 = RepeatMoveFlowEntry.enterFlowEntry;
