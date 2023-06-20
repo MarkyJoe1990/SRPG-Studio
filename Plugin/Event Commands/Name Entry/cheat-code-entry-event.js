@@ -14,7 +14,7 @@
             var keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
             var lengthLimit = 20;
     
-            this._windowManager.setUp(title, keys, 0, lengthLimit, null);
+            this._windowManager.setUp(title, keys, 0, lengthLimit, null, "");
             if (CheatCodeControl.isCheatConfigEnabled()) {
                 this._startCheatWindowManager();
                 return;
