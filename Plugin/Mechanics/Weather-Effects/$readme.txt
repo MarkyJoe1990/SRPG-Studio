@@ -6,12 +6,15 @@ It implements weather and other effects in SRPG Studio. You can finally have eff
 
 How do I use it?
 - take the folder this readme was in and put it in your plugins folder
-- Go into the Material folder of this repo and look for "weather-material". Put that in your Material folder.
+- take the weather-material folder that's in this folder and put it in your material folder
 	- If you don't have a material folder in the root of your SRPG Studio project, make one
 	- Then put the weather-material folder in it
 - Go to the map you want to have weather on, and set its custom parameter "weather" to the name of the weather you want.
 	- Alternatively, create an execute script event command that executes the code: changeWeather("NAME OF WEATHER")
 - You can view the names of the available weathers by looking at the js files within the WeatherObject folder
+
+Can you give me an example of what that looks like?
+
 
 How do I make my own weather?
 Here's a few very useful pointers to hopefully help you figure it out. Note that you need some javascript programming knowledge to make your own weather.
