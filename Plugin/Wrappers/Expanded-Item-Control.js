@@ -35,6 +35,91 @@ var ExpandedItemControl = {
 
     getItemIdCompensation: function() {
         return 0x10000;
+    },
+
+    filterItemIdArray: function(itemIdArray, func) {
+        var newArr = [];
+        var i, currentItemId, currentItem, count = itemIdArray.length;
+
+        // Defaults
+        itemIdArray = itemIdArray || [];
+        func = func || function(item) {
+            return true;
+        };
+
+        // Filter
+        for (i = 0; i < count; i++) {
+            currentItemId = itemIdArray[i];
+            currentItem = this.getItemFromId(currentItemId);
+
+            if (currentItem == null) {
+                continue;
+            }
+
+            if (func(currentItem) === true) {
+                newArr.push(currentItemId);
+            }
+        }
+
+        return newArr;
+    },
+
+    createItemList: function(itemIdArray, func) {
+        if (func != undefined) {
+            itemIdArray = this.filterItemIdArray(itemIdArray, func);
+        }
+
+        var list = this.buildDataList();
+        list.getDataFromId = function(id) {
+            var i, currentObject, count = this._arr.length;
+            for (i = 0; i < count; i++) {
+                currentObject = this.getData(i);
+
+                if (currentObject.getId() === id) {
+                    return currentObject;
+                }
+            }
+
+            return null;
+        }
+
+        list.setDataArray(itemIdArray || []);
+        return list;
+    },
+
+    filterItemList: function(itemList, func) {
+        var list = this.buildDataList();
+        var newArr = [];
+        var i, currentItem, count = itemList.getCount();
+        for (i = 0; i < count; i++) {
+            currentItem = itemList.getData(i);
+            if (func(currentItem) === true) {
+                newArr.push(currentItem);
+            }
+        }
+
+        list.setDataArray(newArr);
+        return list;
+    },
+
+    // Normally, StructureBuilder.buildDataList lacks getDataFromId method.
+    // This adds it so the list functions properly in certain contexts.
+    buildDataList: function() {
+        var list = StructureBuilder.buildDataList();
+        list.getDataFromId = function(id) {
+            var i, currentObject, count = this._arr.length;
+            for (i = 0; i < count; i++) {
+                currentObject = this.getData(i);
+
+                if (currentObject.getId() === id) {
+                    return currentObject;
+                }
+            }
+
+            return null;
+        }
+
+        return list;
     }
 }
 
