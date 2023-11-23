@@ -14,7 +14,6 @@
 	scripts you might have.
 */
 
-GlobalLineGenerator = null;
 LINE_DEBUG_ENABLED = false; //Set to true to enable debug mode
 
 var LINES_LONG_RANGE_COLOR = 0xFF00FF;
@@ -34,17 +33,18 @@ var LineGenerator = defineObject(BaseObject, {
 		this._graphicsManager = root.getGraphicsManager();
 		this._canvas = this._graphicsManager.getCanvas();
 		this._enemiesInRange = [];
-		this._rangeDataArray = CurrentMap.getEnemyRangeCollector().getRangeDataArray();
+		this._enemyRangeCollector = CurrentMap.getEnemyRangeCollector();
+		this._rangeDataArray = this._enemyRangeCollector.getRangeDataArray();
 	},
 	
 	resetTimer: function() {
 		this._timePassed = 0;
-		CurrentMap.getEnemyRangeCollector().reset();
+		this._enemyRangeCollector.reset();
 	},
 	
 	moveLineGenerator: function() {
 		if (this._timePassed % 2 === 0) {
-			CurrentMap.getEnemyRangeCollector().checkNextUnit() === false;
+			this._enemyRangeCollector.checkNextUnit() === false;
 		}
 
 		var playerTurn = this.getParentInstance();
@@ -234,7 +234,6 @@ var LineGenerator = defineObject(BaseObject, {
 	PlayerTurn._prepareTurnMemberData = function() {
 		alias6.call(this);
 		this._lineGenerator = createObjectEx(LineGenerator, this);
-		GlobalLineGenerator = this._lineGenerator;
 	}
 	
 	var alias7 = RepeatMoveFlowEntry.enterFlowEntry;
