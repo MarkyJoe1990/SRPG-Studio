@@ -162,12 +162,26 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             return false;
         }
 
-        if (unit.isInvisible() === true) {
+        if (this._isInvisible(unit) === true) {
             return false;
         }
 		
 		return true;
 	},
+
+    _isInvisible: function(unit) {
+        if (unit.isInvisible() === true) {
+            return true;
+        }
+
+        if (typeof CurrentMap.checkInvisibleUnit != "undefined") {
+            if (CurrentMap.checkInvisibleUnit(unit.getMapX(), unit.getMapY(), UnitType.PLAYER) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    },
 
     isAttackerUnit: function(rangeData) {
         var unit = rangeData.unit;
