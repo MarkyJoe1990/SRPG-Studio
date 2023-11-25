@@ -1,5 +1,5 @@
 /*
-    Version 1.0
+    Version 1.1
     Made by MarkyJoe1990
 
     What the heck does this do?

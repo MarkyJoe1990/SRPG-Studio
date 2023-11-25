@@ -5,6 +5,8 @@
 // Line Generator will be movable and will mostly handle drawing lines
 // and checking unit ranges.
 
+var ENABLE_ENEMY_RANGE_DEBUG = false;
+
 var EnemyRangeCollector = defineObject(BaseObject, {
     _simulator: null,
     _rangeDataArray: null,
@@ -17,8 +19,15 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
     initialize: function() {
         this._simulator = root.getCurrentSession().createMapSimulator();
-        this._rangeDataArray = this.reloadRangeDataArray();
+        
+        var enemyRangeCollectorData = this.reloadRangeData();
+        this._rangeDataArray = enemyRangeCollectorData.rangeDataArray;
+        this._combinedIndexArray = enemyRangeCollectorData.combinedIndexArray;
+        this._switchArray = enemyRangeCollectorData.switchArray;
+        this._weaponSwitchArray = enemyRangeCollectorData.weaponSwitchArray;
+
         this._isSplashControlEnabled = typeof SplashControl != "undefined";
+        this._isEnemyRangeEnabled = typeof EnemyRange != "undefined";
         this.reset();
     },
 
@@ -26,14 +35,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         this._enemyList = root.getCurrentSession().getEnemyList();
         this._enemyCount = this._enemyList.getCount();
         this._currentIndex = 0;
-        this._switchArray = Array(CurrentMap.getSize());
-        this._weaponSwitchArray = Array(CurrentMap.getSize());
-
-        // Reset tile index array
-        this._combinedIndexArray = {
-            indexArray: [],
-            weaponIndexArray: []
-        }
     },
 
     // returns boolean isContinue
@@ -65,12 +66,15 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 // If not, can this unit's range be skipped?
                 if (this.isRangeDataSkippable(rangeData) === false) {
                     // If not, update!
+                    this.removeFromCombinedIndexArray(rangeData);
                     this.updateRangeData(rangeData);
-                    this.updateCombinedIndexArray(rangeData);
-                    this._rangeDataArray[this._currentIndex] = rangeData;
+                    this.addToCombinedIndexArray(rangeData);
+                    if (this._isEnemyRangeEnabled === true) {
+                        EnemyRange.updateRange();
+                        UnitStateAnimator.updateIcons();
+                    }
+
                     break;
-                } else {
-                    this.updateCombinedIndexArray(rangeData);
                 }
             }
         }
@@ -168,6 +172,26 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 		
 		return true;
 	},
+
+    drawDebug: function() {
+        var textui = root.queryTextUI("default_window");
+        var color = textui.getColor();
+        var font = textui.getFont();
+        var session = root.getCurrentSession();
+
+        var scrollX = session.getScrollPixelX();
+        var scrollY = session.getScrollPixelY();
+
+        var i, count = this._switchArray.length;
+        var x, y;
+        for (i = 0; i < count; i++) {
+            x = (CurrentMap.getX(i) * GraphicsFormat.MAPCHIP_WIDTH) - scrollX;
+            y = (CurrentMap.getY(i) * GraphicsFormat.MAPCHIP_HEIGHT) - scrollY;
+
+            TextRenderer.drawText(x, y, this._switchArray[i], -1, color, font);
+        }
+
+    },
 
     _isInvisible: function(unit) {
         if (unit.isInvisible() === true) {
@@ -284,8 +308,8 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                     }
                 }
             }
-            // END SPLASH PLACE
         }
+        // END SPLASH PLACE
         
         // Update movePointArray
         var i, count = rangeData.indexArray.length;
@@ -304,23 +328,47 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         this._rangeDataArray[this._currentIndex] = rangeData;
     },
 
-    // For weapon indexes to not overlap with walk indexes
-    // all walk indexes need to be known first.
-    updateCombinedIndexArray: function(rangeData) {
+    removeFromCombinedIndexArray: function(rangeData) {
         var destIndexArray = this._combinedIndexArray.indexArray;
         var destWeaponIndexArray = destIndexArray; // this._combinedIndexArray.weaponIndexArray;
 
         var rangeDataIndexArray = rangeData.indexArray;
         var rangeDataWeaponIndexArray = rangeData.weaponIndexArray;
 
+        var switchArray = this._switchArray;
+        var weaponSwitchArray = switchArray; // this._weaponSwitchArray;
+
         var i, count = rangeDataIndexArray.length;
         for (i = 0; i < count; i++) {
-            this.nonRedundantAdd(rangeDataIndexArray[i], destIndexArray, this._switchArray);
+            this.nonRedundantRemove(rangeDataIndexArray[i], destIndexArray, switchArray);
         }
 
         count = rangeDataWeaponIndexArray.length;
         for (i = 0; i < count; i++) {
-            this.nonRedundantAdd(rangeDataWeaponIndexArray[i], destWeaponIndexArray, this._switchArray /* this._weaponSwitchArray */);
+            this.nonRedundantRemove(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
+        }
+    },
+
+    // For weapon indexes to not overlap with walk indexes
+    // all walk indexes need to be known first.
+    addToCombinedIndexArray: function(rangeData) {
+        var destIndexArray = this._combinedIndexArray.indexArray;
+        var destWeaponIndexArray = destIndexArray; // this._combinedIndexArray.weaponIndexArray;
+
+        var rangeDataIndexArray = rangeData.indexArray;
+        var rangeDataWeaponIndexArray = rangeData.weaponIndexArray;
+
+        var switchArray = this._switchArray;
+        var weaponSwitchArray = switchArray; // this._weaponSwitchArray;
+
+        var i, count = rangeDataIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantAdd(rangeDataIndexArray[i], destIndexArray, switchArray);
+        }
+
+        count = rangeDataWeaponIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantAdd(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
         }
     },
 
@@ -328,33 +376,30 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         return this._combinedIndexArray;
     },
 
-    reloadRangeDataArray: function() {
+    reloadRangeData: function() {
         // When reloading IDs, make sure you reset the unit property as well
         var global = root.getMetaSession().global;
-        if (global.rangeDataArray == undefined) {
-            global.rangeDataArray = [];
-        }
-
-        // Check current map
         var session = root.getCurrentSession();
         var mapData = session.getCurrentMapInfo();
-        if (global.enemyRangeCollectorMapId != mapData.getId()) {
+        var mapId = mapData.getId();
+        if (global.enemyRangeCollectorData == undefined || global.enemyRangeCollectorMapId != mapId) {
             global.enemyRangeCollectorMapId = mapData.getId();
-            global.rangeDataArray = [];
-            return global.rangeDataArray;
+            global.enemyRangeCollectorData = this._buildEnemyRangeCollectorData();
+            return global.enemyRangeCollectorData;
         }
 
         // rangeData.unit is broken, so we need to reload it.
-        var i, currentRangeData, count = global.rangeDataArray.length;
+        var rangeDataArray = global.enemyRangeCollectorData.rangeDataArray;
+        var i, currentRangeData, count = rangeDataArray.length;
         for (i = count - 1; i >= 0; i--) {
-            currentRangeData = global.rangeDataArray[i];
+            currentRangeData = rangeDataArray[i];
             currentRangeData.unit = this._reloadUnitFromId(currentRangeData.id);
             if (currentRangeData.unit == null) {
-                global.rangeDataArray.splice(i, 1);
+                rangeDataArray.splice(i, 1);
             }
         }
 
-        return global.rangeDataArray;
+        return global.enemyRangeCollectorData;
     },
 
     _isPassUnit: function(unit) {
@@ -492,9 +537,14 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 		var yFactor = root.getCurrentSession().getCurrentMapInfo().getMapWidth();
 		var relativeIndex = [-1, 1, yFactor, yFactor * -1];
 		var j, relCount = relativeIndex.length;
-        var switchArray = [];
+        var switchArray = Array(CurrentMap.getSize());
+
+        var i, currentIndex, count = switchArray.length;
+        for (i = 0; i < count; i++) {
+            switchArray[i] = 0;
+        }
 		
-		var i, currentIndex, count = indexArray.length;
+		count = indexArray.length;
 		for (i = 0; i < count; i++) {
 			var currentIndex = indexArray[i];
 			
@@ -507,10 +557,49 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     },
 
     nonRedundantAdd: function(element, array, switchArray) {
-        if (switchArray[element] !== true) {
-            switchArray[element] = true;
-            array.push(element);
+       if (switchArray[element] === 0) {
+            var guess;
+            for (var min = 0, max = array.length; min < max;) {
+                guess = min + max >>> 1;
+                if (array[guess] < element) {
+                    min = guess + 1;
+                } else {
+                    max = guess;
+                }
+            }
+
+            if (element > array[guess]) {
+                guess++;
+            }
+
+            array.splice(guess, 0, element);
         }
+
+        switchArray[element]++
+        return;
+    },
+
+    nonRedundantRemove: function(element, array, switchArray) {
+        if (switchArray[element] === 1) {
+            var guess;
+            for (var min = 0, max = array.length; min < max;) {
+                guess = min + max >>> 1;
+                if (array[guess] === element) {
+                    break;
+                } else if (array[guess] < element) {
+                    min = guess + 1;
+                } else {
+                    max = guess;
+                }
+            }
+
+            if (element == array[guess]) {
+                array.splice(guess, 1);
+            }
+        };
+
+        switchArray[element]--;
+        return;
     },
 
     _buildRangeData: function() {
@@ -525,6 +614,24 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             indexArray: [],
             weaponIndexArray: [],
             movePointArray: []
+        }
+    },
+
+    _buildEnemyRangeCollectorData: function() {
+        var switchArray = Array(CurrentMap.getSize());
+        var i, count = switchArray.length;
+        for (i = 0; i < count; i++) {
+            switchArray[i] = 0;
+        }
+
+        return {
+            rangeDataArray: [],
+            combinedIndexArray: {
+                indexArray: [],
+                weaponIndexArray: []
+            },
+            switchArray: switchArray.slice(),
+            weaponSwitchArray: switchArray.slice()
         }
     }
 });

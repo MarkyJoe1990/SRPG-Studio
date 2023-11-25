@@ -68,6 +68,16 @@
         alias8.call(this);
     }
 
+    var alias9 = MapLayer.drawMapLayer;
+    MapLayer.drawMapLayer = function() {
+        alias9.call(this);
+
+        if (ENABLE_ENEMY_RANGE_DEBUG === true) {
+            var enemyRangeCollector = CurrentMap.getEnemyRangeCollector();
+            enemyRangeCollector != null && enemyRangeCollector.drawDebug();
+        }
+    }
+
     MarkingPanel._getWeaponColor = function() {
         return this._getColor();
     }
