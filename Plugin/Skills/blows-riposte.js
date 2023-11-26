@@ -55,38 +55,26 @@
 	
 	attackCount
 	number of ADDITIONAL attacks the user will do
+
+修复据点展示报错。
 	
 */
 
 
 (function () {
 	var isBlowBonus = function(unit) {
-		var unitType = unit.getUnitType();
-		var scene = root.getCurrentScene();
-		
-		if (scene != SceneType.REST) {
-			var turnType = root.getCurrentSession().getTurnType();
-			
-			if (unitType == turnType) {
-				return true
-			}
+		if (root.getCurrentScene() != SceneType.REST) {
+			return unit.getUnitType() === root.getCurrentSession().getTurnType();
 		}
-		
+
 		return false;
 	}
 	
 	var isRiposteBonus = function(unit) {
-		var unitType = unit.getUnitType();
-		var scene = root.getCurrentScene();
-		
-		if (scene != SceneType.REST) {
-			var turnType = root.getCurrentSession().getTurnType();
-			
-			if (unitType != turnType) {
-				return true
-			}
+		if (root.getCurrentScene() != SceneType.REST) {
+			return unit.getUnitType() != root.getCurrentSession().getTurnType();
 		}
-		
+
 		return false;
 	}
 	
