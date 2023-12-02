@@ -40,4 +40,12 @@ var EnemyRangeCollectorFlowEntry = defineObject(BaseFlowEntry, {
             TextRenderer.drawRangeText(range, TextFormat.CENTER, text, length, color, font);
 		}
     }
-})
+});
+
+( function () {
+    var alias1 = BattleSetupScene._pushFlowAfterEntries;
+    BattleSetupScene._pushFlowAfterEntries = function(straightFlow) {
+        alias1.call(this, straightFlow);
+        straightFlow.pushFlowEntry(EnemyRangeCollectorFlowEntry);
+    };
+}) ();

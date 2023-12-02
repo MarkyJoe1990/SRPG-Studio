@@ -16,6 +16,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     _combinedIndexArray: null,
     _switchArray: null,
     _weaponSwitchArray: null,
+    _timePassed: 0,
 
     initialize: function() {
         this._simulator = root.getCurrentSession().createMapSimulator();
@@ -32,9 +33,17 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     },
 
     reset: function() {
+        this._timePassed = 0;
         this._enemyList = root.getCurrentSession().getEnemyList();
         this._enemyCount = this._enemyList.getCount();
         this._currentIndex = 0;
+    },
+
+    // Check units every two frames
+    moveEnemyRangeCollector: function() {
+        if (this._timePassed % 2 === 0) {
+            this.checkNextUnit();
+        }
     },
 
     // returns boolean isContinue
@@ -75,6 +84,14 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                     }
 
                     break;
+                }
+            } else {
+                this.removeFromCombinedIndexArray(rangeData);
+                this.nullRangeData(rangeData);
+                this.addToCombinedIndexArray(rangeData);
+                if (this._isEnemyRangeEnabled === true) {
+                    EnemyRange.updateRange();
+                    UnitStateAnimator.updateIcons();
                 }
             }
         }
@@ -326,6 +343,15 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         rangeData.targetCount = this._countTargetsInRange(rangeData);
 
         this._rangeDataArray[this._currentIndex] = rangeData;
+    },
+
+    nullRangeData: function(rangeData) {
+        // rangeData.x = -1;
+        // rangeData.y = -1;
+        rangeData.indexArray = [];
+        rangeData.weaponIndexArray = [];
+        // rangeData.targetCount = 0;
+        // rangeData.movePointArray = [];
     },
 
     removeFromCombinedIndexArray: function(rangeData) {
