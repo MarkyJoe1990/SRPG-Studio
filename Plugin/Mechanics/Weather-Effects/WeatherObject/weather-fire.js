@@ -20,6 +20,9 @@ var WeatherFire = defineObject(WeatherObject, {
 	},
 	
 	specialEffect: function() {
+		var width = root.getGameAreaWidth();
+		var height = Math.floor(root.getGameAreaHeight() / 2);
+
 		var flare = {
 			x: 0,
 			y: 32,
@@ -28,9 +31,9 @@ var WeatherFire = defineObject(WeatherObject, {
 		}
 		
 		this._image.setAlpha(96);
-		this._image.drawStretchParts(0, 240, 640, 240, flare.x, flare.y, flare.width, flare.height);
+		this._image.drawStretchParts(0, height, width, height, flare.x, flare.y, flare.width, flare.height);
 		this._image.setAlpha(96);
 		this._image.setDegree(180)
-		this._image.drawStretchParts(0, 0, 640, 240, flare.x, flare.y, flare.width, flare.height);
+		this._image.drawStretchParts(0, 0, width, height, flare.x, flare.y, flare.width, flare.height);
 	}
 });
