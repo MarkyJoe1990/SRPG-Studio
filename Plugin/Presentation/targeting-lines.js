@@ -168,21 +168,33 @@ var LineGenerator = defineObject(BaseObject, {
 
 
 (function () {
+	MapSequenceArea._isLineGeneratorEnabled = false;
+	MapSequenceArea.enableLineGenerator = function(isLineGeneratorEnabled) {
+		this._isLineGeneratorEnabled = isLineGeneratorEnabled;
+	}
+
+	MapSequenceArea.isLineGeneratorEnabled = function() {
+		return this._isLineGeneratorEnabled === true;
+	}
+
 	var alias1 = MapSequenceArea._prepareSequenceMemberData;
 	MapSequenceArea._prepareSequenceMemberData = function(parentTurnObject) {
 		this._lineGenerator = createObjectEx(LineGenerator, this);
 		alias1.call(this, parentTurnObject);
+
+		var unit = this._targetUnit;
+		this.enableLineGenerator(unit != null && unit.getUnitType() === UnitType.PLAYER);
 	}
 
 	var alias2 = MapSequenceArea._moveArea;
 	MapSequenceArea._moveArea = function() {
-		this._lineGenerator.moveLineGenerator();
+		this.isLineGeneratorEnabled() === true && this._lineGenerator.moveLineGenerator();
 		return alias2.call(this);
 	}
 
 	var alias3 = MapSequenceArea._drawArea;
 	MapSequenceArea._drawArea = function() {
 		alias3.call(this);
-		this._lineGenerator.drawLineGenerator();
+		this.isLineGeneratorEnabled() === true && this._lineGenerator.drawLineGenerator();
 	}
 }) ();
