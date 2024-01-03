@@ -1,5 +1,5 @@
 /*
-	Version 3
+	Version 3.1
 	Made by MarkyJoe1990
 	
 	This implements enemy targeting lines similar to Fire Emblem: Three Houses.
