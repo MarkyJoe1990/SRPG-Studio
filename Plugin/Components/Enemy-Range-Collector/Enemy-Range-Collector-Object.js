@@ -163,11 +163,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             return false;
         }
 
-        // Check if number of units in range changed
-        if (this._isTargetCountChanged(rangeData) === true) {
-            return false;
-        }
-
         return true;
     },
 
@@ -177,14 +172,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         }
 
         if (unit.getAliveState() != AliveType.ALIVE) {
-            return false;
-        }
-
-        if (unit.isActionStop() === true) {
-            return false;
-        }
-
-        if (unit.isWait() === true) {
             return false;
         }
 
@@ -236,11 +223,24 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             return false;
         }
 
+        if (StateControl.isBadStateOption(unit, BadStateOption.NOACTION) === true) {
+            return false;
+        }
+
+        if (unit.custom.alwaysIncludeAttackRange === true) {
+            return true;
+        }
+
+
+        if (unit.custom.neverIncludeAttackRange === true) {
+            return false;
+        }
+
         var aiPattern = unit.createAIPattern();
 		if (aiPattern == null) {
 			return false;
 		}
-		
+
 		if (aiPattern.getPatternType() === PatternType.MOVE) {
             if (aiPattern.getMovePatternInfo().getMoveAIType() === MoveAIType.MOVEONLY) {
                 return false;
@@ -252,10 +252,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 return false;
             }
         };
-
-        if (StateControl.isBadStateOption(unit, BadStateOption.NOACTION) === true) {
-            return false;
-        }
 
         return true;
     },
@@ -270,8 +266,9 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         rangeData.y = unit.getMapY();
         rangeData.indexArray = [];
         rangeData.weaponIndexArray = [];
+        rangeData.isPassUnit = this._isPassUnit(unit);
 
-        if (this._isPassUnit(unit)) {
+        if (rangeData.isPassUnit === true) {
             this._simulator.disableMapUnit();
         }
 
@@ -334,18 +331,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         // END SPLASH PLACE
         
         // Update movePointArray
-        var i, count = rangeData.indexArray.length;
-        rangeData.movePointArray = [];
-        for (i = 0; i < count; i++) {
-            var currentIndex = rangeData.indexArray[i];
-            var currentX = CurrentMap.getX(currentIndex);
-            var currentY = CurrentMap.getY(currentIndex);
-            
-            rangeData.movePointArray[i] = PosChecker.getMovePointFromUnit(currentX, currentY, unit)
-        }
-
-        // Update target count
-        rangeData.targetCount = this._countTargetsInRange(rangeData);
+        rangeData.movePointArray = this._createMovePointArray(rangeData);
 
         this._rangeDataArray[this._currentIndex] = rangeData;
     },
@@ -468,72 +454,96 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     // Check if the movement points have changed at all
     // as well if an opposing unit moved into one of them
     _isTerrainChanged: function(rangeData) {
-		var indexArray = rangeData.indexArray;
-		var movePointArray = rangeData.movePointArray;
 		var unit = rangeData.unit;
-		var unitType = unit.getUnitType();
-		
-		var i, count = indexArray.length;
-		for (i = 0; i < count; i++) {
-			var currentIndex = indexArray[i];
-			var oldMovePoint = movePointArray[i]
-			
-			var x = CurrentMap.getX(currentIndex);
-			var y = CurrentMap.getY(currentIndex);
-			
-			var movePoint = PosChecker.getMovePointFromUnit(x, y, unit);
-			if (movePoint != oldMovePoint) {
-				return true;
-			}
-			
-            // Is there now an opposing unit in a spot where
-            // there didn't used to be?
-			var targetUnit = PosChecker.getUnitFromPos(x, y);
-			if (targetUnit != null) {
-				var targetUnitType = targetUnit.getUnitType();
-				
-				if (targetUnitType != unitType && targetUnit != unit) {
-					return true;
-				}
-			}
-		}
+        var endRange = rangeData.attackRange.mov;
+        var unit = rangeData.unit;
+        var baseX = rangeData.x;
+        var baseY = rangeData.y;
+        var tilesMovedX, tilesMovedY = -endRange;
+        var height = endRange;
+        var mapWidth = CurrentMap.getWidth();
+        var mapHeight = CurrentMap.getHeight();
+        var movePointArray = rangeData.movePointArray;
+        var isPassUnit = rangeData.isPassUnit;
+        var movePoint, targetUnit;
+        var width;
+
+        // Use the range stuff to once again
+        // check the move points
+        var relativeY, relativeX, i = 0;
+        for (; tilesMovedY <= height; tilesMovedY++) {
+            relativeY = baseY + tilesMovedY;
+            width = endRange - Math.abs(tilesMovedY);
+            tilesMovedX = -width;
+            if (relativeY < 0 || relativeY >= mapHeight) {
+                continue;
+            }
+
+            for (; tilesMovedX <= width; tilesMovedX++) {
+                relativeX = baseX + tilesMovedX;
+
+                if (relativeX < 0 || relativeX >= mapWidth) {
+                    continue;
+                }
+
+                targetUnit = PosChecker.getUnitFromPos(relativeX, relativeY);
+                if (targetUnit != null && targetUnit != unit && targetUnit.getUnitType() != unit.getUnitType() && isPassUnit == false) {
+                    movePoint = 0;
+                } else {
+                    movePoint = PosChecker.getMovePointFromUnit(relativeX, relativeY, unit);
+                }
+                
+                if (movePoint != movePointArray[i]) {
+                    return true;
+                };
+
+                i++;
+            }
+        }
 		
 		return false;
     },
 
-    _isTargetCountChanged: function(rangeData) {
-        var prevCount = rangeData.targetCount;
-
-        if (this._countTargetsInRange(rangeData) != prevCount) {
-            return true;
-        }
-
-        return false;
-    },
-
-    _countTargetsInRange: function(rangeData) {
+    _createMovePointArray: function(rangeData) {
+        var endRange = rangeData.attackRange.mov;
         var unit = rangeData.unit;
-        var unitType = unit.getUnitType();
-        var weaponIndexArray = rangeData.weaponIndexArray;
+        var baseX = rangeData.x;
+        var baseY = rangeData.y;
+        var movePointArray = [];
+        var tilesMovedX, tilesMovedY = -endRange;
+        var height = endRange;
+        var mapWidth = CurrentMap.getWidth();
+        var mapHeight = CurrentMap.getHeight();
+        var isPassUnit = rangeData.isPassUnit;
+        var width;
+        var value;
 
-        var targetCount = 0;
-        var i, count = weaponIndexArray.length;
-        for (i = 0; i < count; i++) {
-            var currentWeaponIndex = weaponIndexArray[i];
-            
-            var x = CurrentMap.getX(currentWeaponIndex);
-            var y = CurrentMap.getY(currentWeaponIndex);
-            
-            var targetUnit = PosChecker.getUnitFromPos(x, y);
-            if (targetUnit != null) {
-                // Only count unit if it's an opposing unit.
-                if (targetUnit.getUnitType() != unitType && targetUnit != unit) {
-                    targetCount++;
+        var relativeY, relativeX, targetUnit;
+        for (; tilesMovedY <= height; tilesMovedY++) {
+            relativeY = baseY + tilesMovedY;
+            width = endRange - Math.abs(tilesMovedY);
+            tilesMovedX = -width;
+            if (relativeY < 0 || relativeY >= mapHeight) {
+                continue;
+            }
+
+            for (; tilesMovedX <= width; tilesMovedX++) {
+                relativeX = baseX + tilesMovedX;
+
+                if (relativeX < 0 || relativeX >= mapWidth) {
+                    continue;
+                }
+
+                targetUnit = PosChecker.getUnitFromPos(relativeX, relativeY);
+                if (targetUnit != null && targetUnit != unit && targetUnit.getUnitType() != unit.getUnitType() && isPassUnit == false) {
+                    value = movePointArray.push(0);
+                } else {
+                    value = movePointArray.push(PosChecker.getMovePointFromUnit(relativeX, relativeY, unit));
                 }
             }
         }
-        
-        return targetCount;
+
+        return movePointArray;
     },
 
     _getSplashWeaponIndexArray: function(indexArray, weapon) {
@@ -641,7 +651,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             prevAttackRange: null,
             x: -1,
             y: -1,
-            unitCount: -1,
+            isPassUnit: false,
             indexArray: [],
             weaponIndexArray: [],
             movePointArray: []
