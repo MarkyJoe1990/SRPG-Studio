@@ -54,6 +54,11 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
         for (; this._currentIndex < this._enemyCount; this._currentIndex++) {
             unit = this._enemyList.getData(this._currentIndex);
+
+            if (unit == null) {
+                continue;
+            }
+
             attackRange = UnitRangePanel.getUnitAttackRange(unit);
 
             // Check rangeData
