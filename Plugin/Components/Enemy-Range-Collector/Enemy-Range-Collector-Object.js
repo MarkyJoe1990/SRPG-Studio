@@ -8,7 +8,6 @@
 var ENABLE_ENEMY_RANGE_DEBUG = false;
 
 var EnemyRangeCollector = defineObject(BaseObject, {
-    _simulator: null,
     _rangeDataArray: null,
     _enemyList: null,
     _enemyCount: 0,
@@ -19,8 +18,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     _timePassed: 0,
 
     initialize: function() {
-        this._simulator = root.getCurrentSession().createMapSimulator();
-        
         var enemyRangeCollectorData = this.reloadRangeData();
         this._rangeDataArray = enemyRangeCollectorData.rangeDataArray;
         this._combinedIndexArray = enemyRangeCollectorData.combinedIndexArray;
@@ -63,7 +60,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
             // Check rangeData
             rangeData = this._rangeDataArray[this._currentIndex];
-            if (rangeData == undefined) {
+            if (rangeData == undefined || rangeData.unit != unit) {
                 rangeData = this._buildRangeData();
                 rangeData.unit = unit;
                 rangeData.id = unit.getId();
@@ -260,6 +257,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         var unit = rangeData.unit;
         var attackRange = rangeData.attackRange;
         var isWeapon = this.isAttackerUnit(rangeData);
+        var simulator = root.getCurrentSession().createMapSimulator();
 
         // Update coordinates
         rangeData.x = unit.getMapX();
@@ -269,20 +267,20 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         rangeData.isPassUnit = this._isPassUnit(unit);
 
         if (rangeData.isPassUnit === true) {
-            this._simulator.disableMapUnit();
+            simulator.disableMapUnit();
         }
 
         // Update indexArray
         if (isWeapon === true) {
-            this._simulator.startSimulationWeapon(unit, attackRange.mov, attackRange.startRange, attackRange.endRange);
+            simulator.startSimulationWeapon(unit, attackRange.mov, attackRange.startRange, attackRange.endRange);
         } else {
-            this._simulator.startSimulation(unit, attackRange.mov);
+            simulator.startSimulation(unit, attackRange.mov);
         }
 
         if (StateControl.isBadStateOption(unit, BadStateOption.NOACTION) === true) {
             rangeData.indexArray = [CurrentMap.getIndex(rangeData.x, rangeData.y)];
         } else {
-            rangeData.indexArray = this._simulator.getSimulationIndexArray();
+            rangeData.indexArray = simulator.getSimulationIndexArray();
         }
         
         // Update Weapon Index Array
@@ -291,7 +289,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             if (this._isSplashControlEnabled === true && weapon != null && SplashControl.hasSplashTiles(weapon)) {
                 rangeData.weaponIndexArray = this._getSplashWeaponIndexArray(rangeData.indexArray, weapon);
             } else {
-                rangeData.weaponIndexArray = this._simulator.getSimulationWeaponIndexArray();
+                rangeData.weaponIndexArray = simulator.getSimulationWeaponIndexArray();
             }
         }
 
@@ -464,6 +462,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         var mapWidth = CurrentMap.getWidth();
         var mapHeight = CurrentMap.getHeight();
         var movePointArray = rangeData.movePointArray;
+        var movePointCount = movePointArray.length;
         var isPassUnit = rangeData.isPassUnit;
         var movePoint, targetUnit;
         var width;
@@ -499,6 +498,10 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
                 i++;
             }
+        }
+
+        if (i !== movePointCount) {
+            return true;
         }
 		
 		return false;
