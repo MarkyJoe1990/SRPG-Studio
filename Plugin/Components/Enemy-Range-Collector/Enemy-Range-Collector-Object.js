@@ -60,7 +60,23 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
             // Check rangeData
             rangeData = this._rangeDataArray[this._currentIndex];
-            if (rangeData == undefined || rangeData.unit != unit) {
+
+            if (rangeData != undefined) {
+                if (rangeData.unit != unit) {
+                    this.removeFromCombinedIndexArray(rangeData);
+                    
+                    var nextRangeData = this.getRangeDataFromId(unit.getId());
+                    if (nextRangeData != null) {
+                        rangeData = nextRangeData;
+                        this.addToCombinedIndexArray(rangeData);
+                        this._rangeDataArray[this._currentIndex] = rangeData;
+                    } else {
+                        rangeData = undefined;
+                    }
+                }
+            }
+            
+            if (rangeData == undefined) {
                 rangeData = this._buildRangeData();
                 rangeData.unit = unit;
                 rangeData.id = unit.getId();
@@ -99,6 +115,17 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         }
 
         if (this._currentIndex >= this._enemyCount) {
+
+            if (this._enemyCount < this._rangeDataArray.length) {
+                // Trim off any leftover rangeData from when
+                // units were removed from the enemy list.
+                var i, count = this._rangeDataArray.length;
+                for (i = count - 1; i >= this._enemyCount; i--) {
+                    this.removeFromCombinedIndexArray(this._rangeDataArray[i]);
+                    this._rangeDataArray.pop();
+                }
+            }
+
             return false;
         }
 
@@ -454,6 +481,12 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     _isTerrainChanged: function(rangeData) {
 		var unit = rangeData.unit;
         var endRange = rangeData.attackRange.mov;
+        var prevEndRange = rangeData.prevAttackRange.mov;
+
+        if (endRange !== prevEndRange) {
+            return true;
+        }
+
         var unit = rangeData.unit;
         var baseX = rangeData.x;
         var baseY = rangeData.y;
@@ -462,7 +495,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         var mapWidth = CurrentMap.getWidth();
         var mapHeight = CurrentMap.getHeight();
         var movePointArray = rangeData.movePointArray;
-        var movePointCount = movePointArray.length;
         var isPassUnit = rangeData.isPassUnit;
         var movePoint, targetUnit;
         var width;
@@ -498,10 +530,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
                 i++;
             }
-        }
-
-        if (i !== movePointCount) {
-            return true;
         }
 		
 		return false;
