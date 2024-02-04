@@ -52,6 +52,31 @@
 		}
 	}
 
+    var alias10 = MapSequenceArea._moveMoving;
+    MapSequenceArea._moveMoving = function() {
+        result = alias10.call(this);
+
+        if (result === MapSequenceAreaResult.COMPLETE) {
+            this._parentTurnObject._enemyRangeCollector.saveState(); // Abandon if save states don't work well.
+            this._parentTurnObject._enemyRangeCollector.reset();
+        }
+
+        return result;
+    }
+
+    var alias11 = MapSequenceCommand._moveCommand;
+    MapSequenceCommand._moveCommand = function() {
+        var result = alias11.call(this);
+
+        if (result === MapSequenceCommandResult.CANCEL) {
+            this._parentTurnObject._enemyRangeCollector.loadState();
+            // in case the load state system doesn't work properly
+            // this._parentTurnObject._enemyRangeCollector.reset()
+        }
+
+        return result;
+    }
+
     var alias9 = MapLayer.drawMapLayer;
     MapLayer.drawMapLayer = function() {
         alias9.call(this);

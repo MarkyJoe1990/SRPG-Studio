@@ -16,6 +16,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     _switchArray: null,
     _weaponSwitchArray: null,
     _timePassed: 0,
+    _prevEnemyRangeCollector: null,
 
     initialize: function() {
         var enemyRangeCollectorData = this.reloadRangeData();
@@ -34,6 +35,16 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         this._enemyList = root.getCurrentSession().getEnemyList();
         this._enemyCount = this._enemyList.getCount();
         this._currentIndex = 0;
+    },
+
+    saveState: function() {
+        this._prevEnemyRangeCollector = createObject(this);
+    },
+
+    loadState: function() {
+        for (prop in this._prevEnemyRangeCollector) {
+            this[prop] = this._prevEnemyRangeCollector[prop];
+        }
     },
 
     // Check units every two frames
@@ -115,15 +126,8 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         }
 
         if (this._currentIndex >= this._enemyCount) {
-
-            if (this._enemyCount < this._rangeDataArray.length) {
-                // Trim off any leftover rangeData from when
-                // units were removed from the enemy list.
-                var i, count = this._rangeDataArray.length;
-                for (i = count - 1; i >= this._enemyCount; i--) {
-                    this.removeFromCombinedIndexArray(this._rangeDataArray[i]);
-                    this._rangeDataArray.pop();
-                }
+            while (this._enemyCount < this._rangeDataArray.length) {
+                this.removeFromCombinedIndexArray(this._rangeDataArray.pop());
             }
 
             return false;
@@ -357,8 +361,6 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         
         // Update movePointArray
         rangeData.movePointArray = this._createMovePointArray(rangeData);
-
-        this._rangeDataArray[this._currentIndex] = rangeData;
     },
 
     nullRangeData: function(rangeData) {
