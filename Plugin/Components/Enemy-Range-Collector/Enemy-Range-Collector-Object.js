@@ -17,16 +17,32 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     _weaponSwitchArray: null,
     _timePassed: 0,
     _prevEnemyRangeCollector: null,
+    _flagMarkCache: null,
+    _rangeDisplayCache: null,
+    _counter: null,
+    _isReverse: false,
 
     initialize: function() {
         var enemyRangeCollectorData = this.reloadRangeData();
+
+        // Combined
         this._rangeDataArray = enemyRangeCollectorData.rangeDataArray;
         this._combinedIndexArray = enemyRangeCollectorData.combinedIndexArray;
         this._switchArray = enemyRangeCollectorData.switchArray;
         this._weaponSwitchArray = enemyRangeCollectorData.weaponSwitchArray;
 
+        // Individual
+        this._individualIndexArray = enemyRangeCollectorData.individualIndexArray;
+        this._individualSwitchArray = enemyRangeCollectorData.individualSwitchArray;
+        this._individualWeaponSwitchArray = enemyRangeCollectorData.individualWeaponSwitchArray;
+
         this._isSplashControlEnabled = typeof SplashControl != "undefined";
-        this._isEnemyRangeEnabled = typeof EnemyRange != "undefined";
+
+        // Other
+        this._counter = createObject(CycleCounter);
+        this._counter.disableGameAcceleration();
+        this._counter.setCounterInfo(42);
+        this._isReverse = false;
         this.reset();
     },
 
@@ -38,10 +54,13 @@ var EnemyRangeCollector = defineObject(BaseObject, {
     },
 
     saveState: function() {
+        // Needs to be better optimized
+        // Should only store absolutely necessary data.
         this._prevEnemyRangeCollector = createObject(this);
     },
 
     loadState: function() {
+        // Needs to only load the data used in the save state function
         for (prop in this._prevEnemyRangeCollector) {
             this[prop] = this._prevEnemyRangeCollector[prop];
         }
@@ -78,6 +97,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                     
                     var nextRangeData = this.getRangeDataFromId(unit.getId());
                     if (nextRangeData != null) {
+                        rangeData.unit = unit;
                         rangeData = nextRangeData;
                         this.addToCombinedIndexArray(rangeData);
                         this._rangeDataArray[this._currentIndex] = rangeData;
@@ -107,10 +127,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                     this.removeFromCombinedIndexArray(rangeData);
                     this.updateRangeData(rangeData);
                     this.addToCombinedIndexArray(rangeData);
-                    if (this._isEnemyRangeEnabled === true) {
-                        EnemyRange.updateRange();
-                        UnitStateAnimator.updateIcons();
-                    }
+                    this.updateVisuals();
 
                     break;
                 }
@@ -118,10 +135,10 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 this.removeFromCombinedIndexArray(rangeData);
                 this.nullRangeData(rangeData);
                 this.addToCombinedIndexArray(rangeData);
-                if (this._isEnemyRangeEnabled === true) {
-                    EnemyRange.updateRange();
-                    UnitStateAnimator.updateIcons();
-                }
+
+                rangeData.isMarked = false;
+
+                this.updateVisuals();
             }
         }
 
@@ -212,7 +229,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
     drawDebug: function() {
         var textui = root.queryTextUI("default_window");
-        var color = textui.getColor();
+        var color = 0xFFCCCC;
         var font = textui.getFont();
         var session = root.getCurrentSession();
 
@@ -221,6 +238,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
         var i, count = this._switchArray.length;
         var x, y;
+        // Combined
         for (i = 0; i < count; i++) {
             x = (CurrentMap.getX(i) * GraphicsFormat.MAPCHIP_WIDTH) - scrollX;
             y = (CurrentMap.getY(i) * GraphicsFormat.MAPCHIP_HEIGHT) - scrollY;
@@ -228,6 +246,144 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             TextRenderer.drawText(x, y, this._switchArray[i], -1, color, font);
         }
 
+        // Individual
+        var width = 0;
+        count = this._individualSwitchArray.length;
+        color = 0x88FF88
+        for (i = 0; i < count; i++) {
+            x = (CurrentMap.getX(i) * GraphicsFormat.MAPCHIP_WIDTH) - scrollX + GraphicsFormat.MAPCHIP_WIDTH;
+            y = (CurrentMap.getY(i) * GraphicsFormat.MAPCHIP_HEIGHT) - scrollY;
+
+            width = TextRenderer.getTextWidth(this._individualSwitchArray[i], font);
+
+            TextRenderer.drawText(x - width, y, this._individualSwitchArray[i], -1, color, font);
+        }
+    },
+
+    updateVisuals: function() {
+        this._updateFlagMarkCache();
+        this.updateRangeDisplay();
+    },
+
+    _updateFlagMarkCache: function() {
+        if (ENEMY_RANGE_COLLECTOR_CONFIG.disableMarkingIcon === true) {
+            return;
+        }
+        
+        var graphicsManager = root.getGraphicsManager();
+
+        this._flagMarkCache = graphicsManager.createCacheGraphics(CurrentMap.getWidth() * GraphicsFormat.MAPCHIP_WIDTH, CurrentMap.getHeight() * GraphicsFormat.MAPCHIP_HEIGHT);
+        graphicsManager.setRenderCache(this._flagMarkCache);
+
+        var config = ENEMY_RANGE_COLLECTOR_CONFIG.markingIcon;
+        var handle = root.createResourceHandle(config.isRuntime, config.id, 0, config.xSrc, config.ySrc);
+
+        // Draw Start
+        var i, x, y, currentRangeData, count = this._rangeDataArray.length;
+        var width = GraphicsFormat.MAPCHIP_WIDTH;
+        var xOffset = Math.floor(GraphicsFormat.MAPCHIP_WIDTH - GraphicsFormat.ICON_WIDTH) / 2;
+        var height = GraphicsFormat.MAPCHIP_HEIGHT;
+        for (i = 0; i < count; i++) {
+            currentRangeData = this._rangeDataArray[i];
+            if (currentRangeData.isMarked === true) {
+                // draw flag
+                x = (currentRangeData.x * width) + xOffset;
+                y = currentRangeData.y * height;
+                GraphicsRenderer.drawImage(x, y, handle, GraphicsType.ICON);
+            }
+        }
+
+        // Draw end
+        graphicsManager.resetRenderCache();
+    },
+
+    moveFlagMark: function() {
+        if (this._counter.moveCycleCounter() !== MoveResult.CONTINUE) {
+            this._isReverse = this._isReverse !== true;
+        };
+
+        return MoveResult.CONTINUE;
+    },
+
+    drawFlagMark: function() {
+        if (ENEMY_RANGE_COLLECTOR_CONFIG.disableMarkingIcon === true) {
+            return;
+        }
+
+        if (this._flagMarkCache !== null) {
+            if (this._flagMarkCache.isCacheAvailable() === true) {
+                var session = root.getCurrentSession();
+                var counter = this._counter.getCounter();
+                var max = this._counter._max;
+                
+                var yOffset = 0;
+                if (this._isReverse === true) {
+                    yOffset = EaseControl.easeInOutQuad(max - counter, -10, -20, max);
+                } else {
+                    yOffset = EaseControl.easeInOutQuad(counter, -10, -20, max);
+                }
+
+                this._flagMarkCache.drawParts(0, yOffset, session.getScrollPixelX(), session.getScrollPixelY(), root.getGameAreaWidth(), root.getGameAreaHeight());
+                return;
+            }
+        }
+    },
+
+    updateRangeDisplay: function(markingPanel) {
+        if (ENEMY_RANGE_COLLECTOR_CONFIG.disableCustomRangeDisplay === true) {
+            return;
+        }
+
+        if (markingPanel == undefined) {
+            markingPanel = MapLayer.getMarkingPanel();
+        }
+
+        if (markingPanel == null) {
+            return;
+        }
+
+        var graphicsManager = root.getGraphicsManager();
+
+        this._rangeDisplayCache = graphicsManager.createCacheGraphics(CurrentMap.getWidth() * GraphicsFormat.MAPCHIP_WIDTH, CurrentMap.getHeight() * GraphicsFormat.MAPCHIP_HEIGHT);
+        graphicsManager.setRenderCache(this._rangeDisplayCache);
+        // Draw start
+
+        // Draw all range first
+
+        var individualIndexArray = this.getIndividualIndexArray();
+        var individualSwitchArray = this.getIndividualSwitchArray();
+        
+		if (markingPanel._isVisible === true) {
+            var indexArray = this._subtractArray(individualSwitchArray, this.getCombinedIndexArray().indexArray);
+            var switchArray = this.getSwitchArray();
+            EdgeRangeControl.drawEdgeRange(indexArray, switchArray, ENEMY_RANGE_IMAGE_SET, 1);
+        } 
+
+        EdgeRangeControl.drawEdgeRange(individualIndexArray.indexArray, individualSwitchArray, ENEMY_RANGE_IMAGE_SET, 0);
+
+        // Draw end
+        graphicsManager.resetRenderCache();
+    },
+
+    drawRangeDisplay: function() {
+        if (this._rangeDisplayCache !== null) {
+            if (this._rangeDisplayCache.isCacheAvailable() === true) {
+                var session = root.getCurrentSession();
+                this._rangeDisplayCache.drawParts(0, 0, session.getScrollPixelX(), session.getScrollPixelY(), root.getGameAreaWidth(), root.getGameAreaHeight());
+                return;
+            }
+        }
+    },
+
+    _subtractArray: function(subtractArray, destArray) {
+        var arr = destArray.slice();
+
+        var i, count = arr.length;
+        for (i = count - 1; i >= 0; i--) {
+            subtractArray[arr[i]] > 0 && arr.splice(i, 1);
+        }
+
+        return arr;
     },
 
     _isInvisible: function(unit) {
@@ -317,7 +473,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         // Update Weapon Index Array
         if (isWeapon === true) {
             var weapon = ItemControl.getEquippedWeapon(unit);
-            if (this._isSplashControlEnabled === true && weapon != null && SplashControl.hasSplashTiles(weapon)) {
+            if (this._isSplashControlEnabled === true && weapon != null && SplashControl.hasSplashTiles(weapon) === true) {
                 rangeData.weaponIndexArray = this._getSplashWeaponIndexArray(rangeData.indexArray, weapon);
             } else {
                 rangeData.weaponIndexArray = simulator.getSimulationWeaponIndexArray();
@@ -346,7 +502,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 var occupantUnit = PosChecker.getUnitFromPos(x, y);
                 if (occupantUnit == null || occupantUnit == unit) {
                     var splashPlaceEventInfo = splashPlace.getPlaceEventInfo();
-                    if (splashPlaceEventInfo.getCustomKeyword() == "Splash") {
+                    if (splashPlaceEventInfo.getCustomKeyword() === "Splash") {
                         var allowedTiles = SplashControl.getAllowedTiles(splashPlace);
                         var splashTiles = SplashControl.getSplashTiles(splashPlace);
                         var flipType = SplashControl.getFlipType(splashPlace);
@@ -391,6 +547,10 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         for (i = 0; i < count; i++) {
             this.nonRedundantRemove(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
         }
+
+        if (rangeData.isMarked === true && ENEMY_RANGE_COLLECTOR_CONFIG.disableIndividualRangeMarking !== true) {
+            this.removeFromIndividualIndexArray(rangeData);
+        }
     },
 
     // For weapon indexes to not overlap with walk indexes
@@ -414,10 +574,68 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         for (i = 0; i < count; i++) {
             this.nonRedundantAdd(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
         }
+
+        if (rangeData.isMarked === true && ENEMY_RANGE_COLLECTOR_CONFIG.disableIndividualRangeMarking !== true) {
+            this.addToIndividualIndexArray(rangeData);
+        }
+    },
+
+    addToIndividualIndexArray: function(rangeData) {
+        var destIndexArray = this._individualIndexArray.indexArray;
+        var destWeaponIndexArray = destIndexArray; // this._combinedIndexArray.weaponIndexArray;
+
+        var rangeDataIndexArray = rangeData.indexArray;
+        var rangeDataWeaponIndexArray = rangeData.weaponIndexArray;
+
+        var switchArray = this._individualSwitchArray;
+        var weaponSwitchArray = switchArray; // this._weaponSwitchArray;
+
+        var i, count = rangeDataIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantAdd(rangeDataIndexArray[i], destIndexArray, switchArray);
+        }
+
+        count = rangeDataWeaponIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantAdd(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
+        }
+    },
+
+    removeFromIndividualIndexArray: function(rangeData) {
+        var destIndexArray = this._individualIndexArray.indexArray;
+        var destWeaponIndexArray = destIndexArray; // this._combinedIndexArray.weaponIndexArray;
+
+        var rangeDataIndexArray = rangeData.indexArray;
+        var rangeDataWeaponIndexArray = rangeData.weaponIndexArray;
+
+        var switchArray = this._individualSwitchArray;
+        var weaponSwitchArray = switchArray; // this._weaponSwitchArray;
+
+        var i, count = rangeDataIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantRemove(rangeDataIndexArray[i], destIndexArray, switchArray);
+        }
+
+        count = rangeDataWeaponIndexArray.length;
+        for (i = 0; i < count; i++) {
+            this.nonRedundantRemove(rangeDataWeaponIndexArray[i], destWeaponIndexArray, weaponSwitchArray /* this._weaponSwitchArray */);
+        }
     },
 
     getCombinedIndexArray: function() {
         return this._combinedIndexArray;
+    },
+
+    getSwitchArray: function() {
+        return this._switchArray;
+    },
+
+    getIndividualIndexArray: function() {
+        return this._individualIndexArray;
+    },
+
+    getIndividualSwitchArray: function() {
+        return this._individualSwitchArray;
     },
 
     reloadRangeData: function() {
@@ -687,7 +905,8 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             isPassUnit: false,
             indexArray: [],
             weaponIndexArray: [],
-            movePointArray: []
+            movePointArray: [],
+            isMarked: false
         }
     },
 
@@ -700,12 +919,21 @@ var EnemyRangeCollector = defineObject(BaseObject, {
 
         return {
             rangeDataArray: [],
+            // Combined Enemy Ranges
             combinedIndexArray: {
                 indexArray: [],
                 weaponIndexArray: []
             },
             switchArray: switchArray.slice(),
-            weaponSwitchArray: switchArray.slice()
+            weaponSwitchArray: switchArray.slice(),
+
+            // Individual Enemy Ranges
+            individualIndexArray: {
+                indexArray: [],
+                weaponIndexArray: []
+            },
+            individualSwitchArray: switchArray.slice(),
+            individualWeaponSwitchArray: switchArray.slice()
         }
     }
 });

@@ -1,5 +1,5 @@
 /*
-    Version 1.6
+    Version 1.7
     Made by MarkyJoe1990
 
     What the heck does this do?
@@ -7,6 +7,10 @@
     It scans the enemy team, then collects, stores
     and updates their movement and attack ranges
     in an efficient matter.
+
+    Additionally, as of update 1.7, this plugin
+    also allows you to mark enemies individually to
+    keep track of their specific attack ranges.
 
     I don't get it. What's the practical use for this?
     ==================================================
@@ -26,9 +30,14 @@
     script in your plugins folder and watch how insanely fast
     those same ranges load!
 
+    Where's the configuration options?
+    ==================================
+    config.js
+
     What functions does this overwrite?
     ===================================
     MarkingPanel.drawMarkingPanel
     MarkingPanel.updateMarkingPanel
     MarkingPanel.updateMarkingPanelFromUnit
+    MarkingPanel._getColor
 */
