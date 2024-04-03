@@ -1,5 +1,5 @@
 /*
-    Event Scheduler v1.0
+    Event Scheduler v1.1
     By MarkyJoe1990
 
     This plugin allows you to set events to run
@@ -44,4 +44,13 @@
 
     This should add information on the terrain window that tells you when
     the event will fire off.
+
+    You can also add/subtract time, freeze the timer on events, and
+    manually cancel events when you no longer want them to occur.
+    Please refer to Event-Scheduler-Control.js for these functions.
+
+    Features I might add later:
+    - Ability to show the main timer.
+    - Ability to hide events that are scheduled
+    - Ability to replace event count down display with exact main time when event will play.
 */

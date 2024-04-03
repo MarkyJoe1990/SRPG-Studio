@@ -56,24 +56,24 @@ var EventSchedulerRenderer = {
         var second = Math.floor(time / 60) % 60;
 
         if (hour < 10) {
-            NumberRenderer.drawRightNumber(x, y, 0);
+            NumberRenderer.drawRightNumber(x, y - 2, 0);
             x += 10;
         }
-        NumberRenderer.drawRightNumber(x, y, hour);
+        NumberRenderer.drawRightNumber(x, y - 2, hour);
         x += 10;
         if (hour >= 10) {
             x += 10;
         }
 
         // Draw :
-        TextRenderer.drawText(x, y + 2, ":", -1, color, font);
+        TextRenderer.drawText(x, y, ":", -1, color, font);
         x += 10;
 
         if (minute < 10) {
-            NumberRenderer.drawRightNumber(x, y, 0);
+            NumberRenderer.drawRightNumber(x, y - 2, 0);
             x += 10;
         }
-        NumberRenderer.drawRightNumber(x, y, minute);
+        NumberRenderer.drawRightNumber(x, y - 2, minute);
         x += 10;
         if (minute >= 10) {
             x += 10;
@@ -81,14 +81,14 @@ var EventSchedulerRenderer = {
 
 
         // Draw :
-        TextRenderer.drawText(x, y + 2, ":", -1, color, font);
+        TextRenderer.drawText(x, y, ":", -1, color, font);
         x += 10;
 
         if (second < 10) {
-            NumberRenderer.drawRightNumber(x, y, 0);
+            NumberRenderer.drawRightNumber(x, y - 2, 0);
             x += 10;
         }
-        NumberRenderer.drawRightNumber(x, y, second);
+        NumberRenderer.drawRightNumber(x, y - 2, second);
     },
 
     getIntervalY: function() {
