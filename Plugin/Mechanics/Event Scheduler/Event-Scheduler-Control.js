@@ -1,6 +1,7 @@
 var IS_EVENT_SCHEDULE_MODE = false; // Prevents auto events from running outside of the scheduler.
 
 var EventSchedulerControl = {
+    _schedulerData: null,
 
     init: function() {
         this._schedulerData = this.reloadSchedulerData();
@@ -233,7 +234,16 @@ var EventSchedulerControl = {
         }
 
         var schedulerData = meta.global.schedulerData;
-        var mapId = root.getCurrentSession().getCurrentMapInfo().getId();
+        var mapData = root.getCurrentSession().getCurrentMapInfo();
+
+        
+        var mapId;
+        if (mapData != null) {
+            mapId = mapData.getId();
+        } else {
+            mapId = -1;
+        }
+
         if (schedulerData == undefined || schedulerData.mapId !== mapId) {
             schedulerData = this.buildSchedulerData();
             schedulerData.mapId = mapId;

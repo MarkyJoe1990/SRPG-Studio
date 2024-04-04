@@ -20,6 +20,10 @@
     EventChecker._checkEvent = function() {
         EventSchedulerControl.checkEvents();
 
+        if (root.getBaseScene() === SceneType.REST) {
+            return alias6.call(this);
+        }
+
         IS_EVENT_SCHEDULE_MODE = root.getCurrentSession().getTurnType() === TurnType.PLAYER;
         var result = alias6.call(this);
         IS_EVENT_SCHEDULE_MODE = false;
