@@ -46,11 +46,22 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         this.reset();
     },
 
-    reset: function() {
+    reset: function(sortFunction) {
         this._timePassed = 0;
         this._enemyList = root.getCurrentSession().getEnemyList();
         this._enemyCount = this._enemyList.getCount();
         this._currentIndex = 0;
+
+        this._sortIndexArray = [];
+
+        var i, count = this._enemyCount;
+        for (i = 0; i < count; i++) {
+            this._sortIndexArray[i] = i;
+        }
+
+        if (sortFunction != undefined) {
+            this._sortIndexArray.sort(sortFunction);
+        }
     },
 
     saveState: function() {
@@ -80,7 +91,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         var rangeData = null;
 
         for (; this._currentIndex < this._enemyCount; this._currentIndex++) {
-            unit = this._enemyList.getData(this._currentIndex);
+            unit = this._enemyList.getData(this._sortIndexArray[this._currentIndex]);
 
             if (unit == null) {
                 continue;
@@ -89,7 +100,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             attackRange = UnitRangePanel.getUnitAttackRange(unit);
 
             // Check rangeData
-            rangeData = this._rangeDataArray[this._currentIndex];
+            rangeData = this._rangeDataArray[this._sortIndexArray[this._currentIndex]];
 
             if (rangeData != undefined) {
                 if (rangeData.unit != unit) {
@@ -100,7 +111,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                         rangeData.unit = unit;
                         rangeData = nextRangeData;
                         this.addToCombinedIndexArray(rangeData);
-                        this._rangeDataArray[this._currentIndex] = rangeData;
+                        this._rangeDataArray[this._sortIndexArray[this._currentIndex]] = rangeData;
                     } else {
                         rangeData = undefined;
                     }
@@ -112,7 +123,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 rangeData.unit = unit;
                 rangeData.id = unit.getId();
                 rangeData.attackRange = attackRange;
-                this._rangeDataArray[this._currentIndex] = rangeData;
+                this._rangeDataArray[this._sortIndexArray[this._currentIndex]] = rangeData;
             }
 
             // Update and track attack range in case it changed.
@@ -139,6 +150,9 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 rangeData.isMarked = false;
 
                 this.updateVisuals();
+
+                // Needed in order to prevent lag.
+                break;
             }
         }
 
@@ -391,10 +405,8 @@ var EnemyRangeCollector = defineObject(BaseObject, {
             return true;
         }
 
-        if (typeof CurrentMap.checkInvisibleUnit != "undefined") {
-            if (CurrentMap.checkInvisibleUnit(unit.getMapX(), unit.getMapY(), UnitType.PLAYER) === true) {
-                return true;
-            }
+        if (CurrentMap.checkInvisibleUnit(unit.getMapX(), unit.getMapY(), UnitType.PLAYER) === true) {
+            return true;
         }
 
         return false;
@@ -662,6 +674,22 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         }
 
         return global.enemyRangeCollectorData;
+    },
+
+    createSortByDistance: function(unit) {
+        var unitX = unit.getMapX();
+        var unitY = unit.getMapY();
+        var self = this;
+
+        return function(a, b) {
+            var rangeDataA = self._rangeDataArray[a];
+            var rangeDataB = self._rangeDataArray[b];
+
+            var distA = Math.abs(unitX - rangeDataA.x) + Math.abs(unitY - rangeDataA.y);
+            var distB = Math.abs(unitX - rangeDataB.x) + Math.abs(unitY - rangeDataB.y);
+
+            return distA - distB;
+        }
     },
 
     _isPassUnit: function(unit) {

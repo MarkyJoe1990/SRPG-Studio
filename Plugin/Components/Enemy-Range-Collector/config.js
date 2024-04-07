@@ -3,7 +3,7 @@ var ENEMY_RANGE_COLLECTOR_CONFIG = {
     disableCustomRangeDisplay: false, // Set to true if you don't want to use any custom graphics for range display.
     disableUpdateOnUnitMove: false, // If your game is lagging after you move a player unit, try disabling this.
     disableMarkingIcon: false, // If your name is SquidNow, disable this.
-    customRangeDisplayImage: "32x32.png", // Options: "32x32.png", "48x48.png" and "64x64.png".
+    customRangeDisplayImage: "64x64.png", // Options: "32x32.png", "48x48.png" and "64x64.png".
     markingColor: 0xFF0000, // Original color was 0xffdc00
     markingIcon: { // If you want to use a different icon for individual enemy marking, modify these settings.
         id: 0, // Id of icon image sheet you want to use.

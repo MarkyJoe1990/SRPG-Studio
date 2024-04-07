@@ -63,7 +63,11 @@ var ENEMY_RANGE_IMAGE_SET;
             // PlayerTurn doesn't have this._playerTurn but RepeatMoveFlowEntry does.
             var turnObject = this._parentTurnObject._playerTurn || this._parentTurnObject;
             turnObject._enemyRangeCollector.saveState(); // Abandon if save states don't work well.
-            turnObject._enemyRangeCollector.reset();
+
+            // Sorting stuff
+            var unit = turnObject._targetUnit;
+            var enemyRangeCollector = turnObject._enemyRangeCollector;
+            enemyRangeCollector.reset(enemyRangeCollector.createSortByDistance(unit));
         }
 
         return result;
