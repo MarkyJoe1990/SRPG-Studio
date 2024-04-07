@@ -1,5 +1,5 @@
 /*
-    Event Scheduler v1.1
+    Event Scheduler v1.2
     By MarkyJoe1990
 
     This plugin allows you to set events to run
@@ -8,7 +8,8 @@
     The script only considers time to be passing when:
     - The player is in a battle.
     - It's the player's turn.
-    - No other events are currently running.
+    - Animations such as battles and item usage aren't taking place.
+    - No other events are currently running (some exceptions exist, such as Extract Map Pos and other instances where the player has input)
 
     So what is the practical use for this? Well,
     for one, if you wish to have a chess timer in

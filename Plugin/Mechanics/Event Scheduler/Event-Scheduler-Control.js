@@ -2,9 +2,15 @@ var IS_EVENT_SCHEDULE_MODE = false; // Prevents auto events from running outside
 
 var EventSchedulerControl = {
     _schedulerData: null,
+    _incrementValue: 0,
 
     init: function() {
         this._schedulerData = this.reloadSchedulerData();
+        if (DataConfig.isHighPerformance() === true) {
+            this._incrementValue = 1;
+        } else {
+            this._incrementValue = 2;
+        }
     },
 
     scheduleEvent: function(eventId, isCommon, time, isAbsolute) {
@@ -189,12 +195,12 @@ var EventSchedulerControl = {
                 }
 
                 if (currentEvent.isFrozen === true) {
-                    currentEvent.time++;
+                    currentEvent.time += this._incrementValue;
                 }
             }
         }
 
-        schedulerData.time++;
+        schedulerData.time += this._incrementValue;
 
         return MoveResult.CONTINUE;
     },

@@ -1,19 +1,65 @@
 ( function () {
+    isCommandTypeAllowed = function(commandType) {
+        if (commandType === EventCommandType.POSITIONCHOOSE) {
+            return true;
+        }
+
+        return false;
+    };
+
     var alias1 = CurrentMap.prepareMap;
     CurrentMap.prepareMap = function() {
         alias1.call(this);
         EventSchedulerControl.init();
     }
 
+    // Only move timer when player has control.
     var alias3 = PlayerTurn.moveTurnCycle;
     PlayerTurn.moveTurnCycle = function() {
         var mode = this.getCycleMode();
-        if (mode != PlayerTurnMode.AUTOCURSOR && mode != PlayerTurnMode.AUTOEVENTCHECK) {
-            EventSchedulerControl.moveScheduler(); // Only increment time when player has control.
+
+        var isEnabled = true;
+        if (mode === PlayerTurnMode.AUTOCURSOR) {
+            isEnabled = false;
+        } else if (mode === PlayerTurnMode.AUTOEVENTCHECK) {
+            isEnabled = false;
+        } else if (AttackControl.getPreAttackObject() != null) {
+            isEnabled = false;
         }
 
-        return alias3.call(this);
+        EventSchedulerControl.setEnabled(isEnabled);
+        var result = alias3.call(this); // Must be run before the move function in case enabled state changes.
+        EventSchedulerControl.moveScheduler();
+
+        return result;
     };
+
+    var alias8 = UnitCommand.Wand._moveUse;
+    UnitCommand.Wand._moveUse = function() {
+        var result = alias8.call(this);
+
+        EventSchedulerControl.setEnabled(result !== MoveResult.CONTINUE);
+
+        return result;
+    }
+
+    var alias9 = UnitCommand.Item._moveUse;
+    UnitCommand.Item._moveUse = function() {
+        var result = alias9.call(this);
+
+        EventSchedulerControl.setEnabled(result !== MoveResult.CONTINUE);
+
+        return result;
+    }
+
+    var alias10 = EventCommandManager.moveEventCommandManagerCycle;
+    EventCommandManager.moveEventCommandManagerCycle = function(commandType) {
+        EventSchedulerControl.setEnabled(isCommandTypeAllowed(commandType));
+        var result = alias10.call(this, commandType); // Must be run before the move function in case enabled state changes.
+        EventSchedulerControl.moveScheduler();
+
+        return result;
+    }
 
     // EventChecker._checkEvent...?
     var alias6 = EventChecker._checkEvent;
