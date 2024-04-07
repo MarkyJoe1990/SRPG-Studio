@@ -24,7 +24,7 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 	moveWindowManager: function() {
 		var result = this._moveScrollbars();
 		
-		if (result == ScrollbarInput.CANCEL) {
+		if (result == MoveResult.END) {
 			return MoveResult.END;
 		}
 		
@@ -32,24 +32,62 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 	},
 	
 	drawWindowManager: function() {
-		var x = LayoutControl.getCenterX(-1, this.getTotalWindowWidth());
-		var y = LayoutControl.getCenterY(-1, this.getTotalWindowHeight());
+		var totalWidth = this.getTotalWindowWidth();
+		var totalHeight = this.getTotalWindowHeight();
+
+		var x = LayoutControl.getCenterX(-1, totalWidth);
+		var y = LayoutControl.getCenterY(-1, totalHeight);
 		
+		// draw press start
+		var startX = (x + totalWidth) - (TitleRenderer.getTitlePartsWidth() * 5);
+		var startY = y - TitleRenderer.getTitlePartsHeight();
+		this._drawStartTitle(startX, startY);
+
 		this._scrollbar.drawScrollbar(x, y);
 		
 		var screen = root.queryScreen("Config");
 		var textui = screen.getBottomFrameTextUI();
 		var textuiTop = screen.getTopFrameTextUI();
 		
-		var object = this.getObject();
-		var description = object.getConfigDescription();
+		// var object = this.getObject();
+		var description = this.getDescription();//object.getConfigDescription();
 		
-		TextRenderer.drawScreenTopText(this.getConfigMenuTitle(), textuiTop);
+		TextRenderer.drawScreenTopTextCenter(this.getConfigMenuTitle(), textuiTop);
 		TextRenderer.drawScreenBottomText(description, textui);
+	},
+
+	_drawStartTitle: function(x, y) {
+		var range = this._getStartTitleRange(x, y);
+		var textui = root.queryTextUI('start_title');
+		var color = textui.getColor();
+		var font = textui.getFont();
+		var pic = textui.getUIImage();
+
+		if (pic !== null) {
+			TextRenderer.drawFixedTitleText(range.x, range.y, StringTable.UnitSortie_Start, color, font, TextFormat.CENTER, pic, 3);
+		}
+	},
+
+	_getStartTitleRange: function(x, y) {
+		return createRangeObject(x, y, TitleRenderer.getTitlePartsWidth() * 5, TitleRenderer.getTitlePartsHeight());
 	},
 	
 	getObject: function() {
 		return this._scrollbar.getObject()
+	},
+
+	getDescription: function() {
+		var object = this.getObject();
+		var index = object.getConfigIndex();
+		index = object._configScrollbar.getIndex();
+		var descriptions = object.getConfigDescriptions();
+		var description = descriptions[index];
+
+		if (description == undefined) {
+			description = object.getConfigDescription();
+		}
+
+		return description;
 	},
 	
 	getConfigArray: function() {
@@ -89,7 +127,7 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 	
 	_moveScrollbars: function() {
 		var result = MoveResult.CONTINUE;
-		
+
 		if (InputControl.isInputState(InputType.UP) || MouseControl.isInputAction(MouseType.UPWHEEL)) {
 			this._moveUpDown();
 		} else if (InputControl.isInputState(InputType.DOWN) || MouseControl.isInputAction(MouseType.DOWNWHEEL)) {
@@ -99,8 +137,31 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 			
 			result = this._scrollbar.getObject().moveConfig();
 		}
+
+		if (this._isStartTitlePressed()) {
+			result = MoveResult.END;
+		}
 		
 		return result;
+	},
+
+	_isStartTitlePressed: function() {
+		var totalWidth = this.getTotalWindowWidth();
+		var totalHeight = this.getTotalWindowHeight();
+
+		var x = LayoutControl.getCenterX(-1, totalWidth);
+		var y = LayoutControl.getCenterY(-1, totalHeight);
+		
+		// draw press start
+		var startX = (x + totalWidth) - (TitleRenderer.getTitlePartsWidth() * 5);
+		var startY = y - TitleRenderer.getTitlePartsHeight();
+		
+		if (MouseControl.isRangePressed(this._getStartTitleRange(startX, startY))) {
+			MediaControl.soundDirect('commandselect');
+			return true;
+		}
+		
+		return false;
 	},
 	
 	_moveUpDown: function() {
@@ -148,8 +209,9 @@ var NewGameConfigWindowManager = defineObject(BaseWindowManager, {
 			var table = currentVariable.table;
 			var id = currentVariable.id;
 			var options = currentVariable.options;
+			var descriptions = currentVariable.descriptions;
 			
-			var variableConfigObject = createVariableConfig(table, id, options);
+			var variableConfigObject = createVariableConfig(table, id, options, descriptions);
 			
 			groupArray.appendObject(variableConfigObject);
 		}

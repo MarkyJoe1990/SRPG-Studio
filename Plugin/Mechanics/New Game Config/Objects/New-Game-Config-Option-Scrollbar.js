@@ -1,10 +1,11 @@
 var NewGameConfigOptionScrollbar = defineObject(BaseScrollbar, {
 	drawScrollContent: function(x, y, object, isSelect, index) {
-		var text = object
+		var value = object
 		var textui = root.queryTextUI("default_window");
 		var isChoice = this._isChoice(index);
 		var colorIndex = 0;
 		var color, alpha;
+		var valueType = typeof value;
 		
 		if (isChoice) {
 			color = ColorValue.DEFAULT;
@@ -16,10 +17,14 @@ var NewGameConfigOptionScrollbar = defineObject(BaseScrollbar, {
 		
 		var font = textui.getFont();
 		
-		if (typeof text == "string") {
-			TextRenderer.drawText(x, y, text, -1, color, font);
-		} else if (typeof text == "number") {
-			NumberRenderer.drawRightNumberColor(x, y - 3, text, colorIndex, alpha);
+		if (valueType == "string") {
+			TextRenderer.drawText(x, y, value, -1, color, font);
+		} else if (valueType == "number") {
+			NumberRenderer.drawRightNumberColor(x, y - 3, value, colorIndex, alpha);
+		} else if (valueType == "function") {
+
+		} else {
+			TextRenderer.drawText(x, y, value.name, -1, color, font);
 		}
 		
 	},
@@ -29,7 +34,7 @@ var NewGameConfigOptionScrollbar = defineObject(BaseScrollbar, {
 	},
 	
 	getScrollbarWidth: function() {
-		return (this._col * this._objectWidth) + ((this._col - 1) * this.getSpaceX()) + 20;
+		return BaseScrollbar.getScrollbarWidth.call(this) + 10;
 	},
 	
 	getSpaceX: function() {
@@ -45,6 +50,13 @@ var NewGameConfigOptionScrollbar = defineObject(BaseScrollbar, {
 	
 	getObjectHeight: function() {
 		return 20;
+	},
+
+	playCancelSound: function() {
+	},
+
+	playStartSound: function() {
+		MediaControl.soundDirect('commandselect');
 	},
 	
 	_isChoice: function(index) {

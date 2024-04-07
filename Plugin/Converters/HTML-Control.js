@@ -63,6 +63,36 @@ var HtmlControl = {
         this.writeObjectTable(skillList, args);
     },
 
+    writeWeaponTable: function() {
+        var args = arguments;
+        if (args.length == 0) {
+            args = this.getWeaponFields();
+        }
+
+        var weaponList = root.getBaseData().getWeaponList();
+        this.writeObjectTable(weaponList, args);
+    },
+
+    writeItemTable: function() {
+        var args = arguments;
+        if (args.length == 0) {
+            args = this.getItemFields();
+        }
+
+        var itemList = root.getBaseData().getItemList();
+        this.writeObjectTable(itemList, args);
+    },
+
+    writeOriginalDataTable: function() {
+        var args = arguments;
+        if (args.length == 0) {
+            args = this.getOriginalDataFields();
+        }
+
+        var originalDataList = root.getBaseData().getOriginalDataList(0);
+        this.writeObjectTable(originalDataList, args);
+    },
+
     writeObjectTable: function(objectList, args) {
         root.msg("Writing Table");
 
@@ -119,6 +149,18 @@ var HtmlControl = {
 
     getStateFields: function() {
         return ["getId()", "getName()", "getDescription()", "getTurn()"];
+    },
+
+    getWeaponFields: function() {
+        return ["getId()", "getName()", "getDescription()"];
+    },
+
+    getItemFields: function() {
+        return ["getId()", "getName()", "getDescription()"];
+    },
+
+    getOriginalDataFields: function() {
+        return ["getId()", "getName()", "getDescription()"];
     },
 
     writeString: function(content) {

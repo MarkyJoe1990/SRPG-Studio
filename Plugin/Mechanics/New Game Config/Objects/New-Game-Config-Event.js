@@ -141,11 +141,16 @@ var NewGameConfigEventCommand = defineObject(BaseEventCommand, {
 			var currentConfig = scrollBar.getObjectFromIndex(i);
 			var currentValue = currentConfig.getConfigValue();
 			var currentIndex = currentConfig.getConfigIndex();
+			var currentValueType = typeof currentValue;
 			
-			if (typeof currentValue == "number") {
+			if (currentValueType == "number") {
 				currentConfig.setConfigValue(currentValue);
-			} else {
+			} else if (currentValueType == "string") {
 				currentConfig.setConfigValue(currentIndex);
+			} else if (currentValueType == "function") {
+				currentConfig.setConfigValue(currentValue());
+			} else {
+				currentConfig.setConfigValue(currentValue.value);
 			}
 		}
 	},

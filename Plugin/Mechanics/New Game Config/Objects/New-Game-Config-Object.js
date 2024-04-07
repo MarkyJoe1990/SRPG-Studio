@@ -4,7 +4,12 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 	
 	initialize: function() {
 		this._configScrollbar = createScrollbarObject(NewGameConfigOptionScrollbar, this);
-		this._configScrollbar.setScrollFormation(2, 1);
+
+		var configInfo = root.getConfigInfo();
+
+		var colCount = 2 + Math.floor((configInfo.getResolutionIndex() + 1) / 2)
+
+		this._configScrollbar.setScrollFormation(colCount, 1);
 		this._configScrollbar.setObjectArray(this.getConfigOptions());
 		this.setConfigIndex(0);
 	},
@@ -14,11 +19,10 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 		
 		if (result == ScrollbarInput.SELECT) {
 			this.setConfigIndex(this.getConfigScrollbar().getIndex());
-			
 		}
 		
-		if (result == ScrollbarInput.CANCEL) {
-			return MoveResult.CANCEL;
+		if (result == ScrollbarInput.START) {
+			return MoveResult.END;
 		}
 		
 		return MoveResult.CONTINUE;
@@ -53,13 +57,17 @@ var BaseNewGameConfig = defineObject(BaseObject, {
 	getConfigOptions: function() {
 		return [];
 	},
+
+	getConfigDescriptions: function() {
+		return [];
+	},
 	
 	setConfigValue: function(value) {
 		//You must set things here on your own
 	},
 	
 	getConfigValue: function() {
-		return this.getConfigScrollbar().getObject();
+		return this.getConfigScrollbar().getObjectFromIndex(this.getConfigIndex());
 	},
 	
 	getConfigIndex: function() {
@@ -105,6 +113,10 @@ var GlobalSwitchConfig = defineObject(BaseNewGameConfig, {
 	getConfigOptions: function() {
 		return ["Yes", "No"];
 	},
+
+	getConfigDescriptions: function() {
+		return [];
+	},
 	
 	getConfigDescription: function() {
 		return this.getGlobalSwitchTable().getSwitchDescription(this.getGlobalSwitchIndex());
@@ -119,7 +131,7 @@ var GlobalSwitchConfig = defineObject(BaseNewGameConfig, {
 	},
 	
 	getConfigValue: function() {
-		return this.getConfigScrollbar().getIndex();
+		return this.getConfigScrollbar().getObjectFromIndex(this.getConfigIndex());
 	},
 	
 	getConfigIcon: function() {
@@ -164,6 +176,10 @@ var LocalSwitchConfig = defineObject(BaseNewGameConfig, {
 	getConfigOptions: function() {
 		return ["Yes", "No"];
 	},
+
+	getConfigDescriptions: function() {
+		return [];
+	},
 	
 	getConfigDescription: function() {
 		return this.getLocalSwitchTable().getSwitchDescription(this.getLocalSwitchIndex());
@@ -178,7 +194,7 @@ var LocalSwitchConfig = defineObject(BaseNewGameConfig, {
 	},
 	
 	getConfigValue: function() {
-		return this.getConfigScrollbar().getIndex();
+		return this.getConfigScrollbar().getObjectFromIndex(this.getConfigIndex());
 	},
 	
 	getConfigIcon: function() {
@@ -190,6 +206,7 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	_variableTable: 0,
 	_variableId: 0,
 	_configOptions: null,
+	_configDescriptions: null,
 	
 	getVariableTable: function() {
 		return root.getMetaSession().getVariableTable(this._variableTable)
@@ -222,6 +239,10 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	getConfigOptions: function() {
 		return this._configOptions;
 	},
+
+	getConfigDescriptions: function() {
+		return this._configDescriptions || [];
+	},
 	
 	setConfigOptions: function(value) {
 		this._configOptions = value;
@@ -237,7 +258,7 @@ var VariableConfig = defineObject(BaseNewGameConfig, {
 	},
 	
 	getConfigValue: function() {
-		return this.getConfigScrollbar().getObject();
+		return this.getConfigScrollbar().getObjectFromIndex(this.getConfigIndex());
 	},
 	
 	getConfigIcon: function() {
@@ -259,12 +280,23 @@ var createLocalSwitchConfig = function(id) {
 	return localSwitchConfig;
 }
 
-var createVariableConfig = function(table, id, options) {
+var createVariableConfig = function(table, id, options, descriptions) {
 	var variableConfig = defineObject(VariableConfig, {
 		initialize: function() {
 			this._variableTable = table;
 			this._variableId = id;
-			this._configOptions = options;
+
+			if (typeof options == "function") {
+				this._configOptions = options();
+			} else {
+				this._configOptions = options;
+			}
+
+			if (typeof descriptions == "function") {
+				this._configDescriptions = descriptions();
+			} else {
+				this._configDescriptions = descriptions;
+			}
 			
 			BaseNewGameConfig.initialize.call(this);
 

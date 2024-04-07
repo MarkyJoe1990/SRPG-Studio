@@ -20,7 +20,11 @@ var NewGameConfigScrollbar = defineObject(BaseScrollbar, {
 	},
 	
 	getObjectWidth: function() {
-		return 520;
+		var configInfo = root.getConfigInfo();
+
+		var colCount = Math.floor((configInfo.getResolutionIndex() + 1) / 2)
+
+		return 520 + (colCount * 80) + ((colCount - 1) * 10);
 	},
 	
 	getObjectHeight: function() {
