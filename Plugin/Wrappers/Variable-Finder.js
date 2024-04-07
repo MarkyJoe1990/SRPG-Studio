@@ -144,7 +144,7 @@ var LocalSwitchFinder = {
 		
 		return table;
     }
-}
+};
 
 ( function() {
     var alias1 = SetupControl.setup;
