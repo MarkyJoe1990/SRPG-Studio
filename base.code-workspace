@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "./Material"
+		},
+		{
+			"path": "Script"
 		}
 	],
 	"settings": {}
