@@ -114,6 +114,7 @@ CombinationCollector.Trade = defineObject(BaseCombinationCollector, {
 			combination = this._createAndPushCombination(misc);
 			combination.plusScore = score;
 			combination.searchMode = misc.searchMode;
+			combination.tradeQueue = [];
 		}
 	},
 	
