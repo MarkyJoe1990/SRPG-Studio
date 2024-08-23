@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <style>
+            body {
+                font-family: tahoma;
+                max-width: 700px;
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Item&nbsp;Select Menu Revamp</h1>
+        <p>Made by MarkyJoe1990</p>
+        <h2>What is the Item Select Menu?</h2>
+        <p>It's the window that appears when you select the "Item" command after moving a unit. From here, you can select items in your inventory and decide what to do with them using the <strong>Item Work Window</strong>; a side window that pops up after selecting an item with the commands&nbsp;<strong>Equip</strong>,&nbsp;<strong>Use</strong>&nbsp;and&nbsp;<strong>Discard</strong>.</p>
+        <h2>Why revamp it?</h2>
+        <p>The&nbsp;<strong>Item Select Menu</strong>&nbsp;is notoriously very poorly programmed and consequently difficult to add functionality to. To give you an idea, most command lists in SRPG Studio have you select a command, then run the code contained <em>inside</em> that command. These command lists also tend to have a function that populates the list that you can modify in order to add more commands easily.</p>
+        <p>The&nbsp;<strong>Item Select Menu</strong> doesn't work like this. Instead, all command functionality is contained within the menu itself, and the functions it runs are based on the&nbsp;<span style="text-decoration: underline;">position your cursor was in</span> when you made a selection in the&nbsp;<strong>Item Work Window</strong>.</p>
+        <p>This has very obnoxious implications. For example, let's say you want to add a new command in the&nbsp;<strong>Item Work Window</strong> that comes before the&nbsp;<strong>Discard</strong> command, but&nbsp;after&nbsp;the&nbsp;<strong>Use/Equip</strong> command. Instead of simply making a command with all the necessary functionality and adding it to the&nbsp;<strong>Item Work Window's</strong> command list, you need to reprogram several functions in the&nbsp;<strong>Item Select Menu</strong> to treat the&nbsp;<strong>Discard</strong> command's original position (the second) as your new command, and its third position as the&nbsp;<strong>Discard</strong> command. And you have to do this&nbsp;<em>every time</em> you add new commands to the&nbsp;<strong>Item Work Window</strong>.</p>
+        <p>There are several other issues created due to how this menu is structured, but hopefully you get the idea of why this revamp is necessary.</p>
+        <h2>I don't program. Why do I want this?</h2>
+        <p>First and foremost, this revamp comes with a <span style="text-decoration: underline;">bonus feature</span>: the ability to use weapons like items! If you've ever played&nbsp;<em>Fire Emblem: The Binding Blade</em>, you may remember that the Binding Blade could be used both as a weapon&nbsp;<em>and</em> as a healing item. This plugin includes that as functionality. <a href="#useCommand">See the below question for details on how to use it</a>.</p>
+        <p>Second. Since this is intended to make the jobs of programmers in this community easier, that means other people's plugins may be dependent on this one. Furthermore, if you are looking to commission programmers in this community to add functionality to this menu, this reduces the amount of time they have to spend coding, which saves you money!</p>
+        <h2><a id="useCommand"></a>How do I use weapons as items?</h2>
+        <ol>
+        <li>Create an item with all the functionality you need the weapon to have.</li>
+        <li>Go to your weapon and open up its custom parameters.</li>
+        <li>Create a set of curly braces and add a new property called <span style="text-decoration: underline;">itemReferenceId</span>. Set its value to the same ID number as your item.</li>
+        <li>You can also set the <span style="text-decoration: underline;">durabilityCost</span> (number), and whether using the weapon as an item is a&nbsp;<span style="text-decoration: underline;">freeAction</span> (true or false). These are optional properties however.</li>
+        <li>Refer to the code example below for details.</li>
+        </ol>
+        <div style="background-color: #999999;">
+        <pre>{<br />    itemReferenceId: 52,<br />    durabilityCost: 5,<br />    freeAction: true<br />}</pre>
+        </div>
+        <p>&nbsp;Note that this can be&nbsp;<em>any item</em> functionality you want. You aren't just limited to healing items.</p>
+        <h2>I'm a programmer. How do I add new features?</h2>
+        <p>There's two main things you need to know:</p>
+        <ol>
+        <li><strong>ItemWorkWindow.configureCommands</strong> is the function you alias in order to add your new commands. You can see how I did it in&nbsp;<strong>Item-Work-Window.js</strong>.</li>
+        <li>Look at <strong>Item-Work-Command.js</strong>.&nbsp;It has comments to help guide you on how everything works.</li>
+        </ol>
+        <p>From there, you should be able to figure everything else out on your own.</p>
+    </body>
+</html>

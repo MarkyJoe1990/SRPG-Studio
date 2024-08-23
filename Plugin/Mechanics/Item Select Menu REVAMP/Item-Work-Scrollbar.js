@@ -1,7 +1,5 @@
-// Uses BaseListCommand objects
-
 ( function () {
-    // Overwrites ItemWorkScrollbar
+    // Reprograms the ItemWorkScrollbar to contain Commands instead of Strings.
     ItemWorkScrollbar = defineObject(ItemWorkScrollbar, {
         drawScrollContent: function(x, y, object, isSelect, index) {
             var command = object;
@@ -35,7 +33,7 @@
                 return this.getParentInstance().getParentInstance().isWorkAllowed(workIndex);
             }
 
-            return command.isWorkEnabled();
+            return command.isWorkAllowed();
         }
     });
 }) ();
