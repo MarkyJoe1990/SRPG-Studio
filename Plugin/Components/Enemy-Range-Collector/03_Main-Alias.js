@@ -54,36 +54,74 @@ var ENEMY_RANGE_IMAGE_SET;
 		}
 	}
 
+    PlayerTurn.setStateLoadable = function(isStateLoadable) {
+        this._mapSequenceCommand._isStateLoadable = isStateLoadable;
+    }
+
+    var alias20 = MapSequenceArea._prepareSequenceMemberData;
+    MapSequenceArea._prepareSequenceMemberData = function(parentTurnObject) {
+        alias20.call(this, parentTurnObject);
+        this.setStateLoadable(false);
+    }
+
+    var alias19 = MapSequenceArea._moveArea;
+    MapSequenceArea._moveArea = function() {
+        var result = alias19.call(this);
+
+        if (result === MapSequenceAreaResult.COMPLETE && ENEMY_RANGE_COLLECTOR_CONFIG.disableUpdateOnUnitMove !== true) {
+            this.setStateLoadable(false);
+        }
+
+        return result;
+    }
+
     var alias10 = MapSequenceArea._moveMoving;
     MapSequenceArea._moveMoving = function() {
         var result = alias10.call(this);
 
         if (result === MapSequenceAreaResult.COMPLETE && ENEMY_RANGE_COLLECTOR_CONFIG.disableUpdateOnUnitMove !== true) {
-            // Either the parent turn object is PlayerTurn or it's RepeatMoveFlowEntry
-            // PlayerTurn doesn't have this._playerTurn but RepeatMoveFlowEntry does.
-            var turnObject = this._parentTurnObject._playerTurn || this._parentTurnObject;
-            turnObject._enemyRangeCollector.saveState(); // Abandon if save states don't work well.
-
-            // Sorting stuff
-            var unit = turnObject._targetUnit;
-            var enemyRangeCollector = turnObject._enemyRangeCollector;
-            enemyRangeCollector.reset(enemyRangeCollector.createSortByDistance(unit));
+            this._prepareSaveState();
         }
 
         return result;
+    }
+
+    MapSequenceArea.getTurnObject = function() {
+        return this._parentTurnObject._playerTurn || this._parentTurnObject;
+    }
+
+    MapSequenceArea._prepareSaveState = function() {
+        // Either the parent turn object is PlayerTurn or it's RepeatMoveFlowEntry
+        // PlayerTurn doesn't have this._playerTurn but RepeatMoveFlowEntry does.
+        var turnObject = this.getTurnObject();
+        turnObject._enemyRangeCollector.saveState(); // Abandon if save states don't work well.
+
+        // Sorting stuff
+        var unit = turnObject._targetUnit;
+        var enemyRangeCollector = turnObject._enemyRangeCollector;
+        enemyRangeCollector.reset(enemyRangeCollector.createSortByDistance(unit));
+        this.setStateLoadable(true);
+    }
+
+    MapSequenceArea.setStateLoadable = function(isStateLoadable) {
+        this.getTurnObject().setStateLoadable(isStateLoadable);
     }
 
     var alias11 = MapSequenceCommand._moveCommand;
     MapSequenceCommand._moveCommand = function() {
         var result = alias11.call(this);
 
-        if (result === MapSequenceCommandResult.CANCEL && ENEMY_RANGE_COLLECTOR_CONFIG.disableUpdateOnUnitMove !== true) {
+        if (result === MapSequenceCommandResult.CANCEL && this.isStateLoadable() === true) {
             this._parentTurnObject._enemyRangeCollector.loadState();
             // in case the load state system doesn't work properly
             // this._parentTurnObject._enemyRangeCollector.reset();
         }
 
         return result;
+    }
+
+    MapSequenceCommand.isStateLoadable = function() {
+        return this._isStateLoadable === true;
     }
 
     var alias9 = MapLayer.drawMapLayer;
