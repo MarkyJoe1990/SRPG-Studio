@@ -1,3 +1,37 @@
+/*
+    VariableFinder
+    v1.0 By MarkyJoe1990
+
+    Grabbing Variables and switches can be a pain,
+    so I wrote some code that simplifies the process.
+    Variables and Global switches get cached upon
+    the first time they are called, so you don't
+    need to worry too much about performance.
+
+    Note that if you have two variables or switches with
+    the same name, this will only get the first instance
+    in your variable tables.
+
+    Methods:
+    VariableFinder.getVariableValue(VARIABLE_NAME)
+    Gets the value of the specified variable by name.
+
+    VariableFinder.getVariableValue(VARIABLE_NAME, VALUE)
+    Sets the value of the specified variable, fetched by name.
+
+    GlobalSwitchFinder.isGlobalSwitchOn(SWITCH_NAME)
+    Checks if the named global variable is set to true or not.
+
+    GlobalSwitchFinder.setGlobalSwitch(SWITCH_NAME, BOOLEAN)
+    Sets the named global variable to true or false
+
+    LocalSwitchFinder.isLocalSwitchOn(SWITCH_NAME)
+    Checks if the named local variable is set to true or not.
+
+    LocalSwitchFinder.setLocalSwitch(SWITCH_NAME, BOOLEAN)
+    Sets the named local variable to true or false
+*/
+
 var VariableFinder = {
     _varCache: null,
 
