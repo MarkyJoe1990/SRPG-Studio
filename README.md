@@ -8,6 +8,8 @@ All of my public plugins, assets and other tools for SRPG Studio can be found in
 
 **Components**: Plugins that serve as vital components for other plugins. Often comes with multiple standalone features as well.
 
+**Controls**: Plugins meant to modify or improve the controls of SRPG Studio.
+
 **Converters**: Plugins that are mostly useful for developers in that they convert in-game data into spreadsheets for convenience.
 
 **Event Commands**: Adds new, custom event commands that weren't available before.
