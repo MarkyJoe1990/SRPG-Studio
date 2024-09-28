@@ -4,12 +4,20 @@
 
     This is a special component plugin that adds
     the CameraPan object to be used in code for smooth
-    camera scrolling.
+    camera scrolling. This allows for the following features:
 
-    In addition, this plugin has a new event command
-    that utilizes the CameraPan object, and a config
-    option to enable smooth camera panning for
-    when reinforcements appear.
+    - Smooth screen scrolling when moving the cursor around with
+      a gamepad or keyboard.
+    - Smooth screen scrolling when panning over to enemy units on
+      enemy phase (Set Scroll Speed to Norm in in-game Config)
+    - Smooth screen scrolling when panning over to reinforcements.
+    - Smooth screen scrolling during the Phase Change animation
+    - Smooth screen scrolling when snapping over to specific units
+    - An Event Command for smoothly scrolling over to a position
+      on the map.
+
+    You can enable or disable specific parts of this plugin
+    by opening up 00_config.js
 
     How to use "Camera" event command:
     - Create an event command "Script Execute"
@@ -23,14 +31,4 @@
     - For setting a unit as the camera destination
         - In the "Property" field, add { useUnit: true }
         - In the Original Data Tab, go to the "Unit" field and select your unit.
-
-    How to enable smooth camera for reinforcements:
-    - Go to 00_config.js
-    - Set enableReinforcementPan to true
-
-    If you enable smooth camera panning, do note
-    that the following functions will be overwritten:
-    - ReinforcementChecker.drawReinforcementChecker
-    - ReinforcementChecker.startMove
-    - ReinforcementChecker._moveWait
 */

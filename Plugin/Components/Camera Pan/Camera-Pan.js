@@ -5,9 +5,21 @@ var CameraPan = defineObject(BaseObject, {
     _destY: -1,
     _diffX: -1,
     _diffY: -1,
+    _easeMethod: null,
+    _timeMethod: null,
+    _isCameraFinished: false,
 
     initialize: function() {
         this._counter = createObject(SpeedCounter);
+        this._startX = -1;
+        this._startY = -1;
+        this._destX = -1;
+        this._destY = -1;
+        this._diffX = -1;
+        this._diffY = -1;
+        this._timeMethod = CameraPanControl.defaultTimeMethod;
+        this._easeMethod = CameraPanControl.defaultEaseMethod;
+        this._isCameraFinished = true;
     },
 
     setDestination: function(x, y) {
@@ -58,24 +70,30 @@ var CameraPan = defineObject(BaseObject, {
         this._diffX = this._destX - this._startX;
         this._diffY = this._destY - this._startY;
 
-        var time = Math.floor((Math.abs(this._diffX) + Math.abs(this._diffY)) / 36) + 12;
+        var time = this._timeMethod(this);
         this._counter.setCounterInfo(time);
+        this._isCameraFinished = false;
     },
 
     endCameraPan: function() {
         var session = root.getCurrentSession();
         session.setScrollPixelX(this._destX);
         session.setScrollPixelY(this._destY);
+        this._isCameraFinished = true;
     },
 
     moveCameraPan: function() {
+        if (this._isCameraFinished === true) {
+            return MoveResult.END;
+        }
+
         if (this._counter.moveCycleCounter() === MoveResult.CONTINUE) {
             var time = this._counter.getCounter();
             var max = this._counter._max;
             var session = root.getCurrentSession();
 
-            session.setScrollPixelX(Math.floor(EaseControl.easeInOutQuad(time, this._startX, this._diffX, max)));
-            session.setScrollPixelY(Math.floor(EaseControl.easeInOutQuad(time, this._startY, this._diffY, max)));
+            session.setScrollPixelX(this._easeMethod(time, this._startX, this._diffX, max));
+            session.setScrollPixelY(this._easeMethod(time, this._startY, this._diffY, max));
             return MoveResult.CONTINUE;
         }
 
@@ -93,5 +111,13 @@ var CameraPan = defineObject(BaseObject, {
 
     disableGameAcceleration: function() {
         this._counter.disableGameAcceleration();
+    },
+
+    setTimeMethod: function(func) {
+        this._timeMethod = func;
+    },
+
+    setEaseMethod: function(func) {
+        this._easeMethod = func;
     }
 });

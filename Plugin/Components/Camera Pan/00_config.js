@@ -1,5 +1,7 @@
 var CameraPanConfig = {
     enableReinforcementPan: true,
     enableEnemyPan: true,
-    enableTurnChangePan: true
+    enableTurnChangePan: true,
+    enableMouseMovementPan: true, // Not recommended to turn this off.
+    enableUnitSnapPan: true
 };
