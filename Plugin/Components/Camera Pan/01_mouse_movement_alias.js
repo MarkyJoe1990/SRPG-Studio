@@ -7,6 +7,7 @@
 	MapCursor.initialize = function() {
 		alias1.call(this);
 		this._cameraPan = createObjectEx(CameraPan, this);
+        this._cameraPan.disableGameAcceleration();
 	}
 
     var alias2 = MapCursor.moveCursorAnimation;

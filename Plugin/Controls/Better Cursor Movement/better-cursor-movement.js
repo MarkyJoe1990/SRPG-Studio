@@ -193,6 +193,15 @@
 		session.setMapCursorX(xCursor);
 		session.setMapCursorY(yCursor);
 	}
+
+	// If your speed up key also speeds the mouse,
+	// this alias function prevents it from moving
+	// faster than intended.
+	var alias4 = InputControl.initSingleton;
+	InputControl.initSingleton = function() {
+		alias4.call(this);
+		this._counterHigh.disableGameAcceleration();
+	};
 	
 	//New function
 	InputControl.getDirectionState2 = function() {
