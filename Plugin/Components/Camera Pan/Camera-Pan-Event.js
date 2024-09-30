@@ -41,7 +41,7 @@ var CameraPanEvent = defineObject(BaseEventCommand, {
 	},
 	
 	drawEventCommandCycle: function() {
-		this._enableDebug === true && this._cameraPan.drawDebug();
+		this._cameraPan.drawDebug();
 	},
 
     mainEventCommand: function() {

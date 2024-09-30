@@ -3,7 +3,6 @@ var NameEntryPreview = defineObject(BaseWindow, {
 	
 	setUp: function(string) {
 		this._currentString = string;
-		root.log("GRAND MA IS " + this._currentString);
 	},
 	
 	drawWindowContent: function(x, y) {
@@ -11,8 +10,6 @@ var NameEntryPreview = defineObject(BaseWindow, {
 		var color = textui.getColor();
 		var font = textui.getFont();
 		//Get value from window manager
-
-		root.log(this._currentString);
 
 		TextRenderer.drawText(x, y, this._currentString, -1, color, font);
 	},

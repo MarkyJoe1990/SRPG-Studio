@@ -106,6 +106,10 @@
 		if (pic !== null) {
 			pic.drawStretchParts(x, y, GraphicsFormat.MAPCHIP_WIDTH, GraphicsFormat.MAPCHIP_HEIGHT, this._mapCursorSrcIndex * width, 0, width, height);
 		}
+
+		if (CameraPanConfig.enableMouseMovementPan === true) {
+			this._cameraPan.drawDebug();
+		}
 	}
 	
 	//New function

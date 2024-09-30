@@ -255,4 +255,27 @@ var ENEMY_RANGE_IMAGE_SET;
         alias18.call(this);
         ENEMY_RANGE_IMAGE_SET = root.getMaterialManager().createImage("enemy-range-edges", ENEMY_RANGE_COLLECTOR_CONFIG.customRangeDisplayImage);
     }
+
+    // Update ranges when unit has died from damage over time.
+    var alias21 = DamageEraseFlowEntry.moveFlowEntry;
+    DamageEraseFlowEntry.moveFlowEntry = function() {
+        var result = alias21.call(this);
+
+        if (result !== MoveResult.CONTINUE) {
+            var enemyRangeCollector = CurrentMap.getEnemyRangeCollector();
+            var unit = this._damageData.targetUnit;
+            var rangeData = enemyRangeCollector.getUnitRangeData(unit);
+            if (rangeData != null) {
+                enemyRangeCollector.removeFromCombinedIndexArray(rangeData);
+                enemyRangeCollector.nullRangeData(rangeData);
+                enemyRangeCollector.addToCombinedIndexArray(rangeData);
+                
+                rangeData.isMarked = false;
+                
+                enemyRangeCollector.updateVisuals();
+            }
+        }
+
+        return result;
+    }
 }) ();

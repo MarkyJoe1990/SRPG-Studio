@@ -52,6 +52,10 @@
 
     var alias4 = TurnMarkFlowEntry.drawFlowEntry;
     TurnMarkFlowEntry.drawFlowEntry = function() {
+        if (this._isScrollAllowed === true) {
+            this._cameraPan.drawDebug();
+        }
+
         if (this._isAnimationAllowed !== true) {
             return;
         }
@@ -108,6 +112,10 @@
 
     var alias8 = TurnAnimeFlowEntry.drawFlowEntry;
     TurnAnimeFlowEntry.drawFlowEntry = function() {
+        if (this._isScrollAllowed === true) {
+            this._cameraPan.drawDebug();
+        }
+
         if (this._isAnimationAllowed !== true) {
             return;
         }

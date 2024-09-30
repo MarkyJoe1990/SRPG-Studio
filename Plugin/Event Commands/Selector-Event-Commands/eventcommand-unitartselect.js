@@ -1,6 +1,5 @@
 var UnitArtSelectorEventCommand = defineObject(BaseSelectorEventCommand, {
 	_setVariables: function() {
-		root.log("Fuck");
 		this._myVarTable1.setVariable(this._myVar1.id,this._chosenObject.getId());
 		if (this._myVar2 != null) {
 			this._myVarTable2.setVariable(this._myVar2.id,this._objectIndex);

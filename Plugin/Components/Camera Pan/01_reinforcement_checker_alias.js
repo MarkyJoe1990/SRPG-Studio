@@ -38,6 +38,8 @@
             // EDITTED THIS LINE BELOW
 			unitRenderParam.direction != DirectionType.NULL && UnitRenderer.drawScrollUnit(reinforceUnit.unit, reinforceUnit.xPixel, reinforceUnit.yPixel, unitRenderParam);
 		}
+
+        this._drawScroll();
 	}
 
     // Override
@@ -55,6 +57,11 @@
         }
 
         return MoveResult.CONTINUE;
+    }
+
+    // New function
+    ReinforcementChecker._drawScroll = function() {
+        this._cameraPan.drawDebug();
     }
 
     // New function

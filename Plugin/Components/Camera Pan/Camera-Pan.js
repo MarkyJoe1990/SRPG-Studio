@@ -8,6 +8,7 @@ var CameraPan = defineObject(BaseObject, {
     _easeMethod: null,
     _timeMethod: null,
     _isCameraFinished: false,
+    _isDebugEnabled: false,
 
     initialize: function() {
         this._counter = createObject(SpeedCounter);
@@ -20,6 +21,7 @@ var CameraPan = defineObject(BaseObject, {
         this._timeMethod = CameraPanControl.defaultTimeMethod;
         this._easeMethod = CameraPanControl.defaultEaseMethod;
         this._isCameraFinished = true;
+        this._isDebugEnabled = CameraPanConfig.enableDebug === true;
     },
 
     setDestination: function(x, y) {
@@ -102,11 +104,48 @@ var CameraPan = defineObject(BaseObject, {
     },
 
     drawDebug: function() {
-        var graphicsManager = root.getGraphicsManager();
-        var x = Math.floor(root.getGameAreaWidth() / 2);
-        var y = Math.floor(root.getGameAreaHeight() / 2);
+        if (this._isDebugEnabled !== true) {
+            return;
+        }
 
-        graphicsManager.fillRange(x - (Math.floor(GraphicsFormat.MAPCHIP_WIDTH / 2)), y - (Math.floor(GraphicsFormat.MAPCHIP_HEIGHT / 2)), GraphicsFormat.MAPCHIP_WIDTH, GraphicsFormat.MAPCHIP_HEIGHT, 0xFFFFFF, 128);
+        var graphicsManager = root.getGraphicsManager();
+        var session = root.getCurrentSession();
+        var textui = root.queryTextUI("default_window");
+        var color = textui.getColor();
+        var font = textui.getFont();
+
+        // Draw Enemy ScrollAutoAction Validation Boundary
+        var tileWidth = GraphicsFormat.MAPCHIP_WIDTH;
+        var tileHeight = GraphicsFormat.MAPCHIP_HEIGHT;
+        var gameWidth = root.getGameAreaWidth();
+        var gameHeight = root.getGameAreaHeight();
+        var scrollX = session.getScrollPixelX();
+        var scrollY = session.getScrollPixelY();
+        var extraTileX = scrollX % tileWidth > 0 ? 1 : 0;
+        var extraTileY = scrollY % tileHeight > 0 ? 1 : 0;
+        var tileHighlightCountX = Math.ceil(gameWidth / tileWidth) - 4 + extraTileX;
+        var tileHighlightCountY = Math.ceil(gameHeight / tileHeight) - 4 + extraTileY;
+
+        var width = tileHighlightCountX * tileWidth;
+        var height = tileHighlightCountY * tileHeight;
+        var x = (tileWidth * 2) - (scrollX % tileWidth);
+        var y = (tileHeight * 2) - (scrollY % tileHeight);
+        graphicsManager.fillRange(x, y, width, height, 0x0000FF, 0x20);
+        TextRenderer.drawText(x, y, "Boundary Screen Pos: " + x + ", " + y +
+            "\nBoundary Dimensions: " + width + ", " + height +
+            "\nTile Pos: " + (2 + Math.floor(scrollX / tileWidth)) + ", " + (2 + Math.floor(scrollY / tileHeight)) +
+            "\nTile Dimensions: " + tileHighlightCountX + ", " + tileHighlightCountY,
+             -1, color, font);
+
+        // Draw true screen center setDestinationTrueTileCenter
+        x = Math.floor(gameWidth / 2);
+        y = Math.floor(gameHeight / 2);
+        graphicsManager.fillRange(x - (Math.floor(tileWidth / 2)), y - (Math.floor(tileHeight / 2)), tileWidth, tileHeight, 0xFFFFFF, 0x80);
+
+        // Draw screen center based on setDestinationTileCenter
+        x = (Math.floor(x / tileWidth) * tileWidth) + (x % tileWidth);
+        y = (Math.floor(y / tileHeight) * tileHeight) + (y % tileHeight);
+        graphicsManager.fillRange(x, y, tileWidth, tileHeight, 0xFF0000, 0x80);
     },
 
     disableGameAcceleration: function() {

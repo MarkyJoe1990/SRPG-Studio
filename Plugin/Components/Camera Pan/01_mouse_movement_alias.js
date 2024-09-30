@@ -16,6 +16,12 @@
         return alias2.call(this);
     }
 
+    var alias4 = MapCursor.drawCursor;
+    MapCursor.drawCursor = function() {
+        alias4.call(this);
+        this._cameraPan.drawDebug();
+    }
+
     var alias3 = MapCursor._changeCursorValue;
 	MapCursor._changeCursorValue = function(input) {
         var session = root.getCurrentSession();
