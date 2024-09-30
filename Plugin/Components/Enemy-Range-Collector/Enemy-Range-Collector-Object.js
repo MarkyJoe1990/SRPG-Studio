@@ -37,6 +37,7 @@ var EnemyRangeCollector = defineObject(BaseObject, {
         this._individualWeaponSwitchArray = enemyRangeCollectorData.individualWeaponSwitchArray;
 
         this._isSplashControlEnabled = typeof SplashControl != "undefined";
+        this._isEaseControl = typeof EaseControl != "undefined" && AnimationEasingConfig.enableEnemyRangeCollectorFlagWave === true;
 
         // Other
         this._counter = createObject(CycleCounter);
@@ -361,15 +362,19 @@ var EnemyRangeCollector = defineObject(BaseObject, {
                 var session = root.getCurrentSession();
                 var counter = this._counter.getCounter();
                 var max = this._counter._max;
+                var x = -10;
                 
-                var yOffset = 0;
-                if (this._isReverse === true) {
-                    yOffset = EaseControl.easeInOutQuad(max - counter, -10, -20, max);
-                } else {
-                    yOffset = EaseControl.easeInOutQuad(counter, -10, -20, max);
+                var yOffset = -10;
+                if (this._isEaseControl === true) {
+                    x = 0;
+                    if (this._isReverse === true) {
+                        yOffset = EaseControl.easeInOutQuad(max - counter, -10, -20, max);
+                    } else {
+                        yOffset = EaseControl.easeInOutQuad(counter, -10, -20, max);
+                    }
                 }
 
-                this._flagMarkCache.drawParts(0, yOffset, session.getScrollPixelX(), session.getScrollPixelY(), root.getGameAreaWidth(), root.getGameAreaHeight());
+                this._flagMarkCache.drawParts(x, yOffset, session.getScrollPixelX(), session.getScrollPixelY(), root.getGameAreaWidth(), root.getGameAreaHeight());
                 return;
             }
         }
