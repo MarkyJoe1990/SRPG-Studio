@@ -1,0 +1,3 @@
+var WeatherConfig = {
+    enableDebug: false
+}
