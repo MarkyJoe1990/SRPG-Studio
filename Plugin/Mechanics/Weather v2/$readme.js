@@ -1,5 +1,5 @@
 /*
-    Weather (Revamped) v1.0
+    Weather 2.0
     By MarkyJoe1990
 
     WHAT DOES THIS DO?
