@@ -25,16 +25,16 @@
 ( function() {
 	var alias1 = StateControl.arrangeState;
 	StateControl.arrangeState = function(unit, state, increaseType) {
-		var preAttack, attackParam, activeUnit, passiveUnit, srcUnitId, activeSpirit
+		var preAttack, attackParam, activeUnit, passiveUnit, activeSpirit;
 		var turnState = alias1.call(this, unit, state, increaseType);
 		
-		if (state != null && state.custom.isTaunt == true && increaseType == IncreaseType.INCREASE) {
+		if (TauntControl.isTaunt(state) === true && increaseType == IncreaseType.INCREASE) {
 			preAttack = AttackControl.getPreAttackObject();
 			
 			if (typeof SpiritSkillControl != "undefined") {
 				activeSpirit = SpiritSkillControl.getActiveSpirit();
 			} else {
-				activeSpirit == null
+				activeSpirit == null;
 			}
 			
 			if (preAttack != null) {
@@ -43,15 +43,15 @@
 				passiveUnit = attackParam.targetUnit;
 				
 				if (activeUnit == unit) {
-					activeUnit.custom.tauntTarget = passiveUnit.getId();
+					TauntControl.setTauntTarget(activeUnit, passiveUnit);
 				} else {
-					passiveUnit.custom.tauntTarget = activeUnit.getId();
+					TauntControl.setTauntTarget(passiveUnit, activeUnit);
 				}
 			} else if (activeSpirit != null) {
 				activeUnit = activeSpirit.srcUnit;
 				
 				if (unit != activeUnit) {
-					unit.custom.tauntTarget = activeUnit.getId();
+					TauntControl.setTauntTarget(unit, activeUnit);
 				}
 			}
 		}
@@ -70,8 +70,8 @@
 		var targetUnit = itemTargetInfo.targetUnit;
 		var state = info.getStateInvocation().getState();
 		
-		if (state.custom.isTaunt == true) {
-			targetUnit.custom.tauntTarget = unit.getId();
+		if (TauntControl.isTaunt(state) === true) {
+			TauntControl.setTauntTarget(targetUnit, unit);
 		}
 		
 		return result;
@@ -86,15 +86,9 @@
 			return score;
 		}
 
-		var i, turnStateList = unit.getTurnStateList();
-		var count = turnStateList.getCount();
-		
-		for (i = 0; i < count; i++) {
-			var currentState = turnStateList.getData(i).getState();
-			if (currentState.custom.isTaunt == true) {
-				if (unit.custom.tauntTarget == targetUnit.getId()) {
-					score += 700;
-				}
+		if (TauntControl.isTaunted(unit)) {
+			if (TauntControl.isTauntTarget(unit, targetUnit)) {
+				score += TauntControl.getTauntScore();
 			}
 		}
 		
@@ -116,10 +110,10 @@
 		var score = alias4.call(this, unit, targetUnit, state);
 		
 		var option = state.getBadStateOption();
-		if (state.custom.isTaunt == true && option == BadStateOption.AUTO) {
+		if (TauntControl.isTaunt(state) === true && option == BadStateOption.AUTO) {
 			score += 20;
 		}
-		
+
 		return score;
 	}
 }) ();
