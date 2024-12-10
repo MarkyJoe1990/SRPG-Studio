@@ -18,8 +18,6 @@ var NameEntryWindowManager = defineObject(BaseWindowManager, {
 		this._keys = keys;
 		this._currentString = defaultName;
 
-		root.log("GRAND DAD IS: " + this._currentString);
-
 		this._selfSwitch = selfSwitch;
 		this._lengthLimit = lengthLimit;
 		this._unit = unit;

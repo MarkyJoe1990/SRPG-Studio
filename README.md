@@ -1,22 +1,36 @@
-# SRPG-Studio
-All of my SRPG Studio assets. Most of which are plugins.
+All of my public plugins, assets and other tools for SRPG Studio can be found in this repo.
 
-If you're looking for other useful plugins, I highly recommend these guys:
+[Support me here](https://paypal.me/markyjoe) if you like what I do.
 
-Goinza: https://github.com/Goinza
+# Plugin Folder Contents
 
-QBE256P: https://github.com/QBE256
+**AI**: Adds more actions the enemy AI can do.
 
-McMagister: https://github.com/McMagister
+**Components**: Plugins that serve as vital components for other plugins. Often comes with multiple standalone features as well.
 
-TheRepeat: https://github.com/TheRepeat/SRPG-Studio
+**Controls**: Plugins meant to modify or improve the controls of SRPG Studio.
 
-Piketrcechillas: https://github.com/piketrcechillas/Scripts-for-SPRG-Studios
+**Converters**: Plugins that are mostly useful for developers in that they convert in-game data into spreadsheets for convenience.
 
-Anarch16sync: https://github.com/Anarch16Sync/SRPG-Studio-Plugins
+**Event Commands**: Adds new, custom event commands that weren't available before.
 
-crazyli825: https://github.com/CrazyLi825/SRPGstudio
+**Items**: Adds new item effects, or expands functionality of existing items.
 
-Claris: https://github.com/RogueClaris/SRPGStudioScripts/
+**Mechanics**: Changes to in-game mechanics such as new unit commands, changes in battle formulas, and revamps to existing features.
 
-PurpleManDown: https://github.com/Purplemandown/SRPGS-stuff
+**Optimizations**: Improve performance for users playing SRPG Studio games on lower end PCs or the Steam Deck.
+
+**Presentation**: Improvements to SRPG Studio's visuals such as animated menus, UI and quality of life features like damage preview.
+
+**Skills**: Adds new skills into the game.
+
+**States**: Expands functionality of status effects.
+
+**Tutorials**: Example scripts with several comments meant to teach new scripters how things work.
+
+**Wrappers**: Adds easy to use wrapper functions that help simplify the creation of other plugins.
+
+# Other Scripters
+If you can't find what you want here at my GitHub, you might want to check out these other scripters, [SRPG Studio World](https://paypal.me/markyjoe), or the [SRPG Studio Wiki](https://srpg-studio.fandom.com/wiki/User-Made_Plugin_Links).
+
+[Goinza](https://github.com/Goinza) | [QBE256P](https://github.com/QBE256) | [McMagister](https://github.com/McMagister) | [TheRepeat](https://github.com/TheRepeat/SRPG-Studio) | [Piketrcechillas](https://github.com/piketrcechillas/Scripts-for-SPRG-Studios) | [Anarch16sync](https://github.com/Anarch16Sync/SRPG-Studio-Plugins) | [CrazyLi825](https://github.com/CrazyLi825/SRPGstudio) | [RogueClaris](https://github.com/RogueClaris/SRPGStudioScripts/) | [PurpleManDown](https://github.com/Purplemandown/SRPGS-stuff)
