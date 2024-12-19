@@ -155,4 +155,12 @@
 
         return null;
     }
+
+    // If this is enabled, disable PlayerTurn MapLineScroll,
+    // Since the scrolling is already handled by phase change.
+    var alias9 = PlayerTurn._changeAutoCursor;
+    PlayerTurn._changeAutoCursor = function() {
+        alias9.call(this);
+        this._mapLineScroll._goalArray = null;
+    }
 }) ();

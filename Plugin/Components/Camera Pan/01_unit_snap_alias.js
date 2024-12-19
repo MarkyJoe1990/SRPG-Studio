@@ -17,8 +17,15 @@
         session.setScrollPixelY(prevScrollY);
 
 		if (this._parentTurnObject._mapEdit != null) {
+            // First, check to see if scrolling is necessary
+            var targetPos = createPos(this._targetUnit.getMapX(), this._targetUnit.getMapY());
+            var scrollBoundary = CameraPanControl.calculateScrollBoundary();
+            if (CameraPanControl.isScrollTileAllowed(targetPos.x, targetPos.y, scrollBoundary) !== true) {
+                return;
+            }
+
             var mapCursor = this._parentTurnObject._mapEdit._mapCursor;
-            mapCursor._cameraPan.setDestinationTileCenter(this._targetUnit.getMapX(), this._targetUnit.getMapY());
+            mapCursor._cameraPan.setDestinationTileCenter(targetPos.x, targetPos.y);
             mapCursor._cameraPan.setTimeMethod(CameraPanControl.snapTimeMethod);
             mapCursor._cameraPan.setEaseMethod(CameraPanControl.defaultEaseMethod);
             mapCursor._cameraPan.startCameraPan();
@@ -38,8 +45,15 @@
         session.setScrollPixelX(prevScrollX);
         session.setScrollPixelY(prevScrollY);
 
+        // First, check to see if scrolling is necessary
+        var unitPos = createPos(unit.getMapX(), unit.getMapY());
+        var scrollBoundary = CameraPanControl.calculateScrollBoundary();
+        if (CameraPanControl.isScrollTileAllowed(unitPos.x, unitPos.y, scrollBoundary) !== true) {
+            return;
+        }
+
         var mapCursor = this._mapEdit._mapCursor;
-        mapCursor._cameraPan.setDestinationTileCenter(unit.getMapX(), unit.getMapY());
+        mapCursor._cameraPan.setDestinationTileCenter(unitPos.x, unitPos.y);
         mapCursor._cameraPan.setTimeMethod(CameraPanControl.snapTimeMethod);
         mapCursor._cameraPan.setEaseMethod(CameraPanControl.defaultEaseMethod);
         mapCursor._cameraPan.startCameraPan();
@@ -58,8 +72,15 @@
         session.setScrollPixelX(prevScrollX);
         session.setScrollPixelY(prevScrollY);
 
+        // First, check to see if scrolling is necessary
+        var unitPos = createPos(unit.getMapX(), unit.getMapY());
+        var scrollBoundary = CameraPanControl.calculateScrollBoundary();
+        if (CameraPanControl.isScrollTileAllowed(unitPos.x, unitPos.y, scrollBoundary) !== true) {
+			return;
+		}
+
         var mapCursor = this._mapCursor;
-        mapCursor._cameraPan.setDestinationTileCenter(unit.getMapX(), unit.getMapY());
+        mapCursor._cameraPan.setDestinationTileCenter(unitPos.x, unitPos.y);
         mapCursor._cameraPan.setTimeMethod(CameraPanControl.snapTimeMethod);
         mapCursor._cameraPan.setEaseMethod(CameraPanControl.defaultEaseMethod);
         mapCursor._cameraPan.startCameraPan();
