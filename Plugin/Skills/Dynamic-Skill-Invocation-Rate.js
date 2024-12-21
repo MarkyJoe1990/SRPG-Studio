@@ -44,7 +44,7 @@
         var invocationRateType = typeof invocationRate;
         if (invocationRateType == "number") {
             return Probability.getInvocationProbability(active, InvocationType.ABSOLUTE, invocationRate);
-        } else if (invocationRateType = "function") {
+        } else if (invocationRateType == "function") {
             return Probability.getInvocationProbability(active, InvocationType.ABSOLUTE, invocationRate(active, passive, skill));
         }
 
