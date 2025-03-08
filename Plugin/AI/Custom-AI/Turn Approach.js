@@ -1,4 +1,7 @@
 /*
+    Turn Approach AI
+    v1.0 by MarkyJoe1990
+
     Enemy will start pursuing targets if they are within
     X turns worth of movement away.
 
