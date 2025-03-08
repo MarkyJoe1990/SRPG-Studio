@@ -7,14 +7,32 @@
 
     Simply set the AI to custom, with the Keyword
     "Swarm X Y" with X being the amount of enemies
-    the target needs to be in range of to get the
-    enemy to attack.
+    from group Y that the target needs to be in range
+    of to get the enemy to attack.
 
-    For example, let's say we want the enemy to not
+    Y is NOT an integer, but a binary number. This is
+    so you can have enemies as part of multiple groups
+    using just a single number. Basically, all it means
+    is you'll need to open windows calc -> programmer ->
+    set to binary, and make sure the 1s correspond to
+    the groups you want to use... If you're not sure,
+    then you can set units in distinct groups with the
+    following values:
+    1, 2, 4, 8, 16, 32, 64, etc.
+
+    Now then, let's say we want the enemy to not
     approach unless the target is in range of 2 ally
     units in group 1. The keyword would be:
 
     Swarm 2 1
+
+    But if we want a unit to be part of group 1 and 2,
+    that would be
+
+    Swarm 2 3
+
+    Because 3 ix 0x0011 in binary, which means there is
+    a 1 in the same positions as both 2 and 1 in binary.
 */
 
 ( function () {
