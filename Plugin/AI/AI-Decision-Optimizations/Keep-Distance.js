@@ -5,7 +5,7 @@
 */
 
 ( function () {
-    AIScorer.Distance = defineObject(BaseAIScorer, {
+    AIScorer.KeepDistance = defineObject(BaseAIScorer, {
         getScore: function(unit, combination) {
             var targetUnit = combination.targetUnit;
             if (targetUnit == null) {
@@ -28,6 +28,6 @@
     var alias1 = CombinationSelector._configureScorerSecond;
 	CombinationSelector._configureScorerSecond = function(groupArray) {
 		alias1.call(this, groupArray);
-		groupArray.appendObject(AIScorer.Distance);
+		groupArray.appendObject(AIScorer.KeepDistance);
 	}
 }) ();
