@@ -1,4 +1,7 @@
-/*
+/*=
+    Short Walk AI Scorer
+    v1.0 By MarkyJoe1990
+
     Enemy is encouraged to walk to tiles
     that minimize movement spent.
 */

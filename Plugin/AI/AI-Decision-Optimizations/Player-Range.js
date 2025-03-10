@@ -1,4 +1,7 @@
 /*
+    Player Range AI Scorer
+    v1.0 By MarkyJoe1990
+
     Enemy is encouraged to occupy tiles that are
     in range of as few player units as possible
 */
