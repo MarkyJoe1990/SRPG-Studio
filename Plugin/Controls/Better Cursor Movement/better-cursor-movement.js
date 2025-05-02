@@ -220,6 +220,10 @@
 			this._isWait = false;
 			return inputBinary;
 		}
+
+		if (this._prevInputType === -1) {
+			this._prevInputType = InputBinary.NONE;
+		}
 		
 		// Check if the previous state is no input, or the current input differs from the previous one.
 		if (inputBinary !== this._prevInputType || this._prevInputType === InputBinary.NONE) { 
