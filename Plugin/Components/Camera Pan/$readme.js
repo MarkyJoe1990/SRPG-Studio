@@ -1,6 +1,6 @@
 /*
     Smooth Camera Pan Component
-    v1.0 by MarkyJoe1990
+    v1.1 by MarkyJoe1990
 
     This is a special component plugin that adds
     the CameraPan object to be used in code for smooth
