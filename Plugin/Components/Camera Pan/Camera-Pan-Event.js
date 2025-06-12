@@ -24,7 +24,7 @@ var CameraPanEvent = defineObject(BaseEventCommand, {
         }
 
         this._cameraPan = createObject(CameraPan);
-        this._cameraPan.setDestinationTrueTileCenter(x, y);
+        this._cameraPan.setDestinationTileCenter(x, y);
         this._enableDebug = args.enableDebug === true;
 
         if (this.isEventCommandContinue() !== true) {

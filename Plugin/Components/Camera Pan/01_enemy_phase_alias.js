@@ -25,11 +25,9 @@
 		var scrollBoundary = CameraPanControl.calculateScrollBoundary();
 		
 		if (CameraPanControl.isScrollTileAllowed(unitPos.x, unitPos.y, scrollBoundary) !== true) {
-			return EnterResult.NOTENTER;
-		}
-
-		if (CameraPanControl.isScrollTileAllowed(destPos.x, destPos.y, scrollBoundary) !== true) {
-			return EnterResult.NOTENTER;
+			if (CameraPanControl.isScrollTileAllowed(destPos.x, destPos.y, scrollBoundary) !== true) {
+				return EnterResult.NOTENTER;
+			}
 		}
 
 		var centerPos = createPos(Math.floor((unitPos.x + destPos.x) / 2), Math.floor((unitPos.y + destPos.y) / 2))
