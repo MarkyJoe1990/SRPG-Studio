@@ -1,0 +1,3 @@
+var GuardAssistConfig = {
+    skillName: "Guard"
+}
