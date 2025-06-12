@@ -1,5 +1,5 @@
 /*
-	Version 1.0
+	Version 1.1
 	Made by MarkyJoe1990
 	
 	This plugin allows the creation of "taunt" status effects.
@@ -52,6 +52,15 @@
 				
 				if (unit != activeUnit) {
 					TauntControl.setTauntTarget(unit, activeUnit);
+				}
+			} else if (root.getBaseScene() !== SceneType.REST) {
+				var session = root.getCurrentSession();
+				var activeUnit = session.getActiveEventUnit();
+				if (activeUnit != null) {
+
+					if (unit != activeUnit) {
+						TauntControl.setTauntTarget(unit, activeUnit);
+					}
 				}
 			}
 		}
