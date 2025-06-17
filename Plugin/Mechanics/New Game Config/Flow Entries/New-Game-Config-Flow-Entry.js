@@ -3,6 +3,7 @@ var NewGameConfigFlowEntry = defineObject(BaseFlowEntry, {
 	_questionWindow: null,
 	
 	enterFlowEntry: function(newGameCommand) {
+		this._newGameCommand = newGameCommand;
 		var metaSession = root.getMetaSession();
 		var variableConfig = metaSession.global.variableConfig;
 		var globalSwitchConfig = metaSession.global.globalSwitchConfig;
@@ -27,6 +28,10 @@ var NewGameConfigFlowEntry = defineObject(BaseFlowEntry, {
 		var mode = this.getCycleMode();
 		var result = MoveResult.CONTINUE;
 		
+		if (InputControl.isCancelAction()) {
+			this._newGameCommand.startCancelAction && this._newGameCommand.startCancelAction();
+		}
+
 		if (mode == 0) {
 			result = this._moveWindowManager();
 		} else if (mode == 1) {
