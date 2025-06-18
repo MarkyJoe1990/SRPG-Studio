@@ -1,5 +1,5 @@
 /*
-	Version 2.0
+	Version 3.0
 	Made by MarkyJoe1990
 	
 	This plugin improves the controls for the in-game cursor
@@ -105,10 +105,6 @@
 
 		if (pic !== null) {
 			pic.drawStretchParts(x, y, GraphicsFormat.MAPCHIP_WIDTH, GraphicsFormat.MAPCHIP_HEIGHT, this._mapCursorSrcIndex * width, 0, width, height);
-		}
-
-		if (CameraPanConfig.enableMouseMovementPan === true) {
-			this._cameraPan.drawDebug();
 		}
 	}
 	
@@ -226,11 +222,20 @@
 		}
 		
 		// Check if the previous state is no input, or the current input differs from the previous one.
-		if (inputBinary !== this._prevInputType || this._prevInputType === InputBinary.NONE) { 
+		if (inputBinary !== this._prevInputType || this._prevInputType === InputBinary.NONE) {
+			// Check if the current input is a diagonal that relates to the previous input
 			if (inputBinary > this._prevInputType) {
-				var newInput = this._prevInputType ^ inputBinary;
+				if ((inputBinary & this._prevInputType) !== 0) {
+					var newInput = this._prevInputType ^ inputBinary;
+				} else {
+					var newInput = inputBinary;
+				}
 			} else {
-				var newInput = InputBinary.NONE;
+				if ((inputBinary & this._prevInputType) !== 0) {
+					var newInput = InputBinary.NONE;
+				} else {
+					var newInput = inputBinary;
+				}
 			}
 			
 			this._prevInputType = inputBinary; // 1 9 1
