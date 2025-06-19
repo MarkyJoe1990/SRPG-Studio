@@ -2,6 +2,8 @@ All of my public plugins, assets and other tools for SRPG Studio can be found in
 
 [Support me here](https://paypal.me/markyjoe) if you like what I do.
 
+Please [refer to my wiki](https://github.com/MarkyJoe1990/SRPG-Studio/wiki) for documentation, tutorials and other useful resources.
+
 # Plugin Folder Contents
 
 **AI**: Adds more actions the enemy AI can do.
