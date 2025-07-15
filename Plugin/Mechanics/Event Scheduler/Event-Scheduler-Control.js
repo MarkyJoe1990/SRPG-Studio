@@ -218,19 +218,31 @@ var EventSchedulerControl = {
     },
 
     isEnabled: function() {
-        return this.getSchedulerData().isEnabled;
+        var schedulerData = this.getSchedulerData();
+        return schedulerData != null && schedulerData.isEnabled === true;
     },
 
     setEnabled: function(isEnabled) {
-        this.getSchedulerData().isEnabled = isEnabled;
+        var schedulerData = this.getSchedulerData();
+        if (schedulerData == null) {
+            return;
+        }
+
+        schedulerData.isEnabled = isEnabled;
     },
 
     isFrozen: function() {
-        return this.getSchedulerData().isFrozen;
+        var schedulerData = this.getSchedulerData();
+        return schedulerData == null || schedulerData.isFrozen === true;
     },
 
     setFrozen: function(isFrozen) {
-        this.getSchedulerData().isFrozen = isFrozen;
+        var schedulerData = this.getSchedulerData();
+        if (schedulerData == null) {
+            return;
+        }
+
+        schedulerData.isFrozen = isFrozen;
     },
 
     reloadSchedulerData: function() {
