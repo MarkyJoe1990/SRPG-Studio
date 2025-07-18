@@ -17,7 +17,7 @@ export default function ArrayField(key: number, fieldName: string | undefined, d
             </label>:
             <button type="button" onClick={addField}>Add</button>
             <div>
-                {fields.map((entry: LooseObject, index: number) => <InputField></InputField>)}
+                {fields.map((entry: LooseObject, index: number) => InputField(index, entry))}
             </div>
         </div>
     );
