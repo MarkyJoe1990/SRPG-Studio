@@ -93,6 +93,26 @@ const schema = {
                     type: "text"
                 }
             ]
+        },
+        {
+            displayedName: "Effected Units",
+            fieldName: "unitFilterFlag",
+            description: "Units effected by this action",
+            type: "flag",
+            flagArray: [
+                {
+                    displayedName: "Player",
+                    value: 0x01
+                },
+                {
+                    displayedName: "Enemy",
+                    value: 0x02
+                },
+                {
+                    displayedName: "Ally",
+                    value: 0x04
+                }
+            ]
         }
     ]
 }

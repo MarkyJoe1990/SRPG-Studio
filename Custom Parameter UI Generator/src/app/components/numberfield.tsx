@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-export default function NumberField(key: number, fieldName: string, displayedName: string | undefined, description: string, defVal: number | undefined, min: number, max: number, isVisible: boolean) {
+export default function NumberField(
+    key: number,
+    fieldName: string,
+    displayedName: string | undefined,
+    description: string,
+    defVal: number | undefined,
+    min: number,
+    max: number,
+    isVisible: boolean
+) {
     const inputName = fieldName + "-Input";
     const [val, setVal] = useState((defVal == undefined ? min : defVal).toString());
 

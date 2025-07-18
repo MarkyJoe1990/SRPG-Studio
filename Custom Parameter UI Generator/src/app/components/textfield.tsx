@@ -1,6 +1,13 @@
 import { useState } from "react";
 
-export default function TextField(key: number, fieldName: string, displayedName: string | undefined, description: string, defVal: string | undefined, isVisible: boolean) {
+export default function TextField(
+    key: number,
+    fieldName: string,
+    displayedName: string | undefined,
+    description: string,
+    defVal: string | undefined,
+    isVisible: boolean
+) {
     const inputName = fieldName + "-Input";
     const [val, setVal] = useState("\"" + (defVal == undefined ? "" : defVal) + "\"");
 

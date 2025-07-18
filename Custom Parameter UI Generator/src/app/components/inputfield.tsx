@@ -7,8 +7,13 @@ import BooleanField from "./booleanfield";
 import DropdownField from "./dropdownfield";
 import ArrayField from "./arrayfield";
 import ObjectField from "./objectfield";
+import FlagField from "./flagfield";
 
-export default function InputField(key: number, data: LooseObject, isVisible: boolean) {
+export default function InputField(
+    key: number,
+    data: LooseObject,
+    isVisible: boolean
+) {
     const type: string = data.type;
 
     if (type == "number") {
@@ -29,6 +34,10 @@ export default function InputField(key: number, data: LooseObject, isVisible: bo
 
     if (type == "object") {
         return ObjectField(key, data.fieldName, data.displayedName, data.description, data.propArray, isVisible);
+    }
+
+    if (type == "flag") {
+        return FlagField(key, data.fieldName, data.displayedName, data.description, data.defVal, data.flagArray, isVisible)
     }
 
     if (type == "text") {

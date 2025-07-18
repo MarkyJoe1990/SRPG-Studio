@@ -1,8 +1,13 @@
-import { useState } from "react";
-import LooseObject from "../objects/looseobject";
 import InputField from "./inputfield";
 
-export default function ObjectField(key: number, fieldName: string | undefined, displayedName: string, description: string, propArray: Array<any>, isVisible: boolean) {
+export default function ObjectField(
+    key: number,
+    fieldName: string | undefined,
+    displayedName: string,
+    description: string,
+    propArray: Array<any>,
+    isVisible: boolean
+) {
     const inputName = fieldName + "-Input";
 
     var values: string = "{";

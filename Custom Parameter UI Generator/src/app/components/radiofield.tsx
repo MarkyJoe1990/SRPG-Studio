@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LooseObject from "../objects/looseobject";
 
-export default function DropdownField(
+export default function RadioField(
     key: number,
     fieldName: string,
     displayedName: string | undefined,

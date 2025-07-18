@@ -1,4 +1,10 @@
-export default function NullField(key: number, fieldName: string, displayedName: string, description: string, isVisible: boolean) {
+export default function NullField(
+    key: number,
+    fieldName: string,
+    displayedName: string,
+    description: string,
+    isVisible: boolean
+) {
     const inputName = fieldName + "-Input";
 
     return (

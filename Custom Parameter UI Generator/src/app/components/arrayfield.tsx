@@ -2,7 +2,14 @@ import { useState } from "react";
 import LooseObject from "../objects/looseobject";
 import InputField from "./inputfield";
 
-export default function ArrayField(key: number, fieldName: string | undefined, displayedName: string, description: string, elementData: LooseObject, isVisible: boolean) {
+export default function ArrayField(
+    key: number,
+    fieldName: string | undefined,
+    displayedName: string,
+    description: string,
+    elementData: LooseObject,
+    isVisible: boolean
+) {
     const inputName = fieldName + "-Input";
     const [showCount, setShowCount] = useState(0);
     const max = 10;
