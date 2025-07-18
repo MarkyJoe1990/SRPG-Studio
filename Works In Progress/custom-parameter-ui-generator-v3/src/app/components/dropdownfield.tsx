@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LooseObject from "../objects/looseobject";
 
-export default function DropdownField(key: number, fieldName: string, displayedName: string | undefined, defIndex: number | undefined, options: Array<LooseObject>) {
+export default function DropdownField(key: number, fieldName: string, displayedName: string | undefined, description: string, defIndex: number | undefined, options: Array<LooseObject>, isVisible: boolean) {
     const inputName = fieldName + "-Input";
     const [val, setVal] = useState(defIndex == undefined ? options[0].value : options[defIndex].value);
 
@@ -10,16 +10,18 @@ export default function DropdownField(key: number, fieldName: string, displayedN
     })
 
     return (
-        <div key={key} className="input-field dropdown-field" data-value={val} data-name={fieldName}>
+        <div key={key} className="input-field dropdown-field" data-value={val} data-name={fieldName} data-is-invisible={!isVisible}>
             <label
+                className="input-field-label"
                 htmlFor={ inputName }>
-                {displayedName}
-            </label>:
+                {displayedName}:
+            </label>
             <select
                 onChange={(event) => { setVal(event.currentTarget.value)}}
                 defaultValue={val}
                 id={ inputName }>{selectOptions}
             </select>
+            <div className="field-description">{description}</div>
         </div>
     );
 }

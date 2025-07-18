@@ -5,7 +5,7 @@ import InputField from './components/inputfield';
 import LooseObject from "./objects/looseobject";
 
 export default function Home() {
-  var arr = Schema.map((entry: LooseObject, index: number) => (InputField(index, entry)));
+  var arr = Schema.fields.map((entry: LooseObject, index: number) => (InputField(index, entry, true)));
 
   // Get the values of all fields
 
@@ -22,14 +22,19 @@ export default function Home() {
 
   return (
     <div className="main">
-      <h1>Custom Parameter Generator</h1>
 
-      <div id="field-list">
-        {arr}
+      <div id="input-area">
+        <h1>{Schema.title}</h1>
+        <div id="field-list">
+          {arr}
+        </div>
       </div>
 
-      <label htmlFor="output">Output</label>
-      <textarea readOnly title="output" placeholder="Output will be put here." id="output" value={resultText}></textarea>
+      <div id="output-area">
+        <h1>Output</h1>
+        <textarea disabled={true} readOnly title="output" id="output" value={resultText}></textarea>
+        <button type="button" onClick={() => {navigator.clipboard.writeText(resultText); alert("Output copied!")}}>Copy to clipboard</button>
+      </div>
     </div>
   );
 }

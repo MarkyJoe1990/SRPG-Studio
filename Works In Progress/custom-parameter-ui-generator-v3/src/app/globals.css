@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ddd1c0;
+  --foreground: #292420;
+  --border: solid #292420 1px;
+  --description: #551717;
 }
 
 @theme inline {
@@ -16,6 +18,8 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --border: solid #ededed 1px;
+    --description: #ff6f6f;
   }
 }
 
@@ -25,22 +29,45 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+h1 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
 .main {
-  max-width: 700px;
-  margin: auto;
+  display: grid;
+  grid-template-columns: 100%;
+  column-gap: 10px;
+  max-width: 500px;
+  margin: 10px auto;
   padding: 20px;
-  border: solid white 1px;
+  border: var(--border);
+  box-shadow: 10px 10px 15px 0px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 10px 10px 15px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 10px 10px 15px 0px rgba(0,0,0,0.75);
 }
 
 input {
   background-color: var(--foreground);
   color: var(--background);
+  padding: 0 3px;
 }
 
 textarea {
   background-color: var(--foreground);
   color: var(--background);
+  padding: 6px;
   field-sizing: content;
+}
+
+select {
+  border: var(--border);
+  outline: none;
+}
+
+option {
+  color: var(--background);
+  background-color: var(--foreground);
 }
 
 #output {
@@ -48,20 +75,50 @@ textarea {
 }
 
 button {
-  background-color: #ffffff;
-  padding: 20px;
-  color: black;
+  background-color: var(--foreground);
+  padding: 4px 8px;
+  color: var(--background);
   cursor: pointer;
 }
 
 #field-list {
-  padding: 8px;
+  display: grid;
+  grid-template-columns: 100%;
+  column-gap: 2px;
+  row-gap: 2px;
+}
+
+@media (min-width: 1000px) {
+  .main {
+    max-width: 1000px;
+    grid-template-columns: 50% 50%;
+  }
 }
 
 .input-field {
-  margin-bottom: 8px;
+  padding: 8px;
+  border: var(--border);
 }
 
-.input-field:last-child {
-  margin-bottom: 0;
+.input-field-label {
+  margin-right: 2px;
+}
+
+.array-field-entries, .object-field-entries {
+  margin-top: 8px;
+  margin-left: 20px;
+  display: grid;
+  row-gap: 2px;
+}
+
+[data-is-invisible="true"] {
+  display: none;
+}
+
+.field-description {
+color: var(--description);
+}
+
+#output-area {
+  align-content: end;
 }
