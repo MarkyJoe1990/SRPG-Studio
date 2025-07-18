@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LooseObject from "../objects/looseobject";
+import LooseObject from "./looseobject";
 import InputField from "./inputfield";
 
 export default function ArrayField(

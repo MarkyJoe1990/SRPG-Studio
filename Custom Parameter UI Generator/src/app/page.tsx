@@ -2,7 +2,7 @@
 
 import Schema from './components/schema';
 import InputField from './components/inputfield';
-import LooseObject from "./objects/looseobject";
+import LooseObject from "./components/looseobject";
 import { useState } from 'react';
 
 export default function Home() {

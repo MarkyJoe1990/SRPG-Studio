@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import LooseObject from "../objects/looseobject";
+import LooseObject from "./looseobject";
 
 export default function FlagField(
     key: number,

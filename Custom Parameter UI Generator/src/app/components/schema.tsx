@@ -1,4 +1,4 @@
-const schema = {
+const Schema = {
     title: "Custom Parameter Generator",
     fields: [
         {
@@ -117,4 +117,4 @@ const schema = {
     ]
 }
 
-export default schema;
+export default Schema;

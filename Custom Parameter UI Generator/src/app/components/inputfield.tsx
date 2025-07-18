@@ -2,7 +2,7 @@ import NumberField from "./numberfield";
 import TextField from "./textfield";
 import NullField from "./nullfield";
 
-import LooseObject from "../objects/looseobject";
+import LooseObject from "./looseobject";
 import BooleanField from "./booleanfield";
 import DropdownField from "./dropdownfield";
 import ArrayField from "./arrayfield";
