@@ -1,3 +1,5 @@
+import Presets from "./presets";
+
 const Schema = {
     title: "Custom Parameter Generator",
     fields: [
