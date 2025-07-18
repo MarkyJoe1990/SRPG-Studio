@@ -35,6 +35,7 @@ export default function Home() {
 
       <div id="input-area">
         <h1>{Schema.title}</h1>
+        <div id="plugin-description">{Schema.description}</div>
         <div id="field-list">
           {arr}
         </div>

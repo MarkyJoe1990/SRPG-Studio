@@ -5,6 +5,7 @@
   --foreground: #292420;
   --border: solid #292420 1px;
   --description: #551717;
+  --link: #000097;
 }
 
 @theme inline {
@@ -20,6 +21,7 @@
     --foreground: #ededed;
     --border: solid #ededed 1px;
     --description: #ff6f6f;
+    --link: #9090ff;
   }
 }
 
@@ -79,6 +81,11 @@ button {
   padding: 4px 8px;
   color: var(--background);
   cursor: pointer;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
 }
 
 #field-list {

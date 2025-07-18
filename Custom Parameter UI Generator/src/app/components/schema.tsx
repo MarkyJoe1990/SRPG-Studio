@@ -2,6 +2,7 @@ import Presets from "./presets";
 
 const Schema = {
     title: "Custom Parameter Generator",
+    description: (<span>This is a placeholder description. Useful for any additiona instructions or <a href="https://www.paypal.com/paypalme/markyjoe">links</a> that you might want to include for your plugin. Note that this accepts JSX as an argument.</span>),
     fields: [
         {
             displayedName: "Start Range",
