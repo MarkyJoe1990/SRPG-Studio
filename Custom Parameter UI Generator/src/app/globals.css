@@ -37,6 +37,7 @@ h1 {
 }
 
 .main {
+  position: relative;
   display: grid;
   grid-template-columns: 100%;
   column-gap: 10px;
@@ -95,13 +96,6 @@ a {
   row-gap: 2px;
 }
 
-@media (min-width: 1000px) {
-  .main {
-    max-width: 1000px;
-    grid-template-columns: 50% 50%;
-  }
-}
-
 .input-field {
   padding: 8px;
   border: var(--border);
@@ -123,9 +117,22 @@ a {
 }
 
 .field-description {
-color: var(--description);
+  color: var(--description);
 }
 
 #output-area {
-  align-content: end;
+}
+
+@media (min-width: 1000px) {
+  .main {
+    max-width: 1000px;
+    grid-template-columns: calc(50% - 5px) calc(50% - 5px);
+  }
+
+  #output-area {
+    height: min-content;
+    align-self: end;
+    position: sticky;
+    bottom: 20px;
+  }
 }

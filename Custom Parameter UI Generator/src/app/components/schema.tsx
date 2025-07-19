@@ -5,102 +5,88 @@ const Schema = {
     description: (<span>This is a placeholder description. Useful for any additiona instructions or <a href="https://www.paypal.com/paypalme/markyjoe">links</a> that you might want to include for your plugin. Note that this accepts JSX as an argument.</span>),
     fields: [
         {
-            displayedName: "Start Range",
-            fieldName: "startRange",
-            description: "Moves unit's starting attack range X tiles away",
+            displayedName: "Number Example",
+            fieldName: "numberExample",
+            description: "A number field with a minimum of 0, and a maximum of 10.",
             type: "number",
             min: 0,
             max: 10
         },
         {
-            displayedName: "End Range",
-            fieldName: "endRange",
-            description: "Moves unit's ending attack range X tiles away",
-            type: "number",
-            min: 0,
-            max: 10
-        },
-        {
-            displayedName: "Message",
-            fieldName: "message",
-            description: "What the unit says when they attack",
+            displayedName: "Text Example",
+            fieldName: "textExample",
+            description: "The user can input a string of any kind here.",
             type: "text",
         },
         {
-            displayedName: "Did you eat the chicken?",
-            fieldName: "isChickenEaten",
-            description: "Flag for when unit has eaten the chicken",
+            displayedName: "Boolean Example",
+            fieldName: "booleanExample",
+            description: "Check this box and the custom parameter will be made true.",
             type: "boolean"
         },
         {
-            displayedName: "Favorite Food",
-            fieldName: "favoriteFood",
-            description: "Unit's favorite food. Three possible choices.",
+            displayedName: "Dropdown Example",
+            fieldName: "dropdownExample",
+            description: "This one is great for custom parameters that use enumerations. The output can be any variable type (number, string, boolean, etc.), but for strings, the value field of an option needs to have \\\" at the start and end of it.",
             type: "dropdown",
             options: [
                 {
-                    name: "Chicken",
-                    value: "FoodType.CHICKEN"
+                    name: "Option 1",
+                    value: "OptionType.FIRST"
                 },
                 {
-                    name: "Pizza",
-                    value: "FoodType.PIZZA"
+                    name: "Option 2",
+                    value: "OptionType.SECOND"
                 },
                 {
-                    name: "Bacon",
-                    value: "FoodType.BACON"
+                    name: "Option 3",
+                    value: "OptionType.THIRD"
                 }
             ],
             defaultIndex: 0
         },
         {
-            displayedName: "Secret Code",
-            fieldName: "secretCode",
-            description: "The secret code needed to romance the unit",
+            displayedName: "Array Example",
+            fieldName: "arrayExample",
+            description: "Note that the user can only add a maximum of 10 items to the array. Depending on how much it's needed, I can make the limitation more flexible down the line though.",
             type: "array",
             elementData: {
                 displayedName: "Number",
                 fieldName: "number",
-                description: "",
+                description: "A type must be specified for the array. This array uses numbers!",
                 type: "number",
                 min: 0,
                 max: 9
             }
         },
         {
-            displayedName: "Coordinates",
-            fieldName: "coordinates",
-            description: "Map coordinates unit must go to for special prize",
+            displayedName: "Object Example",
+            fieldName: "objectExample",
+            description: "Object fields can hold values of any kind, including other objects!",
             type: "object",
             propArray: [
                 {
                     displayedName: "X",
                     fieldName: "x",
-                    description: "",
+                    description: "X Coordinate on the map",
                     type: "number",
                     min: 0,
-                    max: 9
+                    max: 100
                 },
                 {
                     displayedName: "Y",
                     fieldName: "y",
-                    description: "",
+                    description: "Y Coordinate on the map",
                     type: "number",
                     min: 0,
-                    max: 9
-                },
-                {
-                    displayedName: "Words",
-                    fieldName: "words",
-                    description: "Words unit will say upon reaching coordinates",
-                    type: "text"
+                    max: 80
                 }
             ]
         },
         {
-            displayedName: "Effected Units",
-            fieldName: "unitFilterFlag",
-            description: "Units effected by this action",
+            displayedName: "Flag Example",
+            fieldName: "flagExample",
+            description: "For custom parameters that use flags such as UnitFilterFlag, this field type is recommended!",
             type: "flag",
             flagArray: [
                 {
@@ -114,8 +100,19 @@ const Schema = {
                 {
                     displayedName: "Ally",
                     value: 0x04
+                },
+                {
+                    displayedName: "Neutral",
+                    value: 0x08
                 }
             ]
+        },
+        {
+            displayedName: "Fixed Example",
+            fieldName: "fixedExample",
+            description: "This value cannot be changed. Not sure what it'd be useful for, but maybe someone can find something! Similar to the dropdown type, strings must have \\\" at the start and end of them.",
+            type: "fixed",
+            value: "\"This value is unchangeable.\""
         }
     ]
 }

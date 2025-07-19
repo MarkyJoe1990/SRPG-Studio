@@ -8,6 +8,7 @@ import DropdownField from "./dropdownfield";
 import ArrayField from "./arrayfield";
 import ObjectField from "./objectfield";
 import FlagField from "./flagfield";
+import FixedField from "./fixedfield";
 
 export default function InputField(
     key: number,
@@ -42,6 +43,10 @@ export default function InputField(
 
     if (type == "text") {
         return TextField(key, data.fieldName, data.displayedName, data.description, data.default, isVisible);
+    }
+
+    if (type == "fixed") {
+        return FixedField(key, data.fieldName, data.displayedName, data.description, data.value, isVisible);
     }
 
     return NullField(key, data.fieldName, data.displayedName, data.description, isVisible);
