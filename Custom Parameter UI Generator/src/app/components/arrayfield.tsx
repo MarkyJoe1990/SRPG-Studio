@@ -46,7 +46,6 @@ export default function ArrayField(
             <span className="input-field-label">
                 {displayedName}:
             </span>
-            <div className="field-description">{description}</div>
             <button type="button" onClick={() => {
                 var count = showCount - 1;
                 if (count < 0) {
@@ -63,6 +62,7 @@ export default function ArrayField(
 
                 setShowCount(count);
             }}>+</button>
+            <div className="field-description">{description}</div>
             <div className="array-field-entries">
                 {arr}
             </div>
