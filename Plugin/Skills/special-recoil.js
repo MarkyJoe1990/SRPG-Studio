@@ -1,6 +1,7 @@
 /*
-	Version 3.0
+	Version 4.0
 	Made by MarkyJoe
+	With edits by MMM
 	
 	This script adds two skills that can hurt, heal,
 	or inflict a user upon hitting or killing a target.
@@ -74,9 +75,11 @@
 	function needs to return a number.
 
 	Function Overwrites:
-	This plugin overwrites the UIBattleLayout._showDamageAnime
-	function. Be careful using this with other plugins that
-	modify this function.
+	This plugin overwrites the following functions:
+	- UIBattleLayout._showDamageAnime
+	- UnitDeathFlowEntry._completeMemberData
+	Be careful using this with other plugins that
+	modify these functions.
 */
 
 var RecoilControl = {
@@ -162,7 +165,7 @@ var RecoilControl = {
 (function () {
 	
 	// Validation Function
-	var validateDamage = function(virtualActive, damageActive) {
+	var validateDamage = function(virtualActive, virtualPassive, attackEntry, damageActive) {
 		var unit = virtualActive.unitSelf;
 		if (damageActive < 0) {
 			if (typeof DisableHealStateControl != "undefined") {
@@ -178,8 +181,8 @@ var RecoilControl = {
 
 		if (destHp > max) {
 			return hp - max;
-		} else if (destHp < 0) {
-			if (SkillControl.checkAndPushSkill(active, passive, attackEntry, true, SkillType.SURVIVAL) != null) {
+		} else if (destHp <= 0) {
+			if (SkillControl.checkAndPushSkill(virtualActive.unitSelf, virtualPassive.unitSelf, attackEntry, true, SkillType.SURVIVAL) != null) {
 				return hp - 1;
 			}
 
@@ -250,7 +253,7 @@ var RecoilControl = {
 		damageActive += checkSkills(virtualActive, virtualPassive, passive, active, attackEntry, SkillControl.getDirectSkillArray(passive, -1, 'Revenge-Recoil'), RecoilControl.isRevengeRecoil);
 
 		// Validate and finalize damage
-		return validateDamage(virtualActive, damageActive);
+		return validateDamage(virtualActive, virtualPassive, attackEntry, damageActive);
 	}
 	
 	var alias2 = UIBattleLayout._showDamageAnime;
@@ -322,5 +325,208 @@ var RecoilControl = {
 		}
 		//END EDIT
 	}
+
+    //If unit and enemy die simultaneously, don't receive any drops from the enemy
+	alias3 = DropFlowEntry._isTrophyGettable;
+    DropFlowEntry._isTrophyGettable = function(winner, loser, trophy) {
+        return alias3.call(this, winner, loser, trophy) && !DamageControl.isLosted(winner)
+    }
+
+	alias4 = AttackFlow._pushFlowEntriesEnd;
+	AttackFlow._pushFlowEntriesEnd = function(straightFlow) {
+		straightFlow.pushFlowEntry(RecoilDeathFlowEntry);
+		alias4.call(this, straightFlow);
+    }
+
+	//New flow object to handle death events specifically for the active unit
+	var RecoilDeathFlowEntry = defineObject(BaseFlowEntry,
+    {
+    	_coreAttack: null,
+    	_eraseCounter: null,
+    	_activeUnit: null,
+    	_passiveUnit: null,
+    	_capsuleEvent: null,
+    	_bothDead: false,
+
+    	enterFlowEntry: function(coreAttack) {
+    		this._prepareMemberData(coreAttack);
+    		return this._completeMemberData(coreAttack);
+    	},
+
+    	moveFlowEntry: function() {
+    		var mode = this.getCycleMode();
+    		var result = MoveResult.CONTINUE;
+
+    		if (mode === UnitDeathMode.EVENT) {
+    			result = this._moveEvent();
+    		}
+    		else if (mode === UnitDeathMode.ERASE) {
+    		    //if attacker and defender die, they are erased twice, this check avoids that
+    		    if (_bothDead) result = MoveResult.END;
+    			else result = this._moveErase();
+    		}
+
+    		return result;
+    	},
+
+    	_prepareMemberData: function(coreAttack) {
+    		var order = coreAttack.getAttackFlow().getAttackOrder();
+
+    		this._coreAttack = coreAttack;
+    		this._eraseCounter = createObject(EraseCounter);
+    		this._activeUnit = order.getActiveUnit();
+    		this._passiveUnit = order.getPassiveUnit();
+    		this._capsuleEvent = createObject(CapsuleEvent);
+    	},
+
+    	_completeMemberData: function(coreAttack) {
+    		// Makes it possible to reference "Battle" in the event command "Change Variables."
+    		// With this, the opponent who defeated a unit can be identified in the unit event "Dead."
+    		root.getSceneController().notifyBattleEnd(this._activeUnit, this._passiveUnit);
+
+    		// Processing is not continued if both units are not beaten.
+    		if (!DamageControl.isLosted(this._activeUnit)) {
+    			return EnterResult.NOTENTER;
+    		}
+
+    		if (DamageControl.isLosted(this._passiveUnit)) {
+    			_bothDead = true;
+    		}
+
+    		if (DamageControl.isSyncope(this._activeUnit)) {
+    			return EnterResult.NOTENTER;
+    		}
+
+    		// RecoilDeathFlowEntry is used from CoreAttack,
+    		// however, the skip at the CoreAttack should be accomplished,
+    		// so if it's currently a skip state, skip without condition.
+    		if (this.isFlowSkip() || this._coreAttack.isBattleCut()) {
+    			this._doEndAction();
+    			return EnterResult.NOTENTER;
+    		}
+
+    		// Record that dead event will be processed later.
+    		coreAttack.recordUnitLostEvent(true);
+
+    		// Check if the event doesn't exist, or could be ended. (If injuries are allowed, death events will not occur.)
+    		if (this._capsuleEvent.enterCapsuleEvent(UnitEventChecker.getUnitLostEvent(this._activeUnit), false) === EnterResult.NOTENTER) {
+    			if (this.isFlowSkip() || this._coreAttack.isBattleCut()) {
+    				this._doEndAction();
+    				return EnterResult.NOTENTER;
+    			}
+    			else {
+    				this.changeCycleMode(UnitDeathMode.ERASE);
+    				return EnterResult.OK;
+    			}
+    		}
+
+    		this._playUnitDeathMusic();
+
+    		// Stop the "Quick" of the Enemy turn skip to see the Died message for sure.
+    		CurrentMap.enableEnemyAcceleration(false);
+
+    		this.changeCycleMode(UnitDeathMode.EVENT);
+
+    		return EnterResult.OK;
+    	},
+
+    	_moveEvent: function() {
+    		if (this._capsuleEvent.moveCapsuleEvent() !== MoveResult.CONTINUE) {
+    			// Delete a message which could be displayed at the unit event.
+    			// Prevent drawing the map unit on the message at the easy force battle.
+    			EventCommandManager.eraseMessage(MessageEraseFlag.ALL);
+    			this.changeCycleMode(UnitDeathMode.ERASE);
+    		}
+
+    		return MoveResult.CONTINUE;
+    	},
+
+    	_moveErase: function() {
+    		if (this._eraseCounter.moveEraseCounter() !== MoveResult.CONTINUE) {
+    			this._coreAttack.getBattleObject().eraseRoutine(0);
+    			this._doEndAction();
+    			return MoveResult.END;
+    		}
+    		else {
+    			this._coreAttack.getBattleObject().eraseRoutine(this._eraseCounter.getEraseAlpha());
+    		}
+
+    		return MoveResult.CONTINUE;
+    	},
+
+    	_doEndAction: function() {
+    	},
+
+    	_playUnitDeathMusic: function() {
+    		var handle;
+
+    		if (this._isDeathMusicAllowed()) {
+    			handle = this._getDeathMusicHandle();
+    			if (!handle.isNullHandle()) {
+    				MediaControl.musicPlay(handle);
+    				this._coreAttack.getBattleObject().getBattleTable().setMusicPlayFlag(true);
+    			}
+    		}
+    	},
+
+    	_isDeathMusicAllowed: function() {
+    		return this._activeUnit.getUnitType() === UnitType.PLAYER && !this._activeUnit.isGuest();
+    	},
+
+    	_getDeathMusicHandle: function() {
+    		return root.querySoundHandle('playerdeathmusic');
+    	}
+    }
+    );
+
+    alias5 = UnitDeathFlowEntry._completeMemberData;
+
+    //Needs to be overwritten to handle unit death events correctly
+    UnitDeathFlowEntry._completeMemberData = function(coreAttack) {
+        // Makes it possible to reference "Battle" in the event command "Change Variables."
+        // With this, the opponent who defeated a unit can be identified in the unit event "Dead."
+        root.getSceneController().notifyBattleEnd(this._activeUnit, this._passiveUnit);
+
+        // MMM edit - only handle death of passive unit here, while RecoilDeathFlowEntry handles death for the active unit
+        if (!DamageControl.isLosted(this._passiveUnit)) {
+            return EnterResult.NOTENTER;
+        }
+
+        if (DamageControl.isSyncope(this._passiveUnit)) {
+            return EnterResult.NOTENTER;
+        }
+
+        // UnitDeathFlowEntry is used from CoreAttack,
+        // however, the skip at the CoreAttack should be accomplished,
+        // so if it's currently a skip state, skip without condition.
+        if (this.isFlowSkip() || this._coreAttack.isBattleCut()) {
+            this._doEndAction();
+            return EnterResult.NOTENTER;
+        }
+
+        // Record that dead event will be processed later.
+        coreAttack.recordUnitLostEvent(true);
+
+        // Check if the event doesn't exist, or could be ended. (If injuries are allowed, death events will not occur.)
+        if (this._capsuleEvent.enterCapsuleEvent(UnitEventChecker.getUnitLostEvent(this._passiveUnit), false) === EnterResult.NOTENTER) {
+            if (this.isFlowSkip() || this._coreAttack.isBattleCut()) {
+                this._doEndAction();
+                return EnterResult.NOTENTER;
+            }
+            else {
+                this.changeCycleMode(UnitDeathMode.ERASE);
+                return EnterResult.OK;
+            }
+        }
+
+        this._playUnitDeathMusic();
+
+        // Stop the "Quick" of the Enemy turn skip to see the Died message for sure.
+        CurrentMap.enableEnemyAcceleration(false);
+
+        this.changeCycleMode(UnitDeathMode.EVENT);
+
+        return EnterResult.OK;
+    }
 	
 }) ();
