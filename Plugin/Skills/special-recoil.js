@@ -1,6 +1,7 @@
 /*
-	Version 3.0
+	Version 4.0
 	Made by MarkyJoe
+	With edits by MMM
 	
 	This script adds two skills that can hurt, heal,
 	or inflict a user upon hitting or killing a target.
@@ -74,9 +75,11 @@
 	function needs to return a number.
 
 	Function Overwrites:
-	This plugin overwrites the UIBattleLayout._showDamageAnime
-	function. Be careful using this with other plugins that
-	modify this function.
+	This plugin overwrites the following functions:
+	- UIBattleLayout._showDamageAnime
+	- UnitDeathFlowEntry._completeMemberData
+	Be careful using this with other plugins that
+	modify these functions.
 */
 
 var RecoilControl = {
