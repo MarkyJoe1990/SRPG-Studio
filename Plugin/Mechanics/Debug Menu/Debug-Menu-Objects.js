@@ -35,6 +35,10 @@ var DebugMenu = defineObject(BaseListCommand, {
     },
 
     isCommandDisplayable: function() {
+        if (DebugMenuConfig.isForceDebugMenu === true) {
+            return true;
+        }
+
         return root.isTestPlay() && DebugMenuControl.getDebugEventArray().length > 0;
     },
 
